@@ -20,37 +20,33 @@
   },
   "topbarLinks": [
     {
-      "name": "Support111222",
-      "url": "mailto:hi@mintlify.com"
+      "name": "Feedback",
+      "url": "https://app.kaleido.so/addfeedback/4f0e7587-913e-4779-b214-4c28ca7cb2fe"
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Send your document",
+    "url": "https://sendforsign.com"
   },
   "tabs": [
     {
       "name": "API Reference",
       "url": "api-reference"
-    }
-  ],
-  "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
     },
     {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "name": "Changelog",
+      "url": "changelog"
     },
     {
       "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "blog"
+    },
+    {
+      "name": "About",
+      "url": "about"
     }
   ],
+ 
   "navigation": [
     {
       "group": "Get Started",
@@ -72,11 +68,22 @@
         "api-reference/endpoint/update",
         "api-reference/endpoint/delete"
       ]
+    },
+    {
+      "group": "Changelog",
+      "pages": ["changelog/2023"]
+    },
+    {
+      "group": "Blog",
+      "pages": ["blog/2023"]
+    },
+    {
+      "group": "About",
+      "pages": ["about/vision"]
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "twitter": "https://twitter.com/sendforsign",
+    "linkedin": "https://www.linkedin.com/company/sendforsign/about/"
   }
 }
