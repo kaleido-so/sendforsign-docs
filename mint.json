@@ -18,6 +18,10 @@
       "to": "#9563FF"
     }
   },
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": true
+  },
   "topbarLinks": [
     {
       "name": "Feedback",
