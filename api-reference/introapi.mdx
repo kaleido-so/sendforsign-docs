@@ -1,0 +1,58 @@
+---
+title: "Introduction"
+description: "Understand our general API concepts"
+---
+<Note>
+The Sendforsign API is currently in a **closed beta** phase. Please visit [this page](https://sendforsign.com/dev) to learn 
+more about the capabilities of our API and [request access](https://airtable.com/appQkioapPShnmKIS/shrOjrz2crM1rbv0K) to try it out in action.
+</Note>
+
+## Base URL
+
+Our API is organized around **REST**. It has predictable resource-oriented URLs. We enforce HTTPS in every request 
+to improve data security, integrity, and privacy. The API does not support HTTP.
+
+All requests contain the following base URL:
+```bash
+https://api.sendforsign.com
+```
+
+## Authentication
+
+The Sendforsign API uses API keys to authenticate requests. 
+You can view and manage your API keys in the Sendforsign Dashboard.
+
+Test mode secret keys have the prefix **sfs_test_** and live mode secret keys have 
+the prefix **sfs_live_**. 
+
+```bash
+const Sendforsign = require('sendforsign');
+const sendforsign = Sendforsign('sfs_test_4eC39HqLyjWDarjtT1zdp7dc');
+```
+
+
+## Response 
+Sendforsign uses standard HTTP codes to indicate the success or failure of your requests.
+
+In general, `2xx` HTTP codes correspond to success, `4xx` codes are for user-related failures, 
+and `5xx` codes are for infrastructure issues.
+
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| `200`    | Successful request.|
+| `400`    | Check that the parameters were correct.|
+| `401`    | The API key used was missing.|
+| `403`    | The API key used was invalid.|
+| `404`    | The resource was not found.|
+| `401`    | The API key used was missing.|
+| `429`    | The rate limit was exceeded.|
+| `5xx`    | Indicates an error with Sendforsign servers.|
+
+
+## Endpoints and limits
+<Note>
+We onboard new API customers every week. Every approved customer gains access to the complete Sendforsign API documentation, 
+including endpoints, usage limits, and support from our team.
+Please visit [this page](https://sendforsign.com/dev) to learn 
+more about the capabilities of our API and [request access](https://airtable.com/appQkioapPShnmKIS/shrOjrz2crM1rbv0K) to try it out in action.
+</Note>
