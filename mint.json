@@ -75,7 +75,7 @@
     },
     {
       "group": "About",
-      "pages": ["about/vision"]
+      "pages": ["about/vision", "about/termsandconditions", "about/privacypolicy"]
     }
   ],
   "footerSocials": {
