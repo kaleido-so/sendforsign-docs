@@ -55,7 +55,7 @@
     },
     {
       "group": "Zero-Setup Documents",
-      "pages": ["essentials/first"]
+      "pages": ["essentials/first", "essentials/options"]
     },
     {
       "group": "API Documentation",
