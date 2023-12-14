@@ -1,0 +1,34 @@
+---
+title: "Account structure"
+description: "Sendforsign account structure."
+---
+
+## Structure
+
+The Sendforsign (SFS) API uses different layers to secure access to any stored data within the platform:
+<Frame caption="Account structure">
+  <img src="/api-reference/img/structure.png" />
+</Frame>
+
+## Platform (You)
+
+A platform is a business that integrates the SFS API into its application. This integration is an essential component.
+
+Platform development teams connect to the SFS API using admin-level access tokens. 
+These tokens allow platforms to create, configure clients, and access all resources across various 
+platforms for which they develop software.
+
+## Client
+
+A client, who is a customer of a platform, can be either an organization or an individual. Each platform 
+serves one or more clients. Using a client's ID, it is possible to gain root access to all resources exclusively 
+associated with that particular client.
+
+## Client User
+
+This refers to the employees working for a client. The optional client user access layer is designed for 
+platforms that prefer using SFS's security features for quick development, instead of creating their own 
+custom access control systems.
+
+Through the SFS API, partners can establish customizable roles and permissions at the entity level. 
+SFS then automatically oversees and enforces access policies for each API interaction.

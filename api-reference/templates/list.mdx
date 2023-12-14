@@ -1,0 +1,80 @@
+---
+title: "List of templates"
+description: "Get list of templates."
+---
+
+Requesting a list, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+### Response
+
+  <ResponseField name="templates" type="string">
+    Array of templates.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="templateKey" type="string">
+    ID of the template.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Name of the template.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/template' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          'data': {
+				   'action': 'list',
+				   'clientKey': 'CLIENT_KEY',
+				  }
+     }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       'templates': [{
+                'createTime': '2023-12-01 12:18:55',
+				'changeTime': '2023-12-01 12:18:55',
+                'templateKey': 'TEMPLATE_KEY', 
+				'name': 'New template'
+		}],
+       'code': '200',
+       'message': 'Templates found'
+    } 
+```
+</ResponseExample>

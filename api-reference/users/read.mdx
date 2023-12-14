@@ -1,0 +1,124 @@
+---
+title: "Read user"
+description: "Read existing user."
+---
+
+Reading a user, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="client" type="string" required>
+  Structure, at least one of the fields must be filled.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="userKey" type="string">
+    ID of the user.  
+  </ParamField>
+
+  <ParamField body="fullname" type="string">
+    First and second names of the user.  
+  </ParamField>
+
+  <ParamField body="email" type="string">
+    Email of the user.  
+  </ParamField>
+
+  <ParamField body="customKey" type="string">
+    User custom key, if you used it when creating the client.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="user" type="string">
+    User structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="userKey" type="string">
+    ID of the user.
+  </ResponseField>
+
+  <ResponseField name="fullname" type="string">
+    First and second names of the user.
+  </ResponseField>
+
+  <ResponseField name="email" type="string">
+    Email of the user.
+  </ResponseField>
+
+  <ResponseField name="customKey" type="string">
+    User custom key, if you used it when creating the user.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/user' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  'data': {
+				   'action': 'read',
+				   'clientKey': 'CLIENT_KEY',
+				   'user': {
+							  'userKey': 'USER_KEY',
+							  'fullname': 'John Johnson',
+							  'email': 'john_johnson@mail.com', 
+							  'customKey': 'YOUR_COMBINATION'
+						     }
+				  }
+       }'
+
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       'user': {
+                'createTime': '2023-12-01 12:18:55',
+				'changeTime': '2023-12-01 12:18:55',
+                'userKey': 'USER_KEY', 
+				'fullname': 'John Johnson',
+    		    'email': 'john_johnson@mail.com', 
+				'customKey': 'YOUR_COMBINATION'
+		},
+       'code': '200',
+       'message': 'User found'
+    } 
+
+
+```
+</ResponseExample>

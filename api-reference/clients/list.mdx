@@ -1,0 +1,96 @@
+---
+title: "List of clients"
+description: "Get list of client."
+---
+
+Requesting a list, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+### Response
+
+  <ResponseField name="clients" type="string">
+    Array of clients.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="clientKey" type="string">
+    ID of the client.
+  </ResponseField>
+
+  <ResponseField name="fullname" type="string">
+    First and second names of the client.
+  </ResponseField>
+
+  <ResponseField name="email" type="string">
+    Email of the client.
+  </ResponseField>
+
+  <ResponseField name="organization" type="string">
+    Organization name.
+  </ResponseField>
+
+  <ResponseField name="customKey" type="string">
+    Client custom key, if you used it when creating the client.
+  </ResponseField>
+
+  <ResponseField name="multiple" type="boolean">
+    This parameter indicates that this client has users.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/client' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          'data': {
+				   'action': 'list'
+				  }
+     }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       'clients': [{
+                'createTime': '2023-12-01 12:18:55',
+				'changeTime': '2023-12-01 12:18:55',
+                'clientKey': 'CLIENT_KEY', 
+				'fullname': 'John Johnson',
+    		    'email': 'john_johnson@mail.com',
+				'organization': 'Company Inc.',
+				'customKey': 'YOUR_COMBINATION',
+				'multiple': true
+		}],
+       'code': '200',
+       'message': 'Clients found'
+    } 
+
+```
+</ResponseExample>

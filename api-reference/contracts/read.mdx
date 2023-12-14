@@ -1,0 +1,109 @@
+---
+title: "Read contract"
+description: "Read existing contract."
+---
+
+Reading a contract, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="contract" type="string" required>
+  Structure, at least one of the fields must be filled.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="contractKey" type="string">
+    ID of the contract.
+  </ParamField>
+
+  <ParamField body="name" type="string">
+    Name of the contract.  
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="contract" type="string">
+    Contract structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="contractKey" type="string">
+    ID of the contract.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Name of the contract.
+  </ResponseField>
+
+  <ResponseField name="value" type="string">
+    Content of the contract, HTML.
+  </ResponseField>
+
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  'data': {
+				   'action': 'read',
+				   'clientKey': 'CLIENT_KEY',
+				   'contract': {
+							  'contractKey': 'CONTRACT_KEY', 
+							  'name': 'New contract'
+						     }
+				  }
+       }'
+
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       'contract': {
+                'createTime': '2023-12-01 12:18:55',
+				'changeTime': '2023-12-01 12:18:55',
+                'contractKey': 'CONTRACT_KEY', 
+				'name': 'New contract',
+				'value': '<p>Contract text</p>'
+		},
+       'code': '200',
+       'message': 'Contract found'
+    } 
+
+```
+</ResponseExample>

@@ -29,13 +29,17 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Send your document",
+    "name": "Get started",
     "url": "https://sendforsign.com"
   },
   "tabs": [
     {
       "name": "API Reference",
       "url": "api-reference"
+    },
+    {
+      "name": "React Components",
+      "url": "sdk"
     },
     {
       "name": "Changelog",
@@ -59,7 +63,52 @@
     },
     {
       "group": "API Documentation",
-      "pages": ["api-reference/introapi"]
+      "pages": [
+        "api-reference/introapi", 
+        "api-reference/structure",
+        "api-reference/implementation"
+      ]
+    },
+    {
+      "group": "Clients",
+      "pages": [
+        "api-reference/clients/create",
+        "api-reference/clients/update",
+        "api-reference/clients/read",
+        "api-reference/clients/list"
+      ]
+    },
+    {
+      "group": "Users",
+      "pages": [
+        "api-reference/users/create",
+        "api-reference/users/update",
+        "api-reference/users/read",
+        "api-reference/users/list"
+
+      ]
+    },
+    {
+      "group": "Contracts",
+      "pages": [
+        "api-reference/contracts/create",
+        "api-reference/contracts/update",
+        "api-reference/contracts/read",
+        "api-reference/contracts/list"
+      ]
+    },
+    {
+      "group": "Templates",
+      "pages": [
+        "api-reference/templates/create",
+        "api-reference/templates/update",
+        "api-reference/templates/read",
+        "api-reference/templates/list"
+      ]
+    },
+    {
+      "group": "React Components",
+      "pages": ["sdk/introsdk"]
     },
 
     {

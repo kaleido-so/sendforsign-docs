@@ -1,0 +1,150 @@
+---
+title: "Create client"
+description: "Create new client."
+---
+
+Registering a new client, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="client" type="string" required>
+  Structure, at least one of the fields must be filled.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="fullname" type="string">
+    First and second names of the client.  
+  </ParamField>
+
+  <ParamField body="email" type="string">
+    Email of the client.  
+  </ParamField>
+
+  <ParamField body="organization" type="string">
+    Organization name.  
+  </ParamField>
+
+  <ParamField body="customKey" type="string">
+    Your custom key, if you don't need to use any of the above fields. 
+  </ParamField>
+
+  <ParamField body="users" type="string">
+    Array of users, optional.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="fullname" type="string">
+    First and second names of the user.  
+  </ParamField>
+
+  <ParamField body="email" type="string">
+    Email of the user.  
+  </ParamField>
+
+  <ParamField body="customKey" type="string">
+    A custom user key, if you don't need to use any of the above fields. 
+  </ParamField>
+
+  </Expandable>
+
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="client" type="string">
+    Client structure.
+
+  <Expandable title="child attribute">
+
+<ResponseField name="createTime" type="string">
+  Create time.
+</ResponseField>
+
+<ResponseField name="clientKey" type="string">
+  ID of the client.
+</ResponseField>
+
+  <ResponseField name="users" type="string">
+    Array of users.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.  
+  </ResponseField>
+
+  <ResponseField name="default" type="string">
+    The default user flag.  
+  </ResponseField>
+
+  <ResponseField name="userKey" type="string">
+    ID of the user.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+    </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  'data': {
+				   'action': 'create',
+				   'client': {
+							  'fullname': 'John Johnson',
+							  'email': 'john_johnson@mail.com',
+							  'organization': 'Company Inc.',
+							  'customKey': 'YOUR_COMBINATION',
+							  'multiple': true,
+							  'users': [{
+								'fullname': 'John Johnson',
+							    'email': 'john_johnson@mail.com', 
+							    'customKey': 'YOUR_COMBINATION',
+							  }]
+						     }
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+     {
+       'client': {
+                'createTime': '2023-12-01 12:18:55',
+                'clientKey': 'CLIENT_KEY',
+				'users': [{
+					'createTime': '2023-12-01 12:18:55',
+					'default': true,
+					'userKey': 'USER_KEY',
+				}]
+                 },
+       'code': '201',
+       'message': 'Client created'
+    }
+
+```
+</ResponseExample>

@@ -1,0 +1,107 @@
+---
+title: "Read template"
+description: "Read existing template."
+---
+
+Reading a template, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="templateKey" type="string" required>
+  ID of the template.
+</ParamField>
+
+<ParamField body="template" type="string" required>
+  Structure, at least one of the fields must be filled.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="templateKey" type="string">
+    ID of the template.
+  </ParamField>
+
+  <ParamField body="name" type="string">
+    Name of the template.  
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="template" type="string">
+    Template structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="templateKey" type="string">
+    ID of the template.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Name of the template.
+  </ResponseField>
+
+  <ResponseField name="value" type="string">
+    Content of the template, HTML.
+  </ResponseField>
+
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  'data': {
+				   'action': 'read',
+				   'clientKey': 'CLIENT_KEY',
+				   'template': {
+							  'templateKey': 'TEMPLATE_KEY', 
+							  'name': 'New template'
+						     }
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       'template': {
+                'createTime': '2023-12-01 12:18:55',
+				'changeTime': '2023-12-01 12:18:55',
+                'templateKey': 'TEMPLATE_KEY', 
+				'name': 'New template',
+				'value': '<p>Template text</p>'
+		},
+       'code': '200',
+       'message': 'Template found'
+    }
+```
+</ResponseExample>

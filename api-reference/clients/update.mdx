@@ -1,0 +1,103 @@
+---
+title: "Update client"
+description: "Update existing client."
+---
+
+Updating a client, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="client" type="string" required>
+  Structure, use the fields that should be updated.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="clientKey" type="string" required>
+    ID of the client.  
+  </ParamField>
+
+  <ParamField body="fullname" type="string">
+    First and second names of the client.  
+  </ParamField>
+
+  <ParamField body="email" type="string">
+    Email of the client.  
+  </ParamField>
+
+  <ParamField body="organization" type="string">
+    Organization name.  
+  </ParamField>
+
+  <ParamField body="customKey" type="string">
+    Client custom key, if you used it when creating the client.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="client" type="string">
+    Client structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="clientKey" type="string">
+    ID of the client.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  'data': {
+				   'action': 'update',
+				   'client': {
+							  'clientKey': 'CLIENT_KEY',
+							  'fullname': 'John Johnson',
+							  'email': 'john_johnson@mail.com',
+							  'organization': 'Company Inc.',
+							  'customKey': 'YOUR_COMBINATION'
+						     }
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	  {
+       'client': {
+                'changeTime': '2023-12-01 12:18:55',
+                'clientKey': 'CLIENT_KEY', 
+		},
+       'code': '201',
+       'message': 'Client updated'
+    } 
+
+
+```
+</ResponseExample>

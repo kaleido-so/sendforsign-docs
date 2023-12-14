@@ -1,0 +1,33 @@
+---
+title: "Implementation Overview"
+description: "Get started with Sendforsign API."
+---
+
+To summarize, setting up involves two main steps: first, establishing the server side, which includes creating a 
+Platform user, a Client, and optionally Client users. After that, you move on to setting up the client side, where 
+you can either use the SFS API or React components, the latter being a more straightforward approach for starting with SFS.
+
+## Server Side
+
+From the server side perspective, you need to create several fundamental objects:
+
+- Generate a platform access token (representing your platform).
+- Create a client for each business that use your platform.
+- Create client users for each end-user of the businesses on your platform.
+- Generate a token for each user.
+
+Once these steps are completed, you can proceed to the client side setup.
+
+## Client Side
+
+SFS offers two methods for platforms to smoothly integrate their applications with SFS services:
+
+- React Components:
+    - The SFS React UI SDK is a collection of pre-made React components linked to the API, suitable for 
+    React-based client and server-side applications. This option lets you maintain control over the design and 
+    branding while SFS manages the more complex tasks.
+- API Only:
+    - With API-only integration, platforms interact with SFS services by sending direct requests to SFS servers 
+    using the provided API endpoints. This method offers full control over your integration process, enabling you to 
+    implement necessary API calls within your application. It allows you the freedom to manage your backend logic while 
+    utilizing the services offered by SFS.
