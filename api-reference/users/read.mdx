@@ -89,36 +89,33 @@ curl -X POST 'https://api.sendforsign.com/v1/user' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-		  'data': {
-				   'action': 'read',
-				   'clientKey': 'CLIENT_KEY',
-				   'user': {
-							  'userKey': 'USER_KEY',
-							  'fullname': 'John Johnson',
-							  'email': 'john_johnson@mail.com', 
-							  'customKey': 'YOUR_COMBINATION'
+		  "data": {
+				   "action": "read",
+				   "clientKey": "CLIENT_KEY",
+				   "user": {
+							  "userKey": "USER_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com", 
+							  "customKey": "YOUR_COMBINATION"
 						     }
 				  }
        }'
-
 ```
 </RequestExample>
 
 <ResponseExample>
 ```json Response
 	{
-       'user': {
-                'createTime': '2023-12-01 12:18:55',
-				'changeTime': '2023-12-01 12:18:55',
-                'userKey': 'USER_KEY', 
-				'fullname': 'John Johnson',
-    		    'email': 'john_johnson@mail.com', 
-				'customKey': 'YOUR_COMBINATION'
+       "user": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "userKey": "USER_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com", 
+				"customKey": "YOUR_COMBINATION"
 		},
-       'code': '200',
-       'message': 'User found'
+       "code": "200",
+       "message": "User found"
     } 
-
-
 ```
 </ResponseExample>
