@@ -73,14 +73,14 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-		  'data': {
-				   'action': 'update',
-				   'client': {
-							  'clientKey': 'CLIENT_KEY',
-							  'fullname': 'John Johnson',
-							  'email': 'john_johnson@mail.com',
-							  'organization': 'Company Inc.',
-							  'customKey': 'YOUR_COMBINATION'
+		  "data": {
+				   "action": "update",
+				   "client": {
+							  "clientKey": "CLIENT_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION"
 						     }
 				  }
        }'
@@ -90,14 +90,12 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
 <ResponseExample>
 ```json Response
 	  {
-       'client': {
-                'changeTime': '2023-12-01 12:18:55',
-                'clientKey': 'CLIENT_KEY', 
+       "client": {
+                "changeTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY", 
 		},
-       'code': '201',
-       'message': 'Client updated'
+       "code": "201",
+       "message": "Client updated"
     } 
-
-
 ```
 </ResponseExample>

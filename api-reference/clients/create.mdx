@@ -111,18 +111,18 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-		  'data': {
-				   'action': 'create',
-				   'client': {
-							  'fullname': 'John Johnson',
-							  'email': 'john_johnson@mail.com',
-							  'organization': 'Company Inc.',
-							  'customKey': 'YOUR_COMBINATION',
-							  'multiple': true,
-							  'users': [{
-								'fullname': 'John Johnson',
-							    'email': 'john_johnson@mail.com', 
-							    'customKey': 'YOUR_COMBINATION',
+		  "data": {
+				   "action": "create",
+				   "client": {
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION",
+							  "multiple": true,
+							  "users": [{
+								"fullname": "John Johnson",
+							    "email": "john_johnson@mail.com", 
+							    "customKey": "YOUR_COMBINATION",
 							  }]
 						     }
 				  }
@@ -133,18 +133,17 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
 <ResponseExample>
 ```json Response
      {
-       'client': {
-                'createTime': '2023-12-01 12:18:55',
-                'clientKey': 'CLIENT_KEY',
-				'users': [{
-					'createTime': '2023-12-01 12:18:55',
-					'default': true,
-					'userKey': 'USER_KEY',
+       "client": {
+                "createTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY",
+				"users": [{
+					"createTime": "2023-12-01 12:18:55",
+					"default": true,
+					"userKey": "USER_KEY",
 				}]
                  },
-       'code': '201',
-       'message': 'Client created'
+       "code": "201",
+       "message": "Client created"
     }
-
 ```
 </ResponseExample>

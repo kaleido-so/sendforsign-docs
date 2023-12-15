@@ -78,12 +78,12 @@ curl -X POST 'https://api.sendforsign.com/v1/contract' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-		  'data': {
-				   'action': 'read',
-				   'clientKey': 'CLIENT_KEY',
-				   'contract': {
-							  'contractKey': 'CONTRACT_KEY', 
-							  'name': 'New contract'
+		  "data": {
+				   "action": "read",
+				   "clientKey": "CLIENT_KEY",
+				   "contract": {
+							  "contractKey": "CONTRACT_KEY", 
+							  "name": "New contract"
 						     }
 				  }
        }'
@@ -94,16 +94,15 @@ curl -X POST 'https://api.sendforsign.com/v1/contract' \
 <ResponseExample>
 ```json Response
 	{
-       'contract': {
-                'createTime': '2023-12-01 12:18:55',
-				'changeTime': '2023-12-01 12:18:55',
-                'contractKey': 'CONTRACT_KEY', 
-				'name': 'New contract',
-				'value': '<p>Contract text</p>'
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY", 
+				"name": "New contract",
+				"value": "<p>Contract text</p>"
 		},
-       'code': '200',
-       'message': 'Contract found'
+       "code": "200",
+       "message": "Contract found"
     } 
-
 ```
 </ResponseExample>

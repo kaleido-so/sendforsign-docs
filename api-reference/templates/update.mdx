@@ -73,13 +73,13 @@ curl -X POST 'https://api.sendforsign.com/v1/template' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-		  'data': {
-				   'action': 'update',
-				   'clientKey': 'CLIENT_KEY', 
-				   'template': {
-							  'templateKey': 'TEMPLATE_KEY', 
-							  'name': 'New template',
-							  'value': '<p>Template text</p>'
+		  "data": {
+				   "action": "update",
+				   "clientKey": "CLIENT_KEY", 
+				   "template": {
+							  "templateKey": "TEMPLATE_KEY", 
+							  "name": "New template",
+							  "value": "<p>Template text</p>"
 						     }
 				  }
        }'
@@ -89,13 +89,13 @@ curl -X POST 'https://api.sendforsign.com/v1/template' \
 <ResponseExample>
 ```json Response
 	{
-       'template': {
-                'createTime': '2023-12-01 12:18:55',
-                'changeTime': '2023-12-01 12:18:55',
-                'templateKey': 'TEMPLATE_KEY', 
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "changeTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY", 
 		},
-       'code': '201',
-       'message': 'Template updated'
+       "code": "201",
+       "message": "Template updated"
     } 
 ```
 </ResponseExample>

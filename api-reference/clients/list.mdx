@@ -68,8 +68,8 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
-          'data': {
-				   'action': 'list'
+          "data": {
+				   "action": "list"
 				  }
      }'
 ```
@@ -78,19 +78,18 @@ curl -X POST 'https://api.sendforsign.com/v1/client' \
 <ResponseExample>
 ```json Response
 	{
-       'clients': [{
-                'createTime': '2023-12-01 12:18:55',
-				'changeTime': '2023-12-01 12:18:55',
-                'clientKey': 'CLIENT_KEY', 
-				'fullname': 'John Johnson',
-    		    'email': 'john_johnson@mail.com',
-				'organization': 'Company Inc.',
-				'customKey': 'YOUR_COMBINATION',
-				'multiple': true
+       "clients": [{
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com",
+				"organization": "Company Inc.",
+				"customKey": "YOUR_COMBINATION",
+				"multiple": true
 		}],
-       'code': '200',
-       'message': 'Clients found'
+       "code": "200",
+       "message": "Clients found"
     } 
-
 ```
 </ResponseExample>
