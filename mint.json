@@ -92,9 +92,16 @@
       "group": "Contracts",
       "pages": [
         "api-reference/contracts/create",
+        "api-reference/contracts/create-send",
         "api-reference/contracts/update",
         "api-reference/contracts/read",
         "api-reference/contracts/list"
+      ]
+    },
+    {
+      "group": "Emails",
+      "pages": [
+        "api-reference/emails/send"
       ]
     },
     {

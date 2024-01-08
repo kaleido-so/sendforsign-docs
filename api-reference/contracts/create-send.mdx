@@ -1,0 +1,132 @@
+---
+title: "Create and send contract"
+description: "Create new contract and send to recipients."
+---
+
+Creating and sending new contract, use the API key from the personal account in the header.
+
+### Request
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="userKey" type="string">
+  ID of the user who create the contract. If not specified, the default user credentials will be used.
+</ParamField>
+
+<ParamField body="contract" type="string" required>
+  Contract structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="name" type="string">
+    Name of the contract.  
+  </ParamField>
+
+  <ParamField body="value" type="string">
+    Content of the contract, use HTML.  
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+<ParamField body="recipients" type="string">
+  Array of recipients, optional.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="action" type="string">
+    What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  </ParamField>
+
+  <ParamField body="customMessage" type="string">
+    Custom note to the recipient. If not specified, the default message will be sent.
+  </ParamField>
+
+  <ParamField body="fullname" type="string">
+    Full name of the recipient.
+  </ParamField>
+
+  <ParamField body="email" type="string" required>
+    Email of the recipient.  
+  </ParamField>
+
+  <ParamField body="position" type="number">
+    Signing order. If not specified, all requests will be sent simultaneously.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="contract" type="string">
+    Contract structure.
+
+  <Expandable title="child attribute">
+
+<ResponseField name="createTime" type="string">
+  Create time.
+</ResponseField>
+
+<ResponseField name="contractKey" type="string">
+  ID of the contract.
+</ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/v1/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contract": {
+							  "name": "New contract",
+							  "value": "<p>Contract text</p>"
+						     },
+           "recipients":[{
+                "action": "view",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson@mail.com", 
+                "position": 1
+               }], 
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+     {
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY"
+                 },
+       "code": "201",
+       "message": "Contract created"
+    }
+```
+</ResponseExample>
