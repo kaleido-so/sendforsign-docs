@@ -92,6 +92,7 @@
       "group": "Contracts",
       "pages": [
         "api-reference/contracts/create",
+        "api-reference/contracts/create-from-template",
         "api-reference/contracts/create-send",
         "api-reference/contracts/update",
         "api-reference/contracts/read",

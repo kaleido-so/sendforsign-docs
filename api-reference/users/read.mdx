@@ -1,11 +1,9 @@
 ---
 title: "Read user"
-description: "Read existing user."
+description: "Get information about a specific user."
 ---
 
-Reading a user, use the API key from the personal account in the header.
-
-### Request
+### Body parameters
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -15,7 +13,7 @@ Reading a user, use the API key from the personal account in the header.
   ID of the client.
 </ParamField>
 
-<ParamField body="client" type="string" required>
+<ParamField body="user" type="string" required>
   Structure, at least one of the fields must be filled.
 
   <Expandable title="child attribute">

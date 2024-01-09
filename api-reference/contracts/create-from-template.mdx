@@ -1,6 +1,6 @@
 ---
-title: "Update contract"
-description: "Update an existing contract."
+title: "Create from template"
+description: "Create a new contract using an existing template."
 ---
 
 ### Body parameters
@@ -13,21 +13,21 @@ description: "Update an existing contract."
   ID of the client.
 </ParamField>
 
+<ParamField body="userKey" type="string">
+  ID of the user who create the contract. If not specified, the default user credentials will be used.
+</ParamField>
+
 <ParamField body="contract" type="string" required>
-  Structure, use the fields that should be updated.
+  Contract structure.
 
   <Expandable title="child attribute">
-
-  <ParamField body="contractKey" type="string" required>
-    ID of the contract.  
-  </ParamField>
 
   <ParamField body="name" type="string">
     Name of the contract.  
   </ParamField>
 
-  <ParamField body="value" type="string">
-    Content of the contract, use HTML.  
+  <ParamField body="templateKey" type="string">
+    Template from which you are creating a contract.
   </ParamField>
 
   </Expandable>
@@ -41,17 +41,13 @@ description: "Update an existing contract."
 
   <Expandable title="child attribute">
 
-  <ResponseField name="createTime" type="string">
-    Create time.
-  </ResponseField>
-  
-  <ResponseField name="changeTime" type="string">
-    Change time.
-  </ResponseField>
+<ResponseField name="createTime" type="string">
+  Create time.
+</ResponseField>
 
-  <ResponseField name="contractKey" type="string">
-    ID of the contract.
-  </ResponseField>
+<ResponseField name="contractKey" type="string">
+  ID of the contract.
+</ResponseField>
 
   </Expandable>
 
@@ -72,12 +68,12 @@ curl -X POST 'https://api.sendforsign.com/v1/contract' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
-				   "action": "update",
-				   "clientKey": "CLIENT_KEY", 
+				   "action": "create",
+				   "clientKey": "CLIENT_KEY",
+                   "userKey": "USER_KEY", 
 				   "contract": {
-							  "contractKey": "CONTRACT_KEY", 
 							  "name": "New contract",
-							  "value": "<p>Contract text</p>"
+							  "templateKey": "TEMPLATE_KEY"
 						     }
 				  }
        }'
@@ -86,14 +82,13 @@ curl -X POST 'https://api.sendforsign.com/v1/contract' \
 
 <ResponseExample>
 ```json Response
-	{
+     {
        "contract": {
                 "createTime": "2023-12-01 12:18:55",
-                "changeTime": "2023-12-01 12:18:55",
-                "contractKey": "CONTRACT_KEY", 
-		},
+                "contractKey": "CONTRACT_KEY"
+                 },
        "code": "201",
-       "message": "Contract updated"
-    } 
+       "message": "Contract created"
+    }
 ```
 </ResponseExample>
