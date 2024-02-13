@@ -29,7 +29,7 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Get started",
+    "name": "Landing page",
     "url": "https://sendforsign.com"
   },
   "tabs": [
@@ -121,7 +121,7 @@
 
     {
       "group": "Changelog",
-      "pages": ["changelog/2023"]
+      "pages": ["changelog/2024", "changelog/2023"]
     },
 
     {
