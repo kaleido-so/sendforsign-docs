@@ -1,0 +1,105 @@
+---
+title: "List of placeholders"
+description: "Get a list of all placeholders created in a specific contract or template."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="templateKey" type="string">
+  ID of the template. Use this parameter if you need to retrieve a template's placeholders.
+</ParamField>
+
+<ParamField body="contractKey" type="string">
+  ID of the contract. Use this parameter if you need to retrieve a contract's placeholders.
+</ParamField>
+
+### Response
+
+  <ResponseField name="placeholders" type="string">
+    Array of placeholders.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="id" type="string">
+    ID of the placeholder.
+  </ResponseField>
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Name of the placeholder.
+  </ResponseField>
+
+  <ResponseField name="value" type="string">
+    Value of the placeholder.
+  </ResponseField>
+
+  <ResponseField name="placeholderKey" type="string">
+    Key of the placeholder.
+  </ResponseField>
+
+  <ResponseField name="position" type="string">
+    Position of the placeholder.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "CLIENT_KEY",
+              "contractKey": "CONTRACT_KEY",
+              "templateKey": "TEMPLATE_KEY"
+				  }
+     }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "placeholders": [
+        {
+            "id": "1",
+            "createTime": "2024-02-26T11:07:55.000Z",
+            "changeTime": "2024-02-26T11:07:59.000Z",
+            "name": "Placeholder Name",
+            "value": "Placeholder Value",
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "position": 1
+        }
+    ],
+    "code": "200",
+    "message": "Placeholders found"
+}
+```
+</ResponseExample>

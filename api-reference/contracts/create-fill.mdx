@@ -1,7 +1,11 @@
 ---
-title: "Create and send contract"
-description: "Create a new contract and immediately send it to the recipients."
+title: "Create and fill in contract"
+description: "Create a new contract and populate it with the necessary data."
 ---
+
+The best way to fill in contracts is to prepare a template that already contains all the necessary 
+placeholders in the text. This way, you can populate the necessary data in the right placeholders within 
+the contracts with a single API call.
 
 ### Body parameters
 
@@ -26,37 +30,30 @@ description: "Create a new contract and immediately send it to the recipients."
     Name of the contract.  
   </ParamField>
 
-  <ParamField body="value" type="string">
-    Content of the contract, use HTML.  
+  <ParamField body="templateKey" type="string">
+    Template from which you are creating a contract.
   </ParamField>
 
   </Expandable>
 
 </ParamField>
 
-<ParamField body="recipients" type="string">
-  Array of recipients, optional.
+<ParamField body="placeholders" type="string">
+  Array of placeholders, optional.
 
   <Expandable title="child attribute">
 
-  <ParamField body="action" type="string">
-    What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  <ParamField body="placeholderKey" type="string">
+    A placeholder key corresponds to a specific placeholder in the template from which you create a contract. 
+    Use this parameter if you need to populate any value into this specific placeholder.
   </ParamField>
 
-  <ParamField body="customMessage" type="string">
-    Custom note to the recipient. If not specified, the default message will be sent.
+  <ParamField body="name" type="string">
+    Name of the placeholder.
   </ParamField>
 
-  <ParamField body="fullname" type="string">
-    Full name of the recipient.
-  </ParamField>
-
-  <ParamField body="email" type="string" required>
-    Email of the recipient.  
-  </ParamField>
-
-  <ParamField body="position" type="number">
-    Signing order. If not specified, all requests will be sent simultaneously.
+  <ParamField body="value" type="string">
+    Value of the placeholder.
   </ParamField>
 
   </Expandable>
@@ -95,24 +92,27 @@ description: "Create a new contract and immediately send it to the recipients."
 curl -X POST 'https://api.sendforsign.com/api/contract' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
-     -d '{ 
-		  "data": {
-				   "action": "create",
-				   "clientKey": "CLIENT_KEY",
-                   "userKey": "USER_KEY", 
-				   "contract": {
-							  "name": "New contract",
-							  "value": "<p>Contract text</p>"
-						     },
-           "recipients":[{
-                "action": "view",
-                "customMessage": "Custom message text",
-                "fullname": "John Johnson", 
-                "email": "john_johnson@mail.com", 
-                "position": 1
-               }] 
-				  }
-       }'
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "CLIENT_KEY",
+        "userKey": "USER_KEY",
+        "contract": {
+            "name": "New contract",
+            "templateKey": "TEMPLATE_KEY"
+        },
+        "placeholders": [
+            {
+                "placeholderKey": "PLACEHOLDER_KEY",
+                "value": "Placeholder value"
+            },
+            {
+                "name": "Placeholder name",
+                "value": "Placeholder value"
+            }
+        ]
+    }
+}'
 ```
 </RequestExample>
 
