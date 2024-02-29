@@ -70,58 +70,57 @@
       ]
     },
     {
-      "group": "Clients",
+      "group": "Client",
       "pages": [
-        "api-reference/clients/create",
-        "api-reference/clients/update",
-        "api-reference/clients/read",
-        "api-reference/clients/list"
+        "api-reference/client/create",
+        "api-reference/client/update",
+        "api-reference/client/read",
+        "api-reference/client/list"
       ]
     },
     {
-      "group": "Users",
+      "group": "User",
       "pages": [
-        "api-reference/users/create",
-        "api-reference/users/update",
-        "api-reference/users/read",
-        "api-reference/users/list"
+        "api-reference/user/create",
+        "api-reference/user/update",
+        "api-reference/user/read",
+        "api-reference/user/list"
+      ]
+    },
+    {
+      "group": "Contract",
+      "pages": [
+        "api-reference/contract/create",
+        "api-reference/contract/create-from-template",
+        "api-reference/contract/create-send",
+        "api-reference/contract/create-fill",
+        "api-reference/contract/update",
+        "api-reference/contract/read",
+        "api-reference/contract/list"
+      ]
+    },
+    {
+      "group": "Placeholder",
+      "pages": [
+        "api-reference/placeholder/create",
+        "api-reference/placeholder/list"
+      ]
+    },
+    {
+      "group": "Recipient",
+      "pages": [
+        "api-reference/recipient/create",
+        "api-reference/recipient/send"
 
       ]
     },
     {
-      "group": "Contracts",
+      "group": "Template",
       "pages": [
-        "api-reference/contracts/create",
-        "api-reference/contracts/create-from-template",
-        "api-reference/contracts/create-send",
-        "api-reference/contracts/create-fill",
-        "api-reference/contracts/update",
-        "api-reference/contracts/read",
-        "api-reference/contracts/list"
-      ]
-    },
-    {
-      "group": "Placeholders",
-      "pages": [
-        "api-reference/placeholders/create",
-        "api-reference/placeholders/list"
-      ]
-    },
-    {
-      "group": "Recipients",
-      "pages": [
-        "api-reference/recipients/create",
-        "api-reference/recipients/send"
-
-      ]
-    },
-    {
-      "group": "Templates",
-      "pages": [
-        "api-reference/templates/create",
-        "api-reference/templates/update",
-        "api-reference/templates/read",
-        "api-reference/templates/list"
+        "api-reference/template/create",
+        "api-reference/template/update",
+        "api-reference/template/read",
+        "api-reference/template/list"
       ]
     },
     {
