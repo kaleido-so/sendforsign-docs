@@ -29,7 +29,7 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Landing page",
+    "name": "sendforsign.com",
     "url": "https://sendforsign.com"
   },
   "tabs": [
@@ -93,6 +93,7 @@
       "pages": [
         "api-reference/contracts/create",
         "api-reference/contracts/create-from-template",
+        "api-reference/contracts/send",
         "api-reference/contracts/create-send",
         "api-reference/contracts/create-fill",
         "api-reference/contracts/update",
@@ -103,14 +104,14 @@
     {
       "group": "Placeholders",
       "pages": [
-        "api-reference/placeholders/add",
+        "api-reference/placeholders/create",
         "api-reference/placeholders/list"
       ]
     },
     {
-      "group": "Emails",
+      "group": "Recipients",
       "pages": [
-        "api-reference/emails/send"
+        "api-reference/recipients/create"
       ]
     },
     {

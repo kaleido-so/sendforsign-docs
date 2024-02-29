@@ -22,9 +22,15 @@ description: "Send an existing contract to recipients for signing, approval and 
 </ParamField>
 
 <ParamField body="recipients" type="string">
-  Array of recipients, optional.
+  Array of recipients, optional. If no array of recipients is provided, 
+  the system will send the contract to those recipients who were added previously.
 
   <Expandable title="child attribute">
+
+  <ParamField body="recipientKey" type="string">
+    A recipient key corresponds to an existing recipient in the contract you are sending. 
+    Use this parameter if you need to update any parameter of this specific recipient.
+  </ParamField>
 
   <ParamField body="action" type="string">
     What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
@@ -66,7 +72,7 @@ description: "Send an existing contract to recipients for signing, approval and 
 
 <RequestExample>
 ```bash cURL
-curl -X POST 'https://api.sendforsign.com/api/email' \
+curl -X POST 'https://api.sendforsign.com/api/contract' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
@@ -75,13 +81,23 @@ curl -X POST 'https://api.sendforsign.com/api/email' \
 				   "clientKey": "CLIENT_KEY",
                    "userKey": "USER_KEY", 
 				   "contractKey": "CONTRACT_KEY",
-           "recipients":[{
+           "recipients":[
+            {
+                "recipientKey": "RECIPIENT_KEY",
+                "action": "sign",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson1@mail.com", 
+                "position": 1
+            },
+            {
                 "action": "view",
                 "customMessage": "Custom message text",
                 "fullname": "John Johnson", 
-                "email": "john_johnson@mail.com", 
-                "position": 1
-               }], 
+                "email": "john_johnson2@mail.com", 
+                "position": 2
+            }
+               ], 
 				  }
        }'
 ```

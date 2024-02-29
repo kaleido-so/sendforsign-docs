@@ -1,0 +1,102 @@
+---
+title: "Create recipient"
+description: "Add a recipient to a contract."
+---
+
+One way to add recipients to a contract is when you send a contract. 
+[See this page](/api-reference/contracts/send) to learn more.
+
+If you need to add a recipient to a contract without sending it, use the request below.
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="userKey" type="string">
+  ID of the user who is sending the contract. If not specified, the default user credentials will be used.
+</ParamField>
+
+<ParamField body="contractKey" type="string" required>
+  ID of the contract.
+</ParamField>
+
+<ParamField body="recipients" type="string">
+  Array of recipients, optional.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="action" type="string">
+    What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  </ParamField>
+
+  <ParamField body="customMessage" type="string">
+    Custom note to the recipient. If not specified, the default message will be sent.
+  </ParamField>
+
+  <ParamField body="fullname" type="string">
+    Full name of the recipient.
+  </ParamField>
+
+  <ParamField body="email" type="string" required>
+    Email of the recipient.  
+  </ParamField>
+
+  <ParamField body="position" type="number">
+    Signing order. If not specified, all requests will be sent simultaneously.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="result" type="boolean">
+    Status.
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "CLIENT_KEY",
+				   "contractKey": "CONTRACT_KEY",
+           "recipients":[{
+                "action": "view",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson@mail.com", 
+                "position": 1
+               }], 
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+     {
+       "result": true,
+       "code": "200",
+       "message": "Recipient created"
+    }
+```
+</ResponseExample>
