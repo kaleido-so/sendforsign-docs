@@ -93,7 +93,6 @@
       "pages": [
         "api-reference/contracts/create",
         "api-reference/contracts/create-from-template",
-        "api-reference/contracts/send",
         "api-reference/contracts/create-send",
         "api-reference/contracts/create-fill",
         "api-reference/contracts/update",
@@ -111,7 +110,9 @@
     {
       "group": "Recipients",
       "pages": [
-        "api-reference/recipients/create"
+        "api-reference/recipients/create",
+        "api-reference/recipients/send"
+
       ]
     },
     {
