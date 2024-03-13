@@ -55,11 +55,15 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "safe"]
+      "pages": ["introduction"]
     },
     {
-      "group": "Zero-Setup Documents",
-      "pages": ["essentials/first", "essentials/options"]
+      "group": "Use cases",
+      "pages": [
+        "usecase/firstdoc",
+        "usecase/firsttemplate" 
+ 
+      ]
     },
     {
       "group": "API Documentation",
@@ -110,8 +114,8 @@
       "group": "Recipient",
       "pages": [
         "api-reference/recipient/create",
-        "api-reference/recipient/send"
-
+        "api-reference/recipient/send",
+        "api-reference/recipient/list"
       ]
     },
     {
@@ -124,10 +128,19 @@
       ]
     },
     {
-      "group": "React Components",
+      "group": "Components Documentation",
       "pages": ["sdk/introsdk"]
     },
+    {
+      "group": "Components",
+      "pages": [
+        "sdk/components/contracteditor",
+        "sdk/components/contractlist",
+        "sdk/components/templateeditor",
+        "sdk/components/templatelist"
 
+      ]
+    },
     {
       "group": "Changelog",
       "pages": ["changelog/2024", "changelog/2023"]
@@ -138,7 +151,8 @@
       "pages": [
         "about/vision",
         "about/termsandconditions",
-        "about/privacypolicy"
+        "about/privacypolicy",
+        "about/compliance"
       ]
     }
   ],

@@ -1,0 +1,34 @@
+---
+title: "Template Editor"
+---
+
+The `Template Editor` component is a React component that renders the entire Editor. 
+This component provides the ability to create new templates and open existing templates.
+
+### Preview
+
+<Frame caption="Template component">
+  <img src="/sdk/img/template.png" />
+</Frame>
+
+## Usage
+
+First, install [Sendforsign components.](/sdk/introsdk#installation)
+After that:
+
+<CodeGroup>
+```typescript App.tsx
+import { TemplateEditor } from 'sendforsign';
+```
+</CodeGroup>
+
+## Props
+
+| Prop              | Type              |Default |Description        |
+| ------------------| ---------------- |---------|------------------- |
+| `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
+| `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
+| `userKey`           | `string`       |         |User key for the user who is creating a template.|
+| `templateKey`       | `string`       |         |Unique template key of the contract. If not specified, the component will allow you to create a new template from its interface.|
+
+

@@ -1,0 +1,109 @@
+---
+title: "List of recipients"
+description: "Get a list of all recipients created in a specific contract."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="contractKey" type="string">
+  ID of the contract. Use this parameter if you need to retrieve a contract's recipients.
+</ParamField>
+
+### Response
+
+  <ResponseField name="recipients" type="string">
+    Array of recipients.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="id" type="string">
+    ID of the recipient.
+  </ResponseField>
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="fullname" type="string">
+    Name of the recipient.
+  </ResponseField>
+
+  <ResponseField name="email" type="string">
+    Email of the recipient.
+  </ResponseField>
+
+  <ResponseField name="customMessage" type="string">
+    Custom message of the recipient.
+  </ResponseField>
+
+  <ResponseField name="position" type="string">
+    Position of the recipient.
+  </ResponseField>
+
+  <ResponseField name="action" type="string">
+    Action of the recipient.
+  </ResponseField>
+  
+  <ResponseField name="recipientKey" type="string">
+    Key of the recipient.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "CLIENT_KEY",
+              "contractKey": "CONTRACT_KEY"				  }
+     }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "recipients": [
+        {
+            "id": "1",
+            "createTime": "2024-02-26T11:07:55.000Z",
+            "changeTime": "2024-02-26T11:07:59.000Z",
+            "name": "Recipient Name",
+            "email": "Recipient Email",
+            "customMessage": "Custom message text",
+            "position": "1",
+            "action": "view",
+            "recipientKey": "RECIPIENT_KEY",
+        }
+    ],
+    "code": "200",
+    "message": "Recipients found"
+}
+```
+</ResponseExample>

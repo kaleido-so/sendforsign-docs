@@ -1,0 +1,35 @@
+---
+title: "Template List"
+---
+
+The `Template List` component is a React component that renders the list of templates created by a specific 
+client (clientKey). This component is integrated with the `Template Editor` component, allowing users to 
+open existing contracts and create new ones via the `Template List` component.
+
+### Preview
+
+<Frame caption="Editor">
+  <img src="/sdk/img/t-list.png" />
+</Frame>
+
+## Usage
+
+First, install [Sendforsign components.](/sdk/introsdk#installation)
+After that:
+
+<CodeGroup>
+```typescript App.tsx
+import { TemplateList } from 'sendforsign';
+```
+</CodeGroup>
+
+## Props
+
+| Prop              | Type              |Default |Description        |
+| ------------------| ---------------- |---------|------------------- |
+| `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
+| `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
+| `userKey`           | `string`       |         |User key for the user who is creating a template.|
+| `isModal`           | `boolean`      |`false`  |If `false`, every click on the table row will save the templateKey to local storage. If `true`, a click on the table row will open a modal window with the template rendered.|
+
+

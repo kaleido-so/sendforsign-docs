@@ -9,52 +9,49 @@ The SFS React SDK is a collection of pre-built React components that are integra
 These components are capable of displaying and interacting with data provided by the API. Platforms can use 
 these UI Components to develop React-based web applications for their clients, leveraging the power of the SFS API.
 
-At present, we offer the following components:
+## Supported browsers
+SFS UI Components support the five latest versions of major browsers: Chrome, Firefox, Safari, Edge, Opera.
 
-### Template component
+<Check>As of this release, the SFS React SDK is optimized for desktop, tablets and mobile use.</Check>
 
-Upload your own templates (Word, PDF) or create new ones from scratch right in your app.
+## Installation
 
-<Frame caption="Template component">
-  <img src="/sdk/img/template.png" />
-</Frame>
+Before using Sendforsign React components, you must first install the React SDK and API SDK packages 
+available on the NPM and Yarn directories. To install:
 
-### Audit trail component
+<CodeGroup>
+```npm npm
+npm i sendforsign
+```
+```yarn yarn
+yarn global add sendforsign
+```
+</CodeGroup>
 
-Keep track of what's happening with your documents.
+## Usage
 
-<Frame caption="Audit trail">
-  <img src="/sdk/img/audittrail.png" />
-</Frame>
+Before using components from the React SDK, see the [First document use case](/usecase/firstdoc) to set up your 
+platform account and get the API key.
 
-### Editor component
+We also assume you have already mapped out your customers and their users as Clients and Client users in SFS, 
+and that you have the ability to:
 
-Preview and edit your documents or those uploaded from Word or PDF.
+- look up the SFS Client user key for the user who is logged in to your application;
+- look up the SFS Client key to which the user belongs.
 
-<Frame caption="Editor">
-  <img src="/sdk/img/editor.png" />
-</Frame>
+When a Client user logs in to your application, look up the Client key and User key for that user.
+Once you have a User key and a Client key, you can initialize the SFS client and components.
 
-### List component
+<CodeGroup>
+```typescript App.tsx
+import { ContractEditor } from 'sendforsign';
+```
+</CodeGroup>
 
-See all your documents and templates in one unified place.
+## Run the application
 
-<Frame caption="List">
-  <img src="/sdk/img/list.png" />
-</Frame>
-
-### E-signing component
-
-E-sign any document right in your browser, including Word documents and PDFs.
-
-<Frame caption="E-sign">
-  <img src="/sdk/img/esign.webp" />
-</Frame>
-
-### Approval component
-
-Approve any document right in your browser, including Word documents and PDFs.
-
-<Frame caption="Approval">
-  <img src="/sdk/img/approve.webp" />
-</Frame>
+<CodeGroup>
+```npm npm
+npm run start
+```
+</CodeGroup>

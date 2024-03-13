@@ -1,0 +1,64 @@
+---
+title: "Contract Editor"
+---
+
+The `Contract Editor` component is a React component that renders the entire Editor. 
+The component integrates the functionalities of the `E-signing`, `Approvals` and `Audit Trial` components, 
+providing a complete experience throughout the Contract workflow. This component provides the ability to 
+create new contracts, open existing contracts, send them for signing, sign, approve, and see the Audit Trial.
+
+## Preview
+
+<Frame caption="Editor">
+  <img src="/sdk/img/editor.png" />
+</Frame>
+
+## Usage
+
+First, install [Sendforsign components.](/sdk/introsdk#installation)
+After that:
+
+<CodeGroup>
+```typescript App.tsx
+import { ContractEditor } from 'sendforsign';
+```
+</CodeGroup>
+
+## Props
+
+| Prop              | Type              |Default |Description        |
+| ------------------| ---------------- |---------|------------------- |
+| `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
+| `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
+| `userKey`           | `string`       |         |User key for the user who is creating a contract.|
+| `contractKey`       | `string`       |         |Unique contract key of the contract. If not specified, the component will allow you to create a new contract from its interface.|
+
+
+## Additional functionality of the `Contract Editor` component
+
+These components are integrated into the Contract Editor component. 
+They can be switched on and off in your Sendforsign account.
+
+### Audit trail
+
+Keep track of what's happening with your documents.
+
+<Frame caption="Audit trail">
+  <img src="/sdk/img/audittrail.png" />
+</Frame>
+
+### E-signing
+
+E-sign any document right in your browser, including Word documents and PDFs.
+
+<Frame caption="E-signing">
+  <img src="/sdk/img/esign.webp" />
+</Frame>
+
+### Approval
+
+Approve any document right in your browser, including Word documents and PDFs.
+
+<Frame caption="Approval">
+  <img src="/sdk/img/approve.webp" />
+</Frame>

@@ -1,0 +1,108 @@
+---
+title: 'Send your first document'
+description: 'Learn how to draft and send documents.'
+---
+
+## Get your API key
+
+To begin using Sendforsign and gain the capability to generate documents through our infrastructure, 
+you need to create your SFS account. Creating a new account will automatically generate a unique API key for you.
+
+<Frame caption="API key">
+  <img src="/usecase/img/1.png" />
+</Frame>
+
+## Create your Client key
+
+When the API is created, you need to generate a Сlient key for every account on your platform that 
+will be using the SFS infrastructure. Use your unique API key for this purpose. 
+[Learn more here.](/api-reference/client/create)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "client": {
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION"
+						     }
+				  }
+       }'
+
+```
+
+## Create your first document
+
+SFS provides you with two ways of creating documents: by using an API request (API way) or via our React UI (visual way). 
+Let's create a simple document using our Create API request. [Learn more here.](/api-reference/contract/create)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contract": {
+							  "name": "New contract",
+							  "value": "<p>Hello world</p>"
+						     }
+				  }
+       }'
+```
+
+As a response, you will receive a unique contract key.
+
+```bash json
+{
+    "contract": {
+        "createTime": "2024-03-07T15:18:41.000Z",
+        "contractKey": "d29b3893-826c-47d0-abdd-c6ed2b691a5c"
+    },
+    "code": "201",
+    "message": "Contract created"
+}
+```
+
+## Send your document
+
+Now you're ready to send your contract to recipients. You will need just one API call to do this. 
+[Learn more here.](/api-reference/recipient/send)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "send",
+				   "clientKey": "CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contractKey": "CONTRACT_KEY",
+           "recipients":[
+            {
+                "action": "sign",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson1@mail.com", 
+                "position": 1
+            },
+            {
+                "action": "view",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson2@mail.com", 
+                "position": 2
+            }
+               ], 
+				  }
+       }'
+
+```
