@@ -1,0 +1,73 @@
+---
+title: "Delete recipient"
+description: "Delete an existing recipient."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="contractKey" type="string">
+  ID of the contract.
+</ParamField>
+
+<ParamField body="recipient" required>
+  Structure, add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="recipientKey" type="string" required>
+    Key of the recipient that needs to be deleted.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+<ResponseField name="status" type="string">
+  The status.
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "recipient": {
+            "recipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "result": true,
+    "code": "200",
+    "message": "Recipient deleted"
+}
+```
+</ResponseExample>

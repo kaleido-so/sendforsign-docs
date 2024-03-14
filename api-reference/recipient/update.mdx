@@ -1,0 +1,109 @@
+---
+title: "Update recipient"
+description: "Update an existing recipient."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="contractKey" type="string">
+  ID of the contract.
+</ParamField>
+
+<ParamField body="recipient" required>
+  Structure, add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="recipientKey" type="string" required>
+    Key of the recipient that needs to be updated.
+  </ParamField>
+
+  <ParamField body="action" type="string">
+    What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  </ParamField>
+
+  <ParamField body="customMessage" type="string">
+    Custom note to the recipient. If not specified, the default message will be sent.
+  </ParamField>
+
+  <ParamField body="fullname" type="string">
+    Full name of the recipient.
+  </ParamField>
+
+  <ParamField body="email" type="string" required>
+    Email of the recipient.  
+  </ParamField>
+
+  <ParamField body="position" type="number">
+    Signing order. If not specified, all requests will be sent simultaneously.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="recipient" type="string">
+    Recipient structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "recipient": {
+            "recipientKey": "RECIPIENT_KEY",
+            "action": "view",
+            "customMessage": "Custom message text",
+            "fullname": "Full Name",
+            "email": "email@email.com",
+            "position": 1
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	  {
+       "recipient": {
+                "changeTime": "2023-12-01 12:18:55"
+		},
+       "code": "201",
+       "message": "Recipient updated"
+    } 
+```
+</ResponseExample>

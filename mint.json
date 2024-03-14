@@ -107,15 +107,21 @@
       "group": "Placeholder",
       "pages": [
         "api-reference/placeholder/create",
-        "api-reference/placeholder/list"
+        "api-reference/placeholder/update",
+        "api-reference/placeholder/list",
+        "api-reference/placeholder/delete"
+
       ]
     },
     {
       "group": "Recipient",
       "pages": [
         "api-reference/recipient/create",
+        "api-reference/recipient/update",
         "api-reference/recipient/send",
-        "api-reference/recipient/list"
+        "api-reference/recipient/list",
+        "api-reference/recipient/delete"
+
       ]
     },
     {
@@ -159,5 +165,13 @@
   "footerSocials": {
     "twitter": "https://twitter.com/sendforsign",
     "linkedin": "https://www.linkedin.com/company/sendforsign/about/"
+  },
+  "api": {
+    "auth": {
+      "method": "key",
+      "name": "X-Sendforsign-Key"
+    }
   }
 }
+
+

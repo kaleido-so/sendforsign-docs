@@ -1,0 +1,101 @@
+---
+title: "Update placeholder"
+description: "Update an existing placeholder."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="contractKey" type="string">
+  ID of the contract.
+</ParamField>
+
+<ParamField body="placeholder" required>
+  Structure, add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="placeholderKey" type="string" required>
+    Key of the placeholder that needs to be updated.
+  </ParamField>
+
+  <ParamField body="name" type="string">
+    Name of the placeholder
+  </ParamField>
+
+  <ParamField body="value" type="string">
+    Value of the placeholder.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="placeholder" type="string">
+    Placeholder structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLER_KEY",
+            "name": "Name",
+            "value": "Value"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "placeholder": {
+        "id": "1",
+        "createTime": "2024-03-14T20:34:08.000Z",
+        "changeTime": "2024-03-14T20:38:39.000Z",
+        "name": "Name",
+        "value": "Value",
+        "type": "1",
+        "placeholderKey": "PLACEHOLER_KEY",
+        "position": null
+    },
+    "code": "201",
+    "message": "Placeholder updated"
+}
+```
+</ResponseExample>
