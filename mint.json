@@ -130,7 +130,9 @@
         "api-reference/template/create",
         "api-reference/template/update",
         "api-reference/template/read",
-        "api-reference/template/list"
+        "api-reference/template/list",
+        "api-reference/template/delete"
+
       ]
     },
     {

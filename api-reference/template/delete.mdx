@@ -1,0 +1,66 @@
+---
+title: "Delete template"
+description: "Delete an existing template."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="template" required>
+  Structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="templateKey" type="string" required>
+    Key of the template that needs to be deleted.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "CLIENT_KEY",
+        "template": {
+            "templateKey": "TEMPLATE_KEY"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "template": {
+        "templateKey": "TEMPLATE_KEY"
+    },
+    "code": "200",
+    "message": "Template deleted"
+}
+```
+</ResponseExample>
