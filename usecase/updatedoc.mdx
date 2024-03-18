@@ -1,0 +1,94 @@
+---
+title: 'Update an exisiting document'
+description: 'Learn how to update a document you previously created.'
+---
+
+## Set up your account
+
+Before using components from the React SDK, see the [First document use case](/usecase/firstdoc) to set up your 
+platform account and get the API key.
+
+## Create your document
+
+SFS provides you with two ways of creating documents: by using an API request (API way) or via our React UI (visual way). 
+Let's create a simple document using our API.
+
+To do this, you can use this request. [Learn more here.](/api-reference/contract/create-fill)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "CLIENT_KEY",
+        "userKey": "USER_KEY",
+        "contract": {
+            "name": "New contract",
+            "value": "<p>Contract text</p>"
+        },
+        "placeholders": [
+            {
+                "name": "Placeholder name 1",
+                "value": "Placeholder value 1"
+            },
+            {
+                "name": "Placeholder name 2",
+                "value": "Placeholder value 2"
+            }
+        ]
+    }
+}'
+```
+
+As a response, you will receive a Contract Key:
+
+```bash json
+{
+    "contract": {
+        "createTime": "2024-03-07T15:18:41.000Z",
+        "contractKey": "d29b3893-826c-47d0-abdd-c6ed2b691a5c"
+    },
+    "code": "201",
+    "message": "Contract created"
+}
+```
+
+## Render your document
+
+Awesome, you've just created your document and even added two placeholders to it. To view the document, 
+use the [Contract Editor](/sdk/components/contracteditor) component and enter the Contract Key you've just 
+received as a `contractKey` property for the component.
+
+<Frame caption="New contract">
+  <img src="/usecase/img/7.png" />
+</Frame>
+
+By using this component and a Contract Key, you can continue editing the document, adding and removing 
+placeholders and recipients, and do everything you need to with documents. All changes will be saved 
+to this specific document.
+
+## Allow users to recreate documents
+
+In some cases, you may need to allow users to recreate the content of documents that already exist — 
+either by uploading their own Word file or selecting a template. 
+In such cases, you should use the `canReDraft`=`true` property of the [Contract Editor](/sdk/components/contracteditor). 
+This enables users to start the creation process from scratch for a document that already exists.
+
+If the existing document already has placeholders included, the system will also route these flows accordingly:
+
+- If a user uploads a Word file or creates a document from scratch, the placeholders will remain untouched.
+- If a user selects a template that does not contain placeholders, then the placeholders will remain untouched, 
+and the content will be populated from the selected template.
+- If a user selects a template that already contains placeholders, then the system will do the following:
+1. Populate the content from the template into the document.
+2. Read all the placeholders from the template and all the placeholders from the document and merge them. For 
+placeholders with the same names (on the template side and on the document side), the system will transfer the 
+values from the document's placeholders to the template's placeholders.
+3. Document-side placeholders that don't match any placeholder on the template side will remain untouched.
+
+
+So, for example, if you have a document with a placeholder `Name1-DocValue1`, and a template with placeholders 
+`Name1-TempValue1` and `Name2-TempValue2`, the resulting document will contain the content from the template and 
+two placeholders: `Name1-DocValue1` and `Name2-TempValue2`.

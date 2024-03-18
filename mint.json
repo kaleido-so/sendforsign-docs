@@ -61,8 +61,8 @@
       "group": "Use cases",
       "pages": [
         "usecase/firstdoc",
-        "usecase/firsttemplate" 
- 
+        "usecase/firsttemplate",
+        "usecase/updatedoc"  
       ]
     },
     {
