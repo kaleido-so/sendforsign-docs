@@ -20,10 +20,6 @@ description: "Get a list of all webhooks created for a specific client."
 
   <Expandable title="child attribute">
 
-  <ResponseField name="id" type="string">
-    ID of the webhook.
-  </ResponseField>
-
   <ResponseField name="createTime" type="string">
     Create time.
   </ResponseField>
@@ -34,6 +30,10 @@ description: "Get a list of all webhooks created for a specific client."
 
   <ResponseField name="url" type="string">
     Webhook's endpoint.
+  </ResponseField>
+
+  <ResponseField name="secret" type="string">
+    Webhook's secret.
   </ResponseField>
 
   <ResponseField name="created" type="boolean">
