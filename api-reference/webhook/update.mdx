@@ -1,0 +1,116 @@
+---
+title: "Update webhook"
+description: "Update an existing webhook."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="webhooks" type="string" required>
+  Array of webhooks. Add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="url" type="string" required>
+    Webhook's key.
+  </ParamField>
+
+  <ParamField body="url" type="string">
+    Webhook's endpoint.
+  </ParamField>
+
+  <ParamField body="created" type="boolean">
+    Event to listen: `contract.created`.
+  </ParamField>
+
+  <ParamField body="seen" type="boolean">
+    Event to listen: `contract.seen`.
+  </ParamField>
+
+  <ParamField body="sent" type="boolean">
+    Event to listen: `contract.sent`.
+  </ParamField>
+
+  <ParamField body="approved" type="boolean">
+    Event to listen: `contract.approved`.
+  </ParamField>
+
+  <ParamField body="signed" type="boolean">
+    Event to listen: `contract.signed`.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+
+### Response
+
+<ResponseField name="webhooks" type="string">
+    Array of webhooks.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="webhookKey" type="string">
+    Webhook's key.
+  </ResponseField>
+
+  </Expandable>
+
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "CLIENT_KEY",
+        "webhooks": [
+            {
+                "webhookKey": "WEBHOOK_KEY",
+                "url": "URL",
+                "created": true,
+                "seen": true
+            }
+        ]
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "webhooks": [
+        {
+            "webhookKey": "WEBHOOK_KEY",
+            "changeTime": "2024-04-08T09:01:12.000Z"
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks updated"
+}
+```
+</ResponseExample>

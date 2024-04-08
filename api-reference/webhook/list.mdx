@@ -1,0 +1,106 @@
+---
+title: "List of webhooks"
+description: "Get a list of all webhooks created for a specific client."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+### Response
+
+  <ResponseField name="webhooks" type="string">
+    Array of webhooks.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="id" type="string">
+    ID of the webhook.
+  </ResponseField>
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="url" type="string">
+    Webhook's endpoint.
+  </ResponseField>
+
+  <ResponseField name="created" type="boolean">
+    Event to listen: `contract.created`.
+  </ResponseField>
+
+  <ResponseField name="seen" type="boolean">
+    Event to listen: `contract.seen`.
+  </ResponseField>
+
+  <ResponseField name="sent" type="boolean">
+    Event to listen: `contract.sent`.
+  </ResponseField>
+
+  <ResponseField name="approved" type="boolean">
+    Event to listen: `contract.approved`.
+  </ResponseField>
+
+  <ResponseField name="signed" type="boolean">
+    Event to listen: `contract.signed`.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/webhook' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "CLIENT_KEY"
+              }
+     }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "webhooks": [
+        {
+            "createTime": "2024-03-29T20:02:28.000Z",
+            "changeTime": "2024-03-29T20:02:28.000Z",
+            "url": "URL",
+            "secret": "whsec_123",
+            "webhookKey": "WEBHOOK_KEY",
+            "created": true,
+            "seen": true,
+            "sent": true,
+            "approved": true,
+            "signed": true
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks found"
+}
+```
+</ResponseExample>

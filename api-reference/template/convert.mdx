@@ -1,0 +1,96 @@
+---
+title: "Convert into template"
+description: "Convert a contract into a template."
+---
+When converting a contract into a template, all content will be transferred to the template, 
+and all placeholders will be transferred with their values removed. The original contract will remain unchanged.
+
+### Body parameters 
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="userKey" type="string">
+  ID of the user who converts a contract into a template. If not specified, the default user credentials will be used.
+</ParamField>
+
+<ParamField body="template" required>
+  Template structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="name" type="string" required>
+    Name of the new template.  
+  </ParamField>
+
+  <ParamField body="contractKey" type="string" required>
+    ID of the contract that will be converted into a template.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="template" type="string">
+    Template structure.
+
+  <Expandable title="child attribute">
+
+<ResponseField name="createTime" type="string">
+  Create time.
+</ResponseField>
+
+<ResponseField name="templateKey" type="string">
+  ID of the template.
+</ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "convert",
+				   "clientKey": "CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "template": {
+							  "name": "New template",
+							  "contractKey": "CONTRACT_KEY"
+						     }
+				  }
+       }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+     {
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY"
+                 },
+       "code": "201",
+       "message": "Template created"
+    }
+```
+</ResponseExample>

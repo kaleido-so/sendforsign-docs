@@ -1,0 +1,84 @@
+---
+title: "Delete webhook"
+description: "Delete an existing webhook."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  ID of the client.
+</ParamField>
+
+<ParamField body="webhooks" type="string" required>
+  Array of webhooks. Add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="url" type="string" required>
+    Webhook's key.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+
+### Response
+
+<ResponseField name="webhooks" type="string">
+    Array of webhooks.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="webhookKey" type="string">
+    Webhook's key.
+  </ResponseField>
+
+  </Expandable>
+
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "CLIENT_KEY",
+        "webhooks": [
+            {
+                "webhookKey": "WEBHOOK_KEY"
+            }
+        ]
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "webhooks": [
+        {
+            "webhookKey": "WEBHOOK_KEY",
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks deleted"
+}
+```
+</ResponseExample>
