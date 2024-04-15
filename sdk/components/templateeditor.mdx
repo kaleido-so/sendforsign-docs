@@ -19,6 +19,11 @@ After that:
 <CodeGroup>
 ```typescript App.tsx
 import { TemplateEditor } from 'sendforsign';
+
+<TemplateEditor
+  apiKey='YourApiKey'
+  clientKey='YourClientKey'
+/>
 ```
 </CodeGroup>
 
@@ -29,6 +34,6 @@ import { TemplateEditor } from 'sendforsign';
 | `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
 | `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
 | `userKey`           | `string`       |         |User key for the user who is creating a template.|
-| `templateKey`       | `string`       |         |Unique template key of the contract. If not specified, the component will allow you to create a new template from its interface.|
+| `templateKey`       | `string`       |         |Unique template key of the template that needs to be rendered. If not specified, the component will allow you to create a new template from its interface.|
 
 
