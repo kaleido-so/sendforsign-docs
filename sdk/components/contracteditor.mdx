@@ -21,6 +21,11 @@ After that:
 <CodeGroup>
 ```typescript App.tsx
 import { ContractEditor } from 'sendforsign';
+
+<ContractEditor
+  apiKey="YourApiKey"
+  clientKey="YourClientKey"
+/>
 ```
 </CodeGroup>
 
@@ -31,9 +36,9 @@ import { ContractEditor } from 'sendforsign';
 | `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
 | `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
 | `userKey`           | `string`       |         |User key for the user who is creating a contract.|
-| `contractKey`       | `string`       |         |Unique contract key of the contract. If not specified, the component will allow you to create a new contract from its interface.|
+| `contractKey`       | `string`       |         |Unique contract key of the contract that needs to rendered. If not specified, the component will allow you to create a new contract from its interface.|
 | `pdf`               | `boolean`      |`true`   |If `true`, users can upload PDFs via this component.|
-| `сanReDraft`        | `boolean`      |`false`  |If `true`, users can recreate existing contracts from scratch. [Read this topis](/usecase/updatedoc#allow-users-to-recreate-documents) to learn more.|
+| `сanReDraft`        | `boolean`      |`false`  |If `true`, users can recreate existing contracts from scratch. [Read this topic](/usecase/updatedoc#allow-users-to-recreate-documents) to learn more.|
 | `showTimeline`      | `boolean`      |`true`   |If `false`, the Timeline block will be hidden.|
 | `showActionsBar`    | `boolean`      |`true`   |If `false`, tha Actions block will be hidden.|
 
