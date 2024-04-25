@@ -1,0 +1,20 @@
+---
+title: "Download PDF"
+description: "Download PDF of an existing contract."
+---
+
+Retrieve a contract PDF. As a response, you will receive ArrayBuffer.
+
+### Body parameters
+
+<ParamField body="contractKey" type="string" required>
+  ID of the contract.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.sendforsign.com/api/download_pdf?contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+```
+</RequestExample>

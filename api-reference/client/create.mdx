@@ -3,6 +3,8 @@ title: "Create client"
 description: "Create a new client."
 ---
 
+<Note>All API calls related to the Client require a `Platform Bearer Token` in the request header.</Note>
+
 ### Body parameters
 
 <ParamField body="action" type="string" required>
@@ -106,7 +108,7 @@ description: "Create a new client."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/client' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {

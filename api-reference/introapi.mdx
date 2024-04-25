@@ -19,8 +19,11 @@ https://api.sendforsign.com/api
 
 ## Authentication
 
-The Sendforsign API uses API keys to authenticate requests. 
-You can view and manage your API keys in the Sendforsign Dashboard.
+To authenticate you need to add an Authorization header with the contents of the header 
+being `Bearer 123456789` where `123456789` is your [Client Token](/api-reference/authentication#creating-client-tokens).
+```bash
+Authorization: Bearer 123456789
+```
 
 ## Response 
 Sendforsign uses standard HTTP codes to indicate the success or failure of your requests.

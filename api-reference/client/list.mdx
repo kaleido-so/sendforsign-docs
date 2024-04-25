@@ -3,6 +3,8 @@ title: "List of clients"
 description: "Get a list of all clients created via a specific API Key."
 ---
 
+<Note>All API calls related to the Client require a `Platform Bearer Token` in the request header.</Note>
+
 ### Body parameters
 
 <ParamField body="action" type="string" required>
@@ -63,7 +65,7 @@ description: "Get a list of all clients created via a specific API Key."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/client' \ 
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
