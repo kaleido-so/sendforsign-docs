@@ -41,19 +41,22 @@ curl -X POST 'https://api.sendforsign.com/api/token' \
      -H 'X-Sendforsign-Version: 2024-02-15' \
      -H 'Content-Type: application/json' \
      -d '{
-        "apiKey": "YOUR_API_KEY",
-        "secretKey": "YOUR_SECRET"
-     }'
+         "data": {
+            "action": "create",
+            "apiKey": "YOUR_API_KEY",
+            "secret": "YOUR_SECRET"
+         }
+}'
 ```
 
 <Note>Never store your client secret in plain text. Always treat it in a way you treat 
 any other passwords and API keys in your system, and use a special encrypted storage for this type of sensitive data.</Note>
 
-The successful `200 OK` response contains the `access_token` and its validity time (in seconds):
+The successful `201 Created` response contains the `access_token` and its validity time (in seconds):
 
 ```bash JSON
 {
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhb...",
+  "access_token": "123456789...",
   "token_type": "Bearer",
   "expires_in": 1800
 }
@@ -66,9 +69,8 @@ SFS responds back with a **400 Bad Request** error:
 
 ```bash JSON
 {
-    "error": {
-        "message": "The token has been expired."
-    }
+    "message": "Token expired",
+    "code": 401
 }
 ```
 
@@ -132,15 +134,16 @@ curl -X POST 'https://api.sendforsign.com/api/token' \
      -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
+        "action": "create",
         "clientKey": "YOUR_CLIENT_KEY"
      }'
 ```
 
-The successful `200 OK` response contains the `access_token` and its validity time (in seconds):
+The successful `201 Created` response contains the `access_token` and its validity time (in seconds):
 
 ```bash JSON
 {
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhb...",
+  "access_token": "123456789...",
   "token_type": "Bearer",
   "expires_in": 1800
 }
@@ -155,9 +158,8 @@ SFS responds back with a **400 Bad Request** error:
 
 ```bash JSON
 {
-    "error": {
-        "message": "The token has been expired."
-    }
+    "message": "Token expired",
+    "code": 401
 }
 ```
 
