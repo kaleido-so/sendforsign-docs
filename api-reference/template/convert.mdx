@@ -11,10 +11,6 @@ and all placeholders will be transferred with their values removed. The original
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="userKey" type="string">
   ID of the user who converts a contract into a template. If not specified, the default user credentials will be used.
 </ParamField>
@@ -66,12 +62,11 @@ and all placeholders will be transferred with their values removed. The original
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/template' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "convert",
-				   "clientKey": "CLIENT_KEY",
                    "userKey": "USER_KEY", 
 				   "template": {
 							  "name": "New template",

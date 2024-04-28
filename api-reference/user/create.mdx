@@ -9,10 +9,6 @@ description: "Create a new user."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="user" required>
   Structure, at least one of the fields must be filled.
 
@@ -64,12 +60,11 @@ description: "Create a new user."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/user' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "create",
-				   "clientKey": "CLIENT_KEY",
 				   "user": {
 							  "fullname": "John Johnson",
 							  "email": "john_johnson@mail.com", 

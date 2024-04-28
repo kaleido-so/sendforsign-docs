@@ -9,10 +9,6 @@ description: "Get a list of all placeholders created in a specific contract or t
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="templateKey" type="string">
   ID of the template. Use this parameter if you need to retrieve a template's placeholders.
 </ParamField>
@@ -71,12 +67,11 @@ description: "Get a list of all placeholders created in a specific contract or t
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \ 
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
               "action": "list",
-              "clientKey": "CLIENT_KEY",
               "contractKey": "CONTRACT_KEY",
               "templateKey": "TEMPLATE_KEY"
 				  }

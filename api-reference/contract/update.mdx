@@ -9,10 +9,6 @@ description: "Update an existing contract."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="contract" required>
   Structure, use the fields that should be updated.
 
@@ -68,12 +64,11 @@ description: "Update an existing contract."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/contract' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "update",
-				   "clientKey": "CLIENT_KEY", 
 				   "contract": {
 							  "contractKey": "CONTRACT_KEY", 
 							  "name": "New contract",

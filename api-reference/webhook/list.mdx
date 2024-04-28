@@ -9,10 +9,6 @@ description: "Get a list of all webhooks created for a specific client."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 ### Response
 
   <ResponseField name="webhooks" type="string">
@@ -71,12 +67,11 @@ description: "Get a list of all webhooks created for a specific client."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/webhook' \ 
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
-              "action": "list",
-              "clientKey": "CLIENT_KEY"
+              "action": "list"
               }
      }'
 ```

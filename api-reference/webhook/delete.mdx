@@ -9,10 +9,6 @@ description: "Delete an existing webhook."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="webhooks" type="string" required>
   Array of webhooks. Add the fields that need to be updated and ignore the rest.
 
@@ -53,12 +49,11 @@ description: "Delete an existing webhook."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/webhook' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "delete",
-        "clientKey": "CLIENT_KEY",
         "webhooks": [
             {
                 "webhookKey": "WEBHOOK_KEY"

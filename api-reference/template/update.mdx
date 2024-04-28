@@ -9,10 +9,6 @@ description: "Update an existing template."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="template" required>
   Structure, use the fields that should be updated.
 
@@ -73,7 +69,6 @@ curl -X POST 'https://api.sendforsign.com/api/template' \
      -d '{ 
 		  "data": {
 				   "action": "update",
-				   "clientKey": "CLIENT_KEY", 
 				   "template": {
 							  "templateKey": "TEMPLATE_KEY", 
 							  "name": "New template",

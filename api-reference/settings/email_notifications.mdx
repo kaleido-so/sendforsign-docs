@@ -14,10 +14,6 @@ use the request provided below.
   Settings type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="notification" type="string" required>
   Structure.
 
@@ -48,12 +44,11 @@ use the request provided below.
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/settings' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "type": "email_notifications",
-        "clientKey": "CLIENT_KEY",
         "notification": 
             {
                 "approved": false,

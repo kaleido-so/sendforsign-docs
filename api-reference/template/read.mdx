@@ -9,10 +9,6 @@ description: "Get information about a specific template."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="template" required>
   Structure, at least one of the fields must be filled.
 
@@ -73,12 +69,11 @@ description: "Get information about a specific template."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/template' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "read",
-				   "clientKey": "CLIENT_KEY",
 				   "template": {
 							  "templateKey": "TEMPLATE_KEY", 
 							  "name": "New template"

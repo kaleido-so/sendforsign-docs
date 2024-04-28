@@ -9,10 +9,6 @@ description: "Update an existing placeholder."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="contractKey" type="string" required>
   ID of the contract.
 </ParamField>
@@ -64,12 +60,11 @@ description: "Update an existing placeholder."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "update",
-        "clientKey": "CLIENT_KEY",
         "contractKey": "CONTRACT_KEY",
         "placeholder": {
             "placeholderKey": "PLACEHOLER_KEY",

@@ -9,10 +9,6 @@ description: "Get a list of all recipients created in a specific contract."
   Action type.
 </ParamField>
 
-<ParamField body="clientKey" type="string" required>
-  ID of the client.
-</ParamField>
-
 <ParamField body="contractKey" type="string">
   ID of the contract. Use this parameter if you need to retrieve a contract's recipients.
 </ParamField>
@@ -75,12 +71,11 @@ description: "Get a list of all recipients created in a specific contract."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \ 
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
               "action": "list",
-              "clientKey": "CLIENT_KEY",
               "contractKey": "CONTRACT_KEY"				  }
      }'
 ```
