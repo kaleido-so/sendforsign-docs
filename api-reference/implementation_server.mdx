@@ -12,16 +12,16 @@ for your server side.
 
 From the server side perspective, you need to create several fundamental objects:
 
-- Get a platform API key and Secret key (representing your platform).
+- Get a platform API key and Secret (representing your platform).
 - Generate a platform token.
 - Create a client for each business that use your platform.
 - Generate client tokens.
 - Create client users for each end-user of the businesses on your platform.
 
-## Get a platform API key and Secret key
+## Get a platform API key and Secret
 
 To begin using Sendforsign and gain the capability to generate documents through our infrastructure, 
-you need to create your SFS account. Creating a new account will automatically generate a unique API key and Secret key for you.
+you need to create your SFS account. Creating a new account will automatically generate a unique API key and Secret for you.
 
 <Frame caption="API key">
   <img src="/usecase/img/1.png" />
@@ -30,7 +30,7 @@ you need to create your SFS account. Creating a new account will automatically g
 ## Generate a platform token
 
 To create a new token for accessing the SFS API, first you need to call `POST /api/token` with the request body 
-containing the `apiKey` and `secretKey` values you obtained in the previous step.
+containing the `apiKey` and `Secret` values you obtained in the previous step.
 
 The `/api/token` endpoint does not require any authentication headers, which is in line with the OAuth 2.0 standard. 
 At the same time, we strongly recommend that you pass the `X-Sendforsign-Version` HTTP header to specify the API 
