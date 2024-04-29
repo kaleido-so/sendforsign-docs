@@ -32,12 +32,9 @@ To create a new token for accessing the SFS API, first you need to call `POST /a
 containing the `apiKey` and `Secret` values you obtained in the previous step.
 
 The `/api/token` endpoint does not require any authentication headers, which is in line with the OAuth 2.0 standard. 
-At the same time, we strongly recommend that you pass the `X-Sendforsign-Version` HTTP header to specify the API 
-version in use. This is important because the payload structure of `/api/token` might change in future API versions.
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'X-Sendforsign-Version: 2024-02-15' \
      -H 'Content-Type: application/json' \
      -d '{
          "data": {
@@ -119,7 +116,7 @@ Tokens generated within the SFS API platform have an auto-expiry based on the sp
 (in seconds). Nevertheless, in certain cases you may want to explicitly revoke an active token, such as when 
 a client logs out from your application.
 
-To revoke a token, call `POST /api/token` with a request body containing the `action` type and the `client token`,
+To revoke a token, call `POST /api/token` with a request body containing the `revoke` action and the `client access token`,
 and specify the `platform Bearer token` in the header:
 
 ```bash cURL
