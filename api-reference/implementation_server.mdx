@@ -65,7 +65,7 @@ The successful `201 Created` response contains the `access_token` and its validi
 ## Handle platform token expiry
 
 A partner token is valid only for 1800 seconds (which is 30 minutes). If you will make a request with an expired token, 
-SFS responds back with a **400 Bad Request** error:
+SFS responds back with a **401 Unauthorized** error:
 
 ```bash JSON
 {
@@ -154,7 +154,7 @@ The successful `201 Created` response contains the `access_token` and its validi
 ## Handle client token expiry
 
 A partner token is valid only for 1800 seconds (which is 30 minutes). If you will make a request with an expired token, 
-SFS responds back with a **400 Bad Request** error:
+SFS responds back with a **401 Unauthorized** error:
 
 ```bash JSON
 {
