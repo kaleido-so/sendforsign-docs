@@ -23,8 +23,7 @@ After that:
 import { ContractEditor } from 'sendforsign';
 
 <ContractEditor
-  apiKey='YourApiKey'
-  clientKey='YourClientKey'
+  token='YourClientToken'
 />
 ```
 </CodeGroup>
@@ -33,8 +32,9 @@ import { ContractEditor } from 'sendforsign';
 
 | Prop              | Type              |Default |Description        |
 | ------------------| ---------------- |---------|------------------- |
-| `apiKey`            | `string`       |         |API key for your platform from your SFS account. |
-| `clientKey`         | `string`       |         |Client key for the account that is using the infrastructure from your SFS account. |
+| `apiKey`            | `string`       |         |Use only for testing purposes. API key for your platform. |
+| `clientKey`         | `string`       |         |Use only for testing purposes. Client key for the account that is using the infrastructure. |
+| `token`             | `string`       |         |Client token refers to the client that is using the infrastructure. Learn more about client tokens [here](/api-reference/implementation_server#generate-client-tokens).|
 | `userKey`           | `string`       |         |User key for the user who is creating a contract.|
 | `contractKey`       | `string`       |         |Unique contract key of the contract that needs to rendered. If not specified, the component will allow you to create a new contract from its interface.|
 | `pdf`               | `boolean`      |`true`   |If `true`, users can upload PDFs via this component.|
