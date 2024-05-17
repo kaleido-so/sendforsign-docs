@@ -42,7 +42,7 @@ import { ContractEditor } from 'sendforsign';
 | `showTimeline`      | `boolean`      |`true`   |If `false`, the Timeline block will be hidden.|
 | `showActionsBar`    | `boolean`      |`true`   |If `false`, tha Actions block will be hidden.|
 | `onStepChange`      | `function(data: {currentStep:string})`    |   |Called when component changes states and returns `currentStep: 'TypeChooseStep'` when the component is in the Type Choose state, `currentStep: 'QnAStep'` when the component is in the QnA step, and `currentStep: 'ContractEditorStep'` when the component is in the Editor state.|
-| `onDocumentSave`    | `function(data: {documentSaved:boolean})` |   |Called when the contract value is being edited, this function returns `documentSaved: false` if the value is not saved and `documentSaved: true` if the value is saved.|
+| `onDocumentSave`    | `function(data: {documentSaved:boolean})` |   |Called when the contract body is being edited, this function returns `documentSaved: false` if the value is not saved and `documentSaved: true` if the value is saved.|
 
 
 
