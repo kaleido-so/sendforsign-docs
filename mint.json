@@ -103,7 +103,9 @@
         "api-reference/contract/create-fill",
         "api-reference/contract/update",
         "api-reference/contract/read",
-        "api-reference/contract/list"
+        "api-reference/contract/list",
+        "api-reference/contract/archive"
+
       ]
     },
     {

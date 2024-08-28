@@ -1,0 +1,80 @@
+---
+title: "Archive contract"
+description: "Archive a specific contract."
+---
+
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="contract" required>
+  Structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="contractKey" type="string">
+    ID of the contract.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="contract" type="string">
+    Contract structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="contractKey" type="string">
+    ID of the contract.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Name of the contract.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "archive",
+				   "contract": {
+							  "contractKey": "CONTRACT_KEY"
+						     }
+				  }
+       }'
+
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+	{
+       "contract": {
+                "contractKey": "CONTRACT_KEY", 
+				"name": "New contract"
+		},
+       "code": "200",
+       "message": "Contract archived"
+    } 
+```
+</ResponseExample>
