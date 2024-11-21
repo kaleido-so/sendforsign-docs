@@ -72,13 +72,13 @@ to this specific document.
 ## Allow users to recreate documents
 
 In some cases, you may need to allow users to recreate the content of documents that already exist — 
-either by uploading their own Word file or selecting a template. 
+either by uploading their own Word/PDF file or selecting a template. 
 In such cases, you should use the `canReDraft`=`true` property of the [Contract Editor](/sdk/components/contracteditor). 
 This enables users to start the creation process from scratch for a document that already exists.
 
 If the existing document already has placeholders included, the system will also route these flows accordingly:
 
-- If a user uploads a Word file or creates a document from scratch, the placeholders will remain untouched.
+- If a user uploads a Word/PDF file or creates a document from scratch, the placeholders will remain untouched.
 - If a user selects a template that does not contain placeholders, then the placeholders will remain untouched, 
 and the content will be populated from the selected template.
 - If a user selects a template that already contains placeholders, then the system will do the following:
@@ -89,6 +89,6 @@ values from the document's placeholders to the template's placeholders.
 3. Document-side placeholders that don't match any placeholder on the template side will remain untouched.
 
 
-So, for example, if you have a document with a placeholder `Name1-DocValue1`, and a template with placeholders 
-`Name1-TempValue1` and `Name2-TempValue2`, the resulting document will contain the content from the template and 
+So, for example, if you have a document with a placeholder `Name1` and value `DocValue1`, and a template with placeholders 
+`Name1` and value `TempValue1` and `Name2` and value `TempValue2`, the resulting document will contain the content from the template and 
 two placeholders: `Name1-DocValue1` and `Name2-TempValue2`.

@@ -42,16 +42,10 @@
       "url": "sdk"
     },
     {
-      "name": "Changelog",
-      "url": "changelog"
-    },
-
-    {
       "name": "About",
       "url": "about"
     }
   ],
-
   "navigation": [
     {
       "group": "Get Started",
@@ -61,6 +55,7 @@
       "group": "Use cases",
       "pages": [
         "usecase/firstdoc",
+        "usecase/embeddocforplatform",
         "usecase/firsttemplate",
         "usecase/updatedoc"
       ]
@@ -172,11 +167,6 @@
       ]
     },
     {
-      "group": "Changelog",
-      "pages": ["changelog/2024", "changelog/2023"]
-    },
-
-    {
       "group": "About",
       "pages": [
         "about/vision",
@@ -191,9 +181,9 @@
     "linkedin": "https://www.linkedin.com/company/sendforsign/about/"
   },
   "api": {
+    "baseUrl": "https://api.sendforsign.com/api", 
     "auth": {
-      "method": "key",
-      "name": "X-Sendforsign-Key"
+      "method": "bearer"
     }
   }
 }
