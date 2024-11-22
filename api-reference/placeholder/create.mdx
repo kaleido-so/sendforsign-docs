@@ -3,7 +3,102 @@ title: "Create placeholder"
 description: "Add a placeholder to a contract."
 ---
 
-The best way to add placeholders to a contract is when you create a new contract. 
+One way to add placeholders to a contract is when you create a new contract. 
 [See this page](/api-reference/contract/create-fill) to learn more.
 
+If a contract already exists, use the request below.
 
+### Body parameters
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="contractKey" type="string" required>
+  ID of the contract.
+</ParamField>
+
+<ParamField body="placeholder" required>
+  Structure, add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="placeholderKey" type="string" required>
+    Key of the placeholder that needs to be updated.
+  </ParamField>
+
+  <ParamField body="name" type="string">
+    Name of the placeholder
+  </ParamField>
+
+  <ParamField body="value" type="string">
+    Value of the placeholder.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="placeholder" type="string">
+    Placeholder structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "name": "Placeholder name",
+            "value": "Placeholder value"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "placeholder": {
+        "id": "3",
+        "createTime": "2024-11-22T11:11:24.000Z",
+        "changeTime": "2024-11-22T11:11:24.000Z",
+        "name": "1",
+        "value": "hello",
+        "type": "1",
+        "placeholderKey": "PLACEHOLER_KEY",
+        "position": "3"
+    },
+    "code": 201,
+    "message": "Placeholder created"
+}
+```
+</ResponseExample>
