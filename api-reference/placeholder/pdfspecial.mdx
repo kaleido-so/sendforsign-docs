@@ -1,9 +1,9 @@
 ---
-title: "Place basic placeholder"
-description: "Place a basic placeholder in a PDF contract."
+title: "Place special placeholder"
+description: "Place a special placeholder in a PDF contract."
 ---
 
-Before placing placeholders in a PDF, you need to [create them](/api-reference/placeholder/create) in advance.
+Special placeholders are four types of placeholders that are created automatically for every recipient.
 
 ### Body parameters
 
@@ -78,14 +78,16 @@ curl -X POST 'https://api.sendforsign.com/api/placeholder' \
         "contractKey": "CONTRACT_KEY",
         "placeholders": [
             {
-                "placeholderKey": "PLACEHOLER_KEY",
+                "placeholderKey": "RECIPIENT_KEY_4",
+                "isSpecial": true,
+                "specialType": 4,
                 "insertion": [
                     {
                         "action": "update",
-                        "id": 0,
+                        "id": 2,
                         "pageId": 0,
-                        "width": 100,
-                        "height": 100,
+                        "width": 150,
+                        "height": 150,
                         "positionX": 1,
                         "positionY": 1
                     }
