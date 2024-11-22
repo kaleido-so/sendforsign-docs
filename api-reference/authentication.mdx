@@ -137,3 +137,50 @@ A `201 OK` response indicates that the specified token has been revoked successf
     "message": "Token revoked"
 }
 ```
+
+## Authentication for Testing Purposes
+
+<Warning>
+Use this method for testing purposes only and never with your real clients. This may lead to your API being compromised.
+</Warning>
+
+Although we always recommend using Sendforsign's token mechanism to access our infrastructure, there is an
+alternative way to send API calls and render Sendforsign's components without the need to generate tokens.
+
+You can use a combination of an API Key (in the request header) and a Client Key (in the request body) to achieve the same result
+as using the access token.
+
+Compare the two requests below; both will result in creating a new contract in Sendforsign's infrastructure.
+In the first case, you will need to use only your Bearer Access Token, and in the second case, you can use 
+your `X-Sendforsign-Key` API key in the header and your Client Key in the request body.
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+         "data": {
+         "action": "create",
+            "contract": {
+               "name": "New contract",
+               "value": "<p>Contract text</p>"
+                  }
+               }
+}'
+```
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+         "data": {
+         "action": "create",
+         "clientKey": "YOUR_CLIENT_KEY",
+            "contract": {
+               "name": "New contract",
+               "value": "<p>Contract text</p>"
+                  }
+               }
+}'
+```
