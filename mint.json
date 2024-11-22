@@ -114,6 +114,7 @@
       "pages": [
         "api-reference/placeholder/create",
         "api-reference/placeholder/update",
+        "api-reference/placeholder/pdfbasic",
         "api-reference/placeholder/list",
         "api-reference/placeholder/delete"
       ]
