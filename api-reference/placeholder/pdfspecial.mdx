@@ -5,14 +5,16 @@ description: "Place a special placeholder in a PDF contract."
 
 Special placeholders are four types of placeholders that are created automatically for every recipient.
 So, before placing special fields in your PDF contract, create a recipient using [this request](/api-reference/recipient/create).
-After this, all the special placeholders will be created automatically with corresponding codes:
+After this, all the special placeholders will be created automatically with corresponding keys:
 `Recipient_Key_1`, `Recipient_Key_2`, `Recipient_Key_3`, `Recipient_Key_4`.
 
-Learn about placeholder codes:
-- 1: Recipient's date signed
-- 2: Recipient's full name
-- 3: Recipient's email
-- 4: Recipient's signature
+Here's an example of a placeholder key: `"placeholderKey": "93447fb5-91ee-41ad-9f73-b4ae2d467292_4"`.
+
+Available placeholder codes:
+- <b>1</b>: Recipient's date signed.
+- <b>2</b>: Recipient's full name.
+- <b>3</b>: Recipient's email.
+- <b>4</b>: Recipient's signature.
 
 
 ### Body parameters
