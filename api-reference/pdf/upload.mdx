@@ -1,0 +1,48 @@
+---
+title: "Upload PDF"
+description: "Upload PDF and convert it into a contract."
+---
+
+Before uploading a PDF, you need to create an empty contract and obtain its ContractKey. 
+To do this, use the [Create Contract](/api-reference/contract/create) 
+request with the parameter `"contractType": "pdf"`.
+
+Here's an example:
+```bash cURL
+{
+    "data": {
+        "action": "create",
+        "contract": {
+            "name": "You PDF name",
+            "contractType": "pdf"
+        }
+    }
+}
+```
+
+As a response, you'll receive a ContractKey for the contract you created. 
+Use this key to upload your PDF to SendforSig's infrastructure.
+
+Additionally, you will need to include FormData in the body of the request. 
+
+For example:
+
+```bash cURL
+formData.append('pdf', new Blob([pdfFile as BlobPart], type: 'application/pdf')) 
+```
+
+Where `pdfFile` is the ArrayBuffer of your document.
+
+### Body parameters
+
+<ParamField body="contractKey" type="string" required>
+  ID of the contract.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/upload_pdf?contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+```
+</RequestExample>

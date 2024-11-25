@@ -106,7 +106,8 @@
     {
       "group": "PDF",
       "pages": [
-        "api-reference/pdf/download"
+        "api-reference/pdf/download",
+        "api-reference/pdf/upload"
       ]
     },
     {

@@ -4,6 +4,16 @@ description: "Place a special placeholder in a PDF contract."
 ---
 
 Special placeholders are four types of placeholders that are created automatically for every recipient.
+So, before placing special fields in your PDF contract, create a recipient using [this request](/api-reference/recipient/create).
+After this, all the special placeholders will be created automatically with corresponding codes:
+`Recipient_Key_1`, `Recipient_Key_2`, `Recipient_Key_3`, `Recipient_Key_4`.
+
+Learn about placeholder codes:
+- 1: Recipient's date signed
+- 2: Recipient's full name
+- 3: Recipient's email
+- 4: Recipient's signature
+
 
 ### Body parameters
 
@@ -21,7 +31,19 @@ Special placeholders are four types of placeholders that are created automatical
   <Expandable title="child attribute">
 
   <ParamField body="placeholderKey" type="string" required>
-    Key of the placeholder that needs to be updated.
+    Key of the placeholder that needs to be updated. Generated automatically from 2 paramaters: Recipient's Key and Special Type.
+  </ParamField>
+
+  <ParamField body="isSpecial" type="boolean" required>
+    True for special fields.
+  </ParamField>
+
+  <ParamField body="specialType" type="string" required>
+    Use the following placeholder codes to create the corresponding fields: 
+    <b>1</b>: Recipient's date signed, 
+    <b>2</b>: Recipient's full name
+    <b>3</b>: Recipient's email 
+    <b>4</b>: Recipient's signature
   </ParamField>
 
   <ParamField body="insertion" type="string">
@@ -31,7 +53,28 @@ Special placeholders are four types of placeholders that are created automatical
   <Expandable title="child attribute">
 
     <ParamField body="id" type="string">
-        ID of the insertion. Provide new ID for every new insertion.
+    ID of the insertion. Provide a new ID for each insertion. If you provide the ID of an existing 
+    placeholder, the placeholder will be updated.
+    </ParamField>
+
+    <ParamField body="pageId" type="string">
+      Page number where you insert the placeholder, starting from 0.
+    </ParamField>
+
+    <ParamField body="width" type="string">
+      Width of the placeholder.
+    </ParamField>
+
+    <ParamField body="height" type="string">
+      Height of the placeholder.
+    </ParamField>
+
+    <ParamField body="positionX" type="string">
+      Position X of the placeholder, starting from the top-left corner of the page.
+    </ParamField>
+
+    <ParamField body="positionY" type="string">
+      Position Y of the placeholder, starting from the top-left corner of the page.
     </ParamField>
 
   </Expandable>

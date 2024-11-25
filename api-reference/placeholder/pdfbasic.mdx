@@ -31,7 +31,28 @@ Before placing placeholders in a PDF, you need to [create them](/api-reference/p
   <Expandable title="child attribute">
 
     <ParamField body="id" type="string">
-        ID of the insertion. Provide new ID for every new insertion.
+    ID of the insertion. Provide a new ID for each insertion. If you provide the ID of an existing 
+    placeholder, the placeholder will be updated.
+    </ParamField>
+
+    <ParamField body="pageId" type="string">
+      Page number where you insert the placeholder, starting from 0.
+    </ParamField>
+
+    <ParamField body="width" type="string">
+      Width of the placeholder.
+    </ParamField>
+
+    <ParamField body="height" type="string">
+      Height of the placeholder.
+    </ParamField>
+
+    <ParamField body="positionX" type="string">
+      Position X of the placeholder, starting from the top-left corner of the page.
+    </ParamField>
+
+    <ParamField body="positionY" type="string">
+      Position Y of the placeholder, starting from the top-left corner of the page.
     </ParamField>
 
   </Expandable>
