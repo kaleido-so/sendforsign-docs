@@ -28,7 +28,7 @@ Additionally, you will need to include FormData in the body of the request.
 For example:
 
 ```bash cURL
-formData.append('pdf', new Blob([pdfFile as BlobPart], type: 'application/pdf')) 
+formData.append('pdf', new Blob([pdfFile as BlobPart], {type: 'application/pdf'})) 
 ```
 
 Where `pdfFile` is the ArrayBuffer of your document.
