@@ -32,6 +32,10 @@ description: "Get a list of all contracts created by a specific client."
     Name of the contract.
   </ResponseField>
 
+  <ResponseField name="status" type="string">
+    Status of the contract.
+  </ResponseField>
+
   </Expandable>
 
   </ResponseField>
@@ -60,12 +64,23 @@ curl -X POST 'https://api.sendforsign.com/api/contract' \
 <ResponseExample>
 ```json Response
 	{
-       "contracts": [{
-                "createTime": "2023-12-01 12:18:55",
-				"changeTime": "2023-12-01 12:18:55",
-                "contractKey": "CONTRACT_KEY", 
-				"name": "New contract"
-		}],
+       "contracts": [
+
+        {
+            "createTime": "2024-11-25T08:07:23.000Z",
+            "changeTime": "2024-11-25T08:07:25.000Z",
+            "contractKey": "93447fb5-91ee-41ad-9f73-b4ae2d467292",
+            "name": "IPPDF",
+            "status": "Created"
+        },
+        {
+            "createTime": "2024-11-18T13:27:21.000Z",
+            "changeTime": "2024-11-21T11:29:47.000Z",
+            "contractKey": "ac2a37e8-d5d6-4468-b1bb-29152a31d85d",
+            "name": "A test contract",
+            "status": "Created"
+        }
+        ],
        "code": "200",
        "message": "Contracts found"
     } 

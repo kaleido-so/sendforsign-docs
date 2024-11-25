@@ -53,6 +53,10 @@ description: "Get information about a specific contract."
     Content of the contract, HTML.
   </ResponseField>
 
+  <ResponseField name="status" type="string">
+    Status of the contract.
+  </ResponseField>
+
 
   </Expandable>
 
@@ -92,6 +96,7 @@ curl -X POST 'https://api.sendforsign.com/api/contract' \
 				"changeTime": "2023-12-01 12:18:55",
                 "contractKey": "CONTRACT_KEY", 
 				"name": "New contract",
+                "status": "Created",
 				"value": "<p>Contract text</p>"
 		},
        "code": "200",
