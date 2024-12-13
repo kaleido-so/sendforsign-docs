@@ -52,6 +52,10 @@ description: "Get a list of all webhooks created for a specific client."
     Event to listen: `contract.signed`.
   </ResponseField>
 
+  <ResponseField name="fullySigned" type="boolean">
+    Event to listen: `contract.fullySigned`.
+  </ResponseField>
+
   </Expandable>
 
   </ResponseField>
@@ -91,7 +95,8 @@ curl -X POST 'https://api.sendforsign.com/api/webhook' \
             "seen": true,
             "sent": true,
             "approved": true,
-            "signed": true
+            "signed": true,
+            "fullySigned": true
         }
     ],
     "code": "201",

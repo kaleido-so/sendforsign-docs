@@ -40,6 +40,11 @@ Webhooks are created for the specific client key you use when creating a webhook
     Event to listen: `contract.signed`.
   </ParamField>
 
+  <ParamField body="fullySigned" type="boolean">
+    Event to listen: `contract.fullySigned`.
+  </ParamField>
+
+
   </Expandable>
 
 </ParamField>
@@ -95,7 +100,8 @@ curl -X POST 'https://api.sendforsign.com/api/webhook' \
                 "seen": true,
                 "sent": false,
                 "approved": false,
-                "signed": false
+                "signed": false,
+                "fullySigned": true
             }
         ]
     }

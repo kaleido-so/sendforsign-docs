@@ -145,6 +145,7 @@
     {
       "group": "Webhook",
       "pages": [
+        "api-reference/webhook/concept",
         "api-reference/webhook/create",
         "api-reference/webhook/update",
         "api-reference/webhook/read",

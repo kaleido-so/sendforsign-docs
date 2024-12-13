@@ -1,0 +1,105 @@
+---
+title: "Webhooks concept"
+description: "Learn how to use webhooks."
+---
+
+Webhooks can be created via API calls by using the API references from this section. 
+Please bear in mind that webhooks are separated by Client Keys, so if you create multiple Client Keys for your platform, 
+be sure to follow this rule.
+
+When you listen for the webhooks, you will receive them with the `Content-Type: application/vnd.api+json` header.
+
+Webhooks have 6 events to listen for your purposes:
+- `Contract.created`: fires when a contract is created. 
+- `Contract.sent`: fires for every recipient to whom a contract was sent.
+- `Contract.seen`: fires every time a recipient opens a contract. 
+- `Contract.approved`: fires every time a recipient approves a contract. 
+- `Contract.signed`: fires every time a recipient signs a contract. 
+- `Contract.fully_signed`: fires once when all the recipients have signed a contract. 
+
+Below you will find the examples of webhooks.
+
+### "contract.created"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T15:47:53.000Z",
+  "status": "contract.created"
+}
+```
+
+### "contract.sent"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:02:27.000Z",
+  "status": "contract.sent",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+### "contract.seen"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:03:39.000Z",
+  "status": "contract.seen",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+### "contract.approved"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:05:06.000Z",
+  "status": "contract.approved",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+### "contract.signed"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:06:56.000Z",
+  "status": "contract.signed",
+  "email": "ilia@sendforsign.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+### "contract.fully_signed"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:06:56.000Z",
+  "status": "contract.fully_signed",
+  "contractName": "Sales Contract"
+}
+```
+
+
