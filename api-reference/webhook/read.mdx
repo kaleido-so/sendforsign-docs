@@ -65,6 +65,10 @@ description: "Get information about a specific webhook."
     Event to listen: `contract.signed`.
   </ResponseField>
 
+  <ResponseField name="fullySigned" type="boolean">
+    Event to listen: `contract.fully_signed`.
+  </ResponseField>
+
   </Expandable>
 
 </ResponseField>
@@ -110,7 +114,8 @@ curl -X POST 'https://api.sendforsign.com/api/webhook' \
             "seen": true,
             "sent": false,
             "approved": false,
-            "signed": false
+            "signed": false,
+            "fullySigned": false
         }
     ],
     "code": "201",
