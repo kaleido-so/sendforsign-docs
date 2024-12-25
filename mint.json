@@ -57,7 +57,8 @@
         "usecase/firstdoc",
         "usecase/embeddocforplatform",
         "usecase/firsttemplate",
-        "usecase/updatedoc"
+        "usecase/updatedoc",
+        "usecase/recipientdomain"
       ]
     },
     {
