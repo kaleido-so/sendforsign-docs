@@ -105,10 +105,11 @@
       ]
     },
     {
-      "group": "PDF",
+      "group": "PDF and Word",
       "pages": [
         "api-reference/pdf/download",
-        "api-reference/pdf/upload"
+        "api-reference/pdf/upload",
+        "api-reference/pdf/downloadword"
       ]
     },
     {
@@ -156,7 +157,10 @@
     },
     {
       "group": "Settings",
-      "pages": ["api-reference/settings/email_notifications"]
+      "pages": [
+        "api-reference/settings/email_notifications",
+        "api-reference/settings/branding"
+      ]
     },
     {
       "group": "Components Documentation",
@@ -168,7 +172,8 @@
         "sdk/components/contracteditor",
         "sdk/components/contractlist",
         "sdk/components/templateeditor",
-        "sdk/components/templatelist"
+        "sdk/components/templatelist",
+        "sdk/components/aiassistant"
       ]
     },
     {

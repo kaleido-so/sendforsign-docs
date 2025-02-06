@@ -1,0 +1,91 @@
+---
+title: "Custom branding"
+description: "Implement your brand presence."
+---
+
+You can customize the appearance of the emails you send via Sendforsign's infrastructure, use your own email domain, 
+change the domain of recipient links you generate, and more.
+
+### Body parameters
+
+<ParamField body="type" type="string" required>
+  Settings type.
+</ParamField>
+
+<ParamField body="branding" type="string" required>
+  Structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="emailFrom" type="string">
+    The sender's name that will be shown in the emails you send to recipients.
+  </ParamField>
+
+  <ParamField body="emailDomain" type="string">
+    Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  </ParamField>
+
+  <ParamField body="recipientLinkDomain" type="string">
+    Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  </ParamField>
+
+  <ParamField body="emailExplainer" type="string">
+    A short text shown at the bottom of the emails you send to recipients.
+  </ParamField>
+
+  <ParamField body="emailLogo" type="string">
+    The logo that will be shown in the emails you send to recipients. Provide a public URL to a PNG, JPG, JPEG, or SVG image (W154 x H30).
+  </ParamField>
+
+  <ParamField body="emailButtonColor" type="string">
+    The button color that will be shown in the emails you send to recipients. Provide a hex code; the default is #1677ff.
+  </ParamField>
+
+  <ParamField body="recipientPageBranding" type="boolean">
+    Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/settings' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "type": "brandings",
+        "branding": {
+            "emailFrom": "",
+            "emailDomain": "",
+            "recipientLinkDomain": "",
+            "emailExplainer": "",
+            "emailLogo": "",
+            "emailButtonColor": "",
+            "recipientPageBranding": true
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "code": "201",
+    "message": "Settings updated"
+}
+```
+</ResponseExample>
