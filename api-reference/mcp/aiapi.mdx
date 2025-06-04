@@ -45,7 +45,18 @@ curl -X POST 'https://mcp.sendforsign.com/webhook/c17ae5ea-cbd2-43f8-90be-2a8bdf
 <ResponseExample>
 ```json Response
 {
-    "output": "hello! how can I help you?"
+    "output": "Hey how are you?",
+    "contractName": "CONTRACT_NAME",
+    "contractKey": "CONTRACT_KEY",
+    "publicURL": "URL",
+    "recipients": [
+        {
+            "recipientKey": "RECIPIENT_KEY",
+            "fullname": "RECIPIENT_NAME",
+            "email": "RECIPIENT_EMAIL",
+            "recipientURL": "RECIPIENT_SIGNING_URL"
+        }
+    ]
 }
 ```
 </ResponseExample>
