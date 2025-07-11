@@ -12,7 +12,7 @@ to Sendforsign's infrastructure and receiving unified responses.
 
 Supported use cases:
 - `Create a contract in a free format`: Ask the system to generate a contract using your context and best practices.
-- `Create a contract from a template`: Ask the system to generate a contract using a template.
+- `Create a contract from a template TemplateName`: Ask the system to generate a contract using a template.
 - `Fill in the template`: Provide the information needed to fill in the template.
 - `Specify recipients`: Ask the system to add recipients when creating a contract.
 - `See the list of templates`: Retrieve a list of templates created in your account.
@@ -32,7 +32,7 @@ Supported use cases:
 
 <RequestExample>
 ```bash cURL
-curl -X POST 'https://mcp.sendforsign.com/webhook/c17ae5ea-cbd2-43f8-90be-2a8bdf7bbcb0' \
+curl -X POST 'https://mcp.sendforsign.com/webhook/aiapi' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'clientKey: YOUR_CLIENT_KEY' \
      -H 'Content-Type: application/json' \
@@ -46,17 +46,8 @@ curl -X POST 'https://mcp.sendforsign.com/webhook/c17ae5ea-cbd2-43f8-90be-2a8bdf
 ```json Response
 {
     "output": "Hey how are you?",
-    "contractName": "CONTRACT_NAME",
     "contractKey": "CONTRACT_KEY",
-    "publicURL": "URL",
-    "recipients": [
-        {
-            "recipientKey": "RECIPIENT_KEY",
-            "fullname": "RECIPIENT_NAME",
-            "email": "RECIPIENT_EMAIL",
-            "recipientURL": "RECIPIENT_SIGNING_URL"
-        }
-    ]
+    "publicURL": "URL"
 }
 ```
 </ResponseExample>
