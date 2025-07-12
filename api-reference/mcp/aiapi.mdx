@@ -54,8 +54,12 @@ curl -X POST 'https://mcp.sendforsign.com/webhook/aiapi' \
 ```json Response
 {
     "output": "Hey how are you?",
-    "contractKey": "CONTRACT_KEY",
-    "previewURL": "URL"
+    "contract": {
+      "contractKey": "CONTRACT_KEY",
+      "previewURL": "URL",
+    }
+    "code": "201",
+    "message": "Contract created"
 }
 ```
 </ResponseExample>
