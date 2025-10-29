@@ -1,17 +1,20 @@
 ---
 title: "Create client"
 description: "Create a new client."
+api: 'POST https://api.sendforsign.com/api/client'
 ---
 
-<Note>All API calls related to the `/api/client` endpoint require a `Platform Bearer Token` in the request header.</Note>
-
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
 </ParamField>
 
-<ParamField body="client" required>
+<ParamField body="client" type="object" required>
   Structure, at least one of the fields must be filled.
 
   <Expandable title="child attribute">
@@ -52,6 +55,10 @@ description: "Create a new client."
   </Expandable>
 
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

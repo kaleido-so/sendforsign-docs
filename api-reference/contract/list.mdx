@@ -1,9 +1,14 @@
 ---
 title: "List of contracts"
 description: "Get a list of all contracts created by a specific client."
+api: 'POST https://api.sendforsign.com/api/contract'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -11,6 +16,10 @@ description: "Get a list of all contracts created by a specific client."
 
 <ParamField body="clientKey" type="string" required>
   Key of the client.
+</ParamField>
+
+  </Expandable>
+
 </ParamField>
 
 ### Response

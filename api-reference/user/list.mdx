@@ -1,9 +1,14 @@
 ---
 title: "List of users"
 description: "Get a list of all users created via a specific Client Key."
+api: 'POST https://api.sendforsign.com/api/user'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -11,6 +16,10 @@ description: "Get a list of all users created via a specific Client Key."
 
 <ParamField body="clientKey" type="string" required>
   Key of the client.
+</ParamField>
+
+  </Expandable>
+
 </ParamField>
 
 ### Response

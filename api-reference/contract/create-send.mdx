@@ -1,9 +1,14 @@
 ---
 title: "Create and send contract"
 description: "Create a new contract and immediately send it to the recipients."
+api: 'POST https://api.sendforsign.com/api/contract'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -17,7 +22,7 @@ description: "Create a new contract and immediately send it to the recipients."
   ID of the user who create the contract. If not specified, the default user credentials will be used.
 </ParamField>
 
-<ParamField body="contract" required>
+<ParamField body="contract" type="object" required>
   Contract structure.
 
   <Expandable title="child attribute">
@@ -34,7 +39,7 @@ description: "Create a new contract and immediately send it to the recipients."
 
 </ParamField>
 
-<ParamField body="recipients" type="string">
+<ParamField body="recipients" type="array">
   Array of recipients, optional.
 
   <Expandable title="child attribute">
@@ -58,6 +63,10 @@ description: "Create a new contract and immediately send it to the recipients."
   <ParamField body="position" type="number">
     Signing order. If not specified, all requests will be sent simultaneously.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

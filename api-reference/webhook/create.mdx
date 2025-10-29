@@ -1,11 +1,16 @@
 ---
 title: "Create webhook"
 description: "Create a webhook."
+api: 'POST https://api.sendforsign.com/api/webhook'
 ---
 
 Webhooks are created for the specific client key you use when creating a webhook.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -15,7 +20,7 @@ Webhooks are created for the specific client key you use when creating a webhook
   Key of the client.
 </ParamField>
 
-<ParamField body="webhooks" type="string" required>
+<ParamField body="webhooks" type="array" required>
   Array of webhooks.
 
   <Expandable title="child attribute">
@@ -48,6 +53,10 @@ Webhooks are created for the specific client key you use when creating a webhook
     Event to listen: `contract.fully_signed`.
   </ParamField>
 
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

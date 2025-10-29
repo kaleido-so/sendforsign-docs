@@ -1,9 +1,14 @@
 ---
 title: "Delete webhook"
 description: "Delete an existing webhook."
+api: 'POST https://api.sendforsign.com/api/webhook'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,14 +18,18 @@ description: "Delete an existing webhook."
   Key of the client.
 </ParamField>
 
-<ParamField body="webhooks" type="string" required>
+<ParamField body="webhooks" type="array" required>
   Array of webhooks. Add the fields that need to be updated and ignore the rest.
 
   <Expandable title="child attribute">
 
-  <ParamField body="url" type="string" required>
+  <ParamField body="webhookKey" type="string" required>
     Webhook's key.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

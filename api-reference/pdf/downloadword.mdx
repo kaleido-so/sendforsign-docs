@@ -1,17 +1,18 @@
 ---
 title: "Download Word"
 description: "Download Word of an existing text contract."
+api: 'GET https://api.sendforsign.com/api/download_docx'
 ---
 
 Retrieve a contract Word. As a response, you will receive ArrayBuffer.
 
-### Body parameters
+### Query parameters
 
-<ParamField body="clientKey" type="string" required>
+<ParamField query="clientKey" type="string" required>
   Key of the client.
 </ParamField>
 
-<ParamField body="contractKey" type="string" required>
+<ParamField query="contractKey" type="string" required>
   Key of the contract.
 </ParamField>
 

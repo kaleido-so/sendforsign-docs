@@ -1,9 +1,14 @@
 ---
 title: "Delete template"
 description: "Delete an existing template."
+api: 'POST https://api.sendforsign.com/api/template'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Delete an existing template."
   Key of the client.
 </ParamField>
 
-<ParamField body="template" required>
+<ParamField body="template" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -21,6 +26,10 @@ description: "Delete an existing template."
   <ParamField body="templateKey" type="string" required>
     Key of the template that needs to be deleted.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

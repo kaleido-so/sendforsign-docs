@@ -1,6 +1,7 @@
 ---
 title: "Send to recipients"
 description: "Send an existing contract to recipients for signing, approval and more."
+api: 'POST https://api.sendforsign.com/api/recipient'
 ---
 
 One way to send a contract to recipients is when you create a contract. 
@@ -9,6 +10,10 @@ One way to send a contract to recipients is when you create a contract.
 If you need to send an existing contract to recipients, use the request below.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -26,7 +31,7 @@ If you need to send an existing contract to recipients, use the request below.
   Key of the contract.
 </ParamField>
 
-<ParamField body="recipients" type="string">
+<ParamField body="recipients" type="array">
   Array of recipients, optional. If no array of recipients is provided, 
   the system will send the contract to those recipients who were added previously.
 
@@ -56,6 +61,10 @@ If you need to send an existing contract to recipients, use the request below.
   <ParamField body="position" type="number">
     Signing order. If not specified, all requests will be sent simultaneously.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

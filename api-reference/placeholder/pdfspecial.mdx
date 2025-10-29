@@ -1,6 +1,7 @@
 ---
 title: "Place special placeholder"
 description: "Place a special placeholder in a PDF contract."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 Special placeholders are four types of placeholders that are created automatically for every recipient.
@@ -19,6 +20,10 @@ Available placeholder codes:
 
 ### Body parameters
 
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
 <ParamField body="action" type="string" required>
   Action type.
 </ParamField>
@@ -31,7 +36,7 @@ Available placeholder codes:
   Key of the contract.
 </ParamField>
 
-<ParamField body="placeholders" required>
+<ParamField body="placeholders" type="array" required>
   Array of placeholders.
 
   <Expandable title="child attribute">
@@ -52,7 +57,7 @@ Available placeholder codes:
     <b>4</b>: Recipient's signature
   </ParamField>
 
-  <ParamField body="insertion" type="string">
+  <ParamField body="insertion" type="array">
     Array of places.
   </ParamField>
   
@@ -84,6 +89,10 @@ Available placeholder codes:
     </ParamField>
 
   </Expandable>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

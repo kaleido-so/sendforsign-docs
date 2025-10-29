@@ -1,17 +1,18 @@
 ---
 title: "Get Timeline"
 description: "Get timeline of an existing contract."
+api: 'GET https://api.sendforsign.com/api/contract_event'
 ---
 
 Retrieve a contract timeline.
 
-### Body parameters
+### Query parameters
 
-<ParamField body="clientKey" type="string" required>
+<ParamField query="clientKey" type="string" required>
   Key of the client.
 </ParamField>
 
-<ParamField body="contractKey" type="string" required>
+<ParamField query="contractKey" type="string" required>
   Key of the contract.
 </ParamField>
 

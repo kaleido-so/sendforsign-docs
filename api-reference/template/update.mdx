@@ -1,9 +1,14 @@
 ---
 title: "Update template"
 description: "Update an existing template."
+api: 'POST https://api.sendforsign.com/api/template'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Update an existing template."
   Key of the client.
 </ParamField>
 
-<ParamField body="template" required>
+<ParamField body="template" type="object" required>
   Structure, use the fields that should be updated.
 
   <Expandable title="child attribute">
@@ -29,6 +34,10 @@ description: "Update an existing template."
   <ParamField body="value" type="string">
     Content of the template, use HTML.  
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

@@ -1,9 +1,14 @@
 ---
 title: "List of placeholders"
 description: "Get a list of all placeholders created in a specific contract or template."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -19,6 +24,10 @@ description: "Get a list of all placeholders created in a specific contract or t
 
 <ParamField body="contractKey" type="string">
   Key of the contract. Use this parameter if you need to retrieve a contract's placeholders.
+</ParamField>
+
+  </Expandable>
+
 </ParamField>
 
 ### Response

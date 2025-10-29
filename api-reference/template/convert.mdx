@@ -1,11 +1,16 @@
 ---
 title: "Convert into template"
 description: "Convert a contract into a template."
+api: 'POST https://api.sendforsign.com/api/template'
 ---
 When converting a contract into a template, all content will be transferred to the template, 
 and all placeholders will be transferred with their values removed. The original contract will remain unchanged.
 
 ### Body parameters 
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -19,7 +24,7 @@ and all placeholders will be transferred with their values removed. The original
   ID of the user who converts a contract into a template. If not specified, the default user credentials will be used.
 </ParamField>
 
-<ParamField body="template" required>
+<ParamField body="template" type="object" required>
   Template structure.
 
   <Expandable title="child attribute">
@@ -31,6 +36,10 @@ and all placeholders will be transferred with their values removed. The original
   <ParamField body="contractKey" type="string" required>
     Key of the contract that will be converted into a template.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

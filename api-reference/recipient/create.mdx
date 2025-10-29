@@ -1,6 +1,7 @@
 ---
 title: "Create recipient"
 description: "Add a recipient to a contract."
+api: 'POST https://api.sendforsign.com/api/recipient'
 ---
 
 One way to add recipients to a contract is when you send a contract. 
@@ -9,6 +10,10 @@ One way to add recipients to a contract is when you send a contract.
 If you need to add a recipient to a contract without sending it, use the request below.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -26,7 +31,7 @@ If you need to add a recipient to a contract without sending it, use the request
   Key of the contract.
 </ParamField>
 
-<ParamField body="recipients" type="string">
+<ParamField body="recipients" type="array">
   Array of recipients, optional.
 
   <Expandable title="child attribute">
@@ -50,6 +55,10 @@ If you need to add a recipient to a contract without sending it, use the request
   <ParamField body="position" type="number">
     Signing order. If not specified, all requests will be sent simultaneously.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

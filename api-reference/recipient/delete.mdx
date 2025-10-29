@@ -1,9 +1,14 @@
 ---
 title: "Delete recipient"
 description: "Delete an existing recipient."
+api: 'POST https://api.sendforsign.com/api/recipient'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -17,7 +22,7 @@ description: "Delete an existing recipient."
   Key of the contract.
 </ParamField>
 
-<ParamField body="recipient" required>
+<ParamField body="recipient" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -25,6 +30,10 @@ description: "Delete an existing recipient."
   <ParamField body="recipientKey" type="string" required>
     Key of the recipient that needs to be deleted.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

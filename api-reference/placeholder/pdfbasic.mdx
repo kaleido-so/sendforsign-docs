@@ -1,6 +1,7 @@
 ---
 title: "Place basic placeholder"
 description: "Place a basic placeholder in a PDF contract."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 Basic placeholders are text placeholders that can be used to fill in HTML and PDF contracts. 
@@ -9,6 +10,10 @@ Additionally, they can be linked to any recipient afterward.
 Before placing placeholders in a PDF, you need to [create them](/api-reference/placeholder/create) in advance.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -22,7 +27,7 @@ Before placing placeholders in a PDF, you need to [create them](/api-reference/p
   Key of the contract.
 </ParamField>
 
-<ParamField body="placeholders" required>
+<ParamField body="placeholders" type="array" required>
   Array of placeholders.
 
   <Expandable title="child attribute">
@@ -31,7 +36,7 @@ Before placing placeholders in a PDF, you need to [create them](/api-reference/p
     Key of the placeholder that needs to be updated.
   </ParamField>
 
-  <ParamField body="insertion" type="string">
+  <ParamField body="insertion" type="array">
     Array of places.
   </ParamField>
   
@@ -63,6 +68,10 @@ Before placing placeholders in a PDF, you need to [create them](/api-reference/p
     </ParamField>
 
   </Expandable>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

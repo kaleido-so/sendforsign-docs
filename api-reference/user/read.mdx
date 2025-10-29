@@ -1,9 +1,14 @@
 ---
 title: "Read user"
 description: "Get information about a specific user."
+api: 'POST https://api.sendforsign.com/api/user'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Get information about a specific user."
   Key of the client.
 </ParamField>
 
-<ParamField body="user" required>
+<ParamField body="user" type="object" required>
   Structure, at least one of the fields must be filled.
 
   <Expandable title="child attribute">
@@ -33,6 +38,10 @@ description: "Get information about a specific user."
   <ParamField body="customKey" type="string">
     User custom key, if you used it when creating the client.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

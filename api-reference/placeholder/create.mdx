@@ -1,6 +1,7 @@
 ---
 title: "Create placeholder"
 description: "Add a placeholder to a contract."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 One way to add placeholders to a contract is when you create a new contract. 
@@ -9,6 +10,10 @@ One way to add placeholders to a contract is when you create a new contract.
 If a contract already exists, use the request below.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -22,7 +27,7 @@ If a contract already exists, use the request below.
   Key of the contract.
 </ParamField>
 
-<ParamField body="placeholder" required>
+<ParamField body="placeholder" type="object" required>
   Structure, add the fields that need to be updated and ignore the rest.
 
   <Expandable title="child attribute">
@@ -38,6 +43,10 @@ If a contract already exists, use the request below.
   <ParamField body="value" type="string">
     Value of the placeholder.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

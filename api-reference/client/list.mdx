@@ -1,14 +1,21 @@
 ---
 title: "List of clients"
 description: "Get a list of all clients created via a specific API Key."
+api: 'POST https://api.sendforsign.com/api/client'
 ---
-
-<Note>All API calls related to the `/api/client` endpoint require a `Platform Bearer Token` in the request header.</Note>
 
 ### Body parameters
 
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
 <ParamField body="action" type="string" required>
   Action type.
+</ParamField>
+  
+  </Expandable>
+
 </ParamField>
 
 ### Response

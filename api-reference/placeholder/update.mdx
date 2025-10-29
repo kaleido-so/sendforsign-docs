@@ -1,9 +1,14 @@
 ---
 title: "Update placeholder"
 description: "Update an existing placeholder."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -17,7 +22,7 @@ description: "Update an existing placeholder."
   Key of the contract.
 </ParamField>
 
-<ParamField body="placeholder" required>
+<ParamField body="placeholder" type="object" required>
   Structure, add the fields that need to be updated and ignore the rest.
 
   <Expandable title="child attribute">
@@ -33,6 +38,10 @@ description: "Update an existing placeholder."
   <ParamField body="value" type="string">
     Value of the placeholder.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

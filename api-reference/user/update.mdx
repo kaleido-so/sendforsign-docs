@@ -1,9 +1,14 @@
 ---
 title: "Update user"
 description: "Update an existing user."
+api: 'POST https://api.sendforsign.com/api/user'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Update an existing user."
   Key of the client.
 </ParamField>
 
-<ParamField body="user" required>
+<ParamField body="user" type="object" required>
   Structure, use the fields that should be updated.
 
   <Expandable title="child attribute">
@@ -33,6 +38,10 @@ description: "Update an existing user."
   <ParamField body="customKey" type="string">
     User custom key, if you used it when creating the user.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

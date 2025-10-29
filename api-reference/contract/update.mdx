@@ -1,9 +1,14 @@
 ---
 title: "Update contract"
 description: "Update an existing contract."
+api: 'POST https://api.sendforsign.com/api/contract'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Update an existing contract."
   Key of the client.
 </ParamField>
 
-<ParamField body="contract" required>
+<ParamField body="contract" type="object" required>
   Structure, use the fields that should be updated.
 
   <Expandable title="child attribute">
@@ -29,6 +34,10 @@ description: "Update an existing contract."
   <ParamField body="value" type="string">
     Content of the contract, use HTML.  
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

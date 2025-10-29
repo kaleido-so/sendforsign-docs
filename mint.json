@@ -106,8 +106,8 @@
         "api-reference/contract/update",
         "api-reference/contract/read",
         "api-reference/contract/list",
-        "api-reference/contract/archive"
-
+        "api-reference/contract/archive",
+        "api-reference/contract/get_timeline"
       ]
     },
     {
@@ -199,7 +199,8 @@
   "api": {
     "baseUrl": "https://api.sendforsign.com/api", 
     "auth": {
-      "method": "bearer"
+      "method": "key",
+      "name": "X-Sendforsign-Key"
     }
   }
 }

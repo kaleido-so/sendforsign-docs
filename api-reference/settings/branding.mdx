@@ -1,12 +1,17 @@
 ---
 title: "Custom branding"
 description: "Implement your brand presence."
+api: 'POST https://api.sendforsign.com/api/settings'
 ---
 
 You can customize the appearance of the emails you send via Sendforsign's infrastructure, use your own email domain, 
 change the domain of recipient links you generate, and more.
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="type" type="string" required>
   Settings type.
@@ -16,7 +21,7 @@ change the domain of recipient links you generate, and more.
   Key of the client.
 </ParamField>
 
-<ParamField body="branding" type="string" required>
+<ParamField body="branding" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -48,6 +53,10 @@ change the domain of recipient links you generate, and more.
   <ParamField body="recipientPageBranding" type="boolean">
     Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

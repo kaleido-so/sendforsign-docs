@@ -1,9 +1,14 @@
 ---
 title: "Delete placeholder"
 description: "Delete an existing placeholder."
+api: 'POST https://api.sendforsign.com/api/placeholder'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -17,7 +22,7 @@ description: "Delete an existing placeholder."
   Key of the contract.
 </ParamField>
 
-<ParamField body="placeholder" required>
+<ParamField body="placeholder" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -25,6 +30,10 @@ description: "Delete an existing placeholder."
   <ParamField body="placeholderKey" type="string" required>
     Key of the placeholder that needs to be deleted.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

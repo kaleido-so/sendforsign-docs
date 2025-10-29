@@ -1,9 +1,14 @@
 ---
 title: "Read template"
 description: "Get information about a specific template."
+api: 'POST https://api.sendforsign.com/api/template'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Get information about a specific template."
   Key of the client.
 </ParamField>
 
-<ParamField body="template" required>
+<ParamField body="template" type="object" required>
   Structure, at least one of the fields must be filled.
 
   <Expandable title="child attribute">
@@ -25,6 +30,10 @@ description: "Get information about a specific template."
   <ParamField body="name" type="string">
     Name of the template.  
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

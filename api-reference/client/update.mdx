@@ -1,17 +1,20 @@
 ---
 title: "Update client"
 description: "Update an existing client."
+api: 'POST https://api.sendforsign.com/api/client'
 ---
 
-<Note>All API calls related to the `/api/client` endpoint require a `Platform Bearer Token` in the request header.</Note>
-
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
 </ParamField>
 
-<ParamField body="client" required>
+<ParamField body="client" type="object" required>
   Structure, use the fields that should be updated.
 
   <Expandable title="child attribute">
@@ -35,6 +38,10 @@ description: "Update an existing client."
   <ParamField body="customKey" type="string">
     Client custom key, if you used it when creating the client.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

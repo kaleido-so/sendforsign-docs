@@ -1,6 +1,7 @@
 ---
 title: "AI+API"
 description: "Generate agreements with human language."
+api: 'POST https://aiapi.sendforsign.com/webhook/aiapi'
 ---
 
 <Note>This feature is currently in open beta.</Note>
@@ -16,6 +17,16 @@ Supported use cases:
 - `Create and fill in a contract from a template`: Provide the template name, the recipients' names and email addresses, and the data to populate the placeholders.
 - `See the list of templates`: Retrieve a list of templates created in your account.
 - `See the list of template placeholders`: Retrieve a list of placeholders of a template. Specify the name of the template.
+
+### Headers
+
+<ParamField header="clientKey" type="string" required>
+  Your clientKey.
+</ParamField>
+
+<ParamField header="secretKey" type="string" required>
+  Your secretKey.
+</ParamField>
 
 ### Body parameters
 

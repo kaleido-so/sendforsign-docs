@@ -1,9 +1,14 @@
 ---
 title: "Create user"
 description: "Create a new user."
+api: 'POST https://api.sendforsign.com/api/user'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Create a new user."
   Key of the client.
 </ParamField>
 
-<ParamField body="user" required>
+<ParamField body="user" type="object" required>
   Structure, at least one of the fields must be filled.
 
   <Expandable title="child attribute">
@@ -29,6 +34,10 @@ description: "Create a new user."
   <ParamField body="customKey" type="string">
     Your custom key, if you don't need to use any of the above fields. 
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

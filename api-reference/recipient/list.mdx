@@ -1,9 +1,14 @@
 ---
 title: "List of recipients"
 description: "Get a list of all recipients created in a specific contract."
+api: 'POST https://api.sendforsign.com/api/recipient'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -15,6 +20,10 @@ description: "Get a list of all recipients created in a specific contract."
 
 <ParamField body="contractKey" type="string">
   Key of the contract. Use this parameter if you need to retrieve a contract's recipients.
+</ParamField>
+
+  </Expandable>
+
 </ParamField>
 
 ### Response

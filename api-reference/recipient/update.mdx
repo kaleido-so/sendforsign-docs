@@ -1,9 +1,14 @@
 ---
 title: "Update recipient"
 description: "Update an existing recipient."
+api: 'POST https://api.sendforsign.com/api/recipient'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -17,7 +22,7 @@ description: "Update an existing recipient."
   Key of the contract.
 </ParamField>
 
-<ParamField body="recipient" required>
+<ParamField body="recipient" type="object" required>
   Structure, add the fields that need to be updated and ignore the rest.
 
   <Expandable title="child attribute">
@@ -45,6 +50,10 @@ description: "Update an existing recipient."
   <ParamField body="position" type="number">
     Signing order. If not specified, all requests will be sent simultaneously.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

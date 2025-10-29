@@ -1,6 +1,7 @@
 ---
 title: "Email notifications"
 description: "Enable or disable email notifications."
+api: 'POST https://api.sendforsign.com/api/settings'
 ---
 
 Email notifications are updated for the specific client key you use when updating the settings.
@@ -13,6 +14,10 @@ use the request provided below.
 
 ### Body parameters
 
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
 <ParamField body="type" type="string" required>
   Settings type.
 </ParamField>
@@ -21,7 +26,7 @@ use the request provided below.
   Key of the client.
 </ParamField>
 
-<ParamField body="notification" type="string" required>
+<ParamField body="notification" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -33,6 +38,10 @@ use the request provided below.
   <ParamField body="signed" type="boolean">
     Settings to change: send email notifications on `contract.signed`.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 

@@ -1,9 +1,14 @@
 ---
 title: "Archive contract"
 description: "Archive a specific contract."
+api: 'POST https://api.sendforsign.com/api/contract'
 ---
 
 ### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
 
 <ParamField body="action" type="string" required>
   Action type.
@@ -13,7 +18,7 @@ description: "Archive a specific contract."
   Key of the client.
 </ParamField>
 
-<ParamField body="contract" required>
+<ParamField body="contract" type="object" required>
   Structure.
 
   <Expandable title="child attribute">
@@ -21,6 +26,10 @@ description: "Archive a specific contract."
   <ParamField body="contractKey" type="string">
     Key of the contract.
   </ParamField>
+
+  </Expandable>
+
+</ParamField>
 
   </Expandable>
 
