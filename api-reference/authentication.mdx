@@ -39,7 +39,6 @@ curl -X POST 'https://api.sendforsign.com/api/token' \
      -d '{
          "data": {
             "action": "create",
-            "clientKey": "YOUR_CLIENT_KEY",
             "apiKey": "YOUR_API_KEY",
             "secret": "YOUR_SECRET"
          }
@@ -67,7 +66,7 @@ To revoke a token, call `POST /api/token` with a request body containing the `re
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "revoke"
@@ -93,11 +92,10 @@ and specify the `platform Bearer token` in the header:
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "create",
-        "clientKey": "YOUR_CLIENT_KEY",
         "clientKey": "YOUR_CLIENT_KEY"
      }'
 ```
@@ -123,11 +121,10 @@ and specify the `platform Bearer token` in the header:
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Authorization: Bearer 123456789' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "revoke",
-        "clientKey": "YOUR_CLIENT_KEY",
         "access_token": "eyJ0eXAiOiJKV1QiLCJhb..."
      }'
 ```
