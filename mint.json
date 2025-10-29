@@ -193,8 +193,8 @@
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/sendforsign",
-    "linkedin": "https://www.linkedin.com/company/sendforsign/about/"
+    "linkedin": "https://www.linkedin.com/company/sendforsign/about/",
+    "youtube": "https://www.youtube.com/@Sendforsign/videos"
   },
   "api": {
     "baseUrl": "https://api.sendforsign.com/api", 
