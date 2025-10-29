@@ -60,11 +60,12 @@ description: "Create a new user."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/user' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
 				   "user": {
 							  "fullname": "John Johnson",
 							  "email": "john_johnson@mail.com", 

@@ -64,11 +64,12 @@ description: "Update an existing user."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/user' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "update",
+				   "clientKey": "YOUR_CLIENT_KEY",
 				   "user": {
 							  "userKey": "USER_KEY",
 							  "fullname": "John Johnson",

@@ -68,14 +68,16 @@ If you need to add a recipient to a contract without sending it, use the request
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
 				   "contractKey": "CONTRACT_KEY",
            "recipients":[{
                 "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
                 "customMessage": "Custom message text",
                 "fullname": "John Johnson", 
                 "email": "john_johnson@mail.com", 

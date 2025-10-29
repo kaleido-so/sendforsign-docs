@@ -72,15 +72,17 @@ description: "Update an existing recipient."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
         "contractKey": "CONTRACT_KEY",
         "recipient": {
             "recipientKey": "RECIPIENT_KEY",
             "action": "view",
+            "clientKey": "YOUR_CLIENT_KEY",
             "customMessage": "Custom message text",
             "fullname": "Full Name",
             "email": "email@email.com",

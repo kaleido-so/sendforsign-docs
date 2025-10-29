@@ -74,17 +74,19 @@ If you need to send an existing contract to recipients, use the request below.
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "send",
+				   "clientKey": "YOUR_CLIENT_KEY",
                    "userKey": "USER_KEY", 
 				   "contractKey": "CONTRACT_KEY",
            "recipients":[
             {
                 "recipientKey": "RECIPIENT_KEY",
                 "action": "sign",
+                "clientKey": "YOUR_CLIENT_KEY",
                 "customMessage": "Custom message text",
                 "fullname": "John Johnson", 
                 "email": "john_johnson1@mail.com", 
@@ -92,6 +94,7 @@ curl -X POST 'https://api.sendforsign.com/api/recipient' \
             },
             {
                 "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
                 "customMessage": "Custom message text",
                 "fullname": "John Johnson", 
                 "email": "john_johnson2@mail.com", 

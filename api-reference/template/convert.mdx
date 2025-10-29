@@ -62,11 +62,12 @@ and all placeholders will be transferred with their values removed. The original
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/template' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "convert",
+				   "clientKey": "YOUR_CLIENT_KEY",
                    "userKey": "USER_KEY", 
 				   "template": {
 							  "name": "New template",

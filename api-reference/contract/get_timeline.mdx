@@ -1,9 +1,9 @@
 ---
-title: "Download PDF"
-description: "Download PDF of an existing contract."
+title: "Get Timeline"
+description: "Get timeline of an existing contract."
 ---
 
-Retrieve a contract PDF. As a response, you will receive ArrayBuffer.
+Retrieve a contract timeline.
 
 ### Body parameters
 
@@ -17,7 +17,7 @@ Retrieve a contract PDF. As a response, you will receive ArrayBuffer.
 
 <RequestExample>
 ```bash cURL
-curl -X GET 'https://api.sendforsign.com/api/download_pdf?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+curl -X GET 'https://api.sendforsign.com/api/contract_event?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
 ```

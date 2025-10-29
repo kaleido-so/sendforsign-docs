@@ -39,6 +39,7 @@ curl -X POST 'https://api.sendforsign.com/api/token' \
      -d '{
          "data": {
             "action": "create",
+            "clientKey": "YOUR_CLIENT_KEY",
             "apiKey": "YOUR_API_KEY",
             "secret": "YOUR_SECRET"
          }
@@ -66,7 +67,7 @@ To revoke a token, call `POST /api/token` with a request body containing the `re
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "revoke"
@@ -92,10 +93,11 @@ and specify the `platform Bearer token` in the header:
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
         "clientKey": "YOUR_CLIENT_KEY"
      }'
 ```
@@ -121,10 +123,11 @@ and specify the `platform Bearer token` in the header:
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/token' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
         "action": "revoke",
+        "clientKey": "YOUR_CLIENT_KEY",
         "access_token": "eyJ0eXAiOiJKV1QiLCJhb..."
      }'
 ```
@@ -139,10 +142,6 @@ A `201 OK` response indicates that the specified token has been revoked successf
 ```
 
 ## Authentication for testing purposes
-
-<Warning>
-Use this method for testing purposes only and never with your real clients. This may lead to your API being compromised.
-</Warning>
 
 Although we always recommend using Sendforsign's token mechanism to access our infrastructure, there is an
 alternative way to send API calls and render Sendforsign's components without the need to generate tokens.

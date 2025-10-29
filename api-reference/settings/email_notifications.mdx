@@ -47,11 +47,12 @@ use the request provided below.
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/settings' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "type": "email_notifications",
+        "clientKey": "YOUR_CLIENT_KEY",
         "notification": 
             {
                 "approved": false,

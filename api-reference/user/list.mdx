@@ -55,11 +55,12 @@ description: "Get a list of all users created via a specific Client Key."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/user' \ 
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
-				   "action": "list"
+				   "action": "list",
+				   "clientKey": "YOUR_CLIENT_KEY"
 				  }
      }'
 ```

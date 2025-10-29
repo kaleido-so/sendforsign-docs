@@ -7,14 +7,18 @@ Retrieve a contract Word. As a response, you will receive ArrayBuffer.
 
 ### Body parameters
 
+<ParamField body="clientKey" type="string" required>
+  Key of the client.
+</ParamField>
+
 <ParamField body="contractKey" type="string" required>
-  ID of the contract.
+  Key of the contract.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
-curl -X GET 'https://api.sendforsign.com/api/download_docx?contractKey=5cb-49c6-4f62-9b77-5c304' \
-     -H 'Authorization: Bearer 123456789' \
+curl -X GET 'https://api.sendforsign.com/api/download_docx?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
 ```
 </RequestExample>

@@ -67,11 +67,12 @@ description: "Get a list of all placeholders created in a specific contract or t
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \ 
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
               "action": "list",
+              "clientKey": "YOUR_CLIENT_KEY",
               "contractKey": "CONTRACT_KEY",
               "templateKey": "TEMPLATE_KEY"
 				  }

@@ -89,11 +89,12 @@ description: "Create a new contract and immediately send it to the recipients."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/contract' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
                    "userKey": "USER_KEY", 
 				   "contract": {
 							  "name": "New contract",
@@ -101,6 +102,7 @@ curl -X POST 'https://api.sendforsign.com/api/contract' \
 						     },
            "recipients":[{
                 "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
                 "customMessage": "Custom message text",
                 "fullname": "John Johnson", 
                 "email": "john_johnson@mail.com", 

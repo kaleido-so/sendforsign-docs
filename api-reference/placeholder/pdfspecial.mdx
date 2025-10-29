@@ -115,11 +115,12 @@ Available placeholder codes:
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
         "contractKey": "CONTRACT_KEY",
         "placeholders": [
             {
@@ -129,6 +130,7 @@ curl -X POST 'https://api.sendforsign.com/api/placeholder' \
                 "insertion": [
                     {
                         "action": "update",
+                        "clientKey": "YOUR_CLIENT_KEY",
                         "id": 2,
                         "pageId": 0,
                         "width": 150,

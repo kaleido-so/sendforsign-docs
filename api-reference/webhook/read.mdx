@@ -85,11 +85,12 @@ description: "Get information about a specific webhook."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/webhook' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "read",
+        "clientKey": "YOUR_CLIENT_KEY",
         "webhooks": [
             {
                 "webhookKey": "WEBHOOK_KEY"

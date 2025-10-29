@@ -64,11 +64,12 @@ description: "Update an existing template."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/template' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "update",
+				   "clientKey": "YOUR_CLIENT_KEY",
 				   "template": {
 							  "templateKey": "TEMPLATE_KEY", 
 							  "name": "New template",

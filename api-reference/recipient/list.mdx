@@ -71,11 +71,12 @@ description: "Get a list of all recipients created in a specific contract."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \ 
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
           "data": {
               "action": "list",
+              "clientKey": "YOUR_CLIENT_KEY",
               "contractKey": "CONTRACT_KEY"				  }
      }'
 ```
@@ -94,6 +95,7 @@ curl -X POST 'https://api.sendforsign.com/api/recipient' \
             "customMessage": "Custom message text",
             "position": "1",
             "action": "view",
+            "clientKey": "YOUR_CLIENT_KEY",
             "recipientKey": "RECIPIENT_KEY",
         }
     ],

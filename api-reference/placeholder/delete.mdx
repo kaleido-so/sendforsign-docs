@@ -43,11 +43,12 @@ description: "Delete an existing placeholder."
 <RequestExample>
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "delete",
+        "clientKey": "YOUR_CLIENT_KEY",
         "contractKey": "CONTRACT_KEY",
         "placeholder": {
             "placeholderKey": "PLACEHOLDER_KEY"
