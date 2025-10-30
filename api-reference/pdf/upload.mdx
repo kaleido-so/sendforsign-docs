@@ -30,6 +30,11 @@ Additionally, you will need to include FormData in the body of the request.
 For example:
 
 ```bash cURL
+-F 'pdf=@/path/to/yourfile.pdf;type=application/pdf'
+```
+
+Or in typescript:
+```bash ts
 formData.append('pdf', new Blob([pdfFile as BlobPart], {type: 'application/pdf'})) 
 ```
 
@@ -49,6 +54,7 @@ Where `pdfFile` is the ArrayBuffer of your document.
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/upload_pdf?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
      -H 'X-Sendforsign-Key: YOUR_API_KEY' \
-     -H 'Content-Type: application/json' \
+     -H 'Content-Type: multipart/form-data' \
+     -F 'pdf=@/path/to/yourfile.pdf;type=application/pdf'
 ```
 </RequestExample>
