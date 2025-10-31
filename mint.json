@@ -42,6 +42,10 @@
       "url": "sdk"
     },
     {
+      "name": "Changelog",
+      "url": "changelog"
+    },
+    {
       "name": "About",
       "url": "about"
     }
@@ -182,6 +186,14 @@
         "sdk/components/templateeditor",
         "sdk/components/templatelist",
         "sdk/components/aiassistant"
+      ]
+    },
+    {
+      "group": "Years",
+      "pages": [
+        "changelog/2025",
+        "changelog/2024",
+        "changelog/2023"
       ]
     },
     {
