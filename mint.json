@@ -58,6 +58,7 @@
         "usecase/embeddocforplatform",
         "usecase/firsttemplate",
         "usecase/updatedoc",
+        "usecase/add-table-placeholder",
         "usecase/recipientdomain"
       ]
     },

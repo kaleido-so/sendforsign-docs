@@ -20,7 +20,7 @@ will be using the SFS infrastructure. Use your unique API key for this purpose.
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/client' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
@@ -43,12 +43,12 @@ Let's create a simple document using our Create API request. [Learn more here.](
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/contract' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "create",
-                   "userKey": "USER_KEY", 
+                   "clientKey": "YOUR_CLIENT_KEY",
 				   "contract": {
 							  "name": "New contract",
 							  "value": "<p>Hello world</p>"
@@ -77,13 +77,12 @@ Now you're ready to send your contract to recipients. You will need just one API
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
 				   "action": "send",
 				   "clientKey": "CLIENT_KEY",
-                   "userKey": "USER_KEY", 
 				   "contractKey": "CONTRACT_KEY",
            "recipients":[
             {

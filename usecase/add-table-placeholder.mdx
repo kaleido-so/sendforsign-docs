@@ -1,0 +1,167 @@
+---
+title: 'Add Table Placeholders to a Contract'
+description: 'Learn how to add dynamic table placeholders to your contracts.'
+---
+
+## Set up your account
+
+Before using dynamic placeholders, see the [First document use case](/usecase/firstdoc) to set up your 
+platform account and get the API key.
+
+## Create your document
+
+SFS provides you with two ways of creating documents: by using an API request (API way) or via our React UI (visual way). 
+Let's create a simple document using our API.
+
+To do this, you can use this request. [Learn more here.](/api-reference/contract/create-fill)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "CLIENT_KEY",
+        "contract": {
+            "name": "New contract",
+            "value": "<p>Contract text</p>"
+        }
+    }
+}'
+```
+
+As a response, you will receive a Contract Key:
+
+```bash json
+{
+    "contract": {
+        "createTime": "2024-03-07T15:18:41.000Z",
+        "contractKey": "d29b3893-826c-47d0-abdd-c6ed2b691a5c"
+    },
+    "code": "201",
+    "message": "Contract created"
+}
+```
+
+## Add a placeholder to your document
+
+First, you need to add a regular placeholder to your document. This placeholder will later be converted into a dynamic table.
+
+[Learn more about creating placeholders here.](/api-reference/placeholder/create)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "name": "Product Table",
+            "value": "Products will be displayed here"
+        }
+    }
+}'
+```
+
+As a response, you will receive a Placeholder Key:
+
+```bash json
+{
+    "placeholder": {
+        "id": "3",
+        "createTime": "2024-11-22T11:11:24.000Z",
+        "changeTime": "2024-11-22T11:11:24.000Z",
+        "name": "Product Table",
+        "value": "Products will be displayed here",
+        "type": "1",
+        "placeholderKey": "abc123-def456-ghi789",
+        "position": "3"
+    },
+    "code": 201,
+    "message": "Placeholder created"
+}
+```
+
+## Convert the placeholder into a dynamic table
+
+Now that you have a placeholder with a placeholder key, you can convert it into a dynamic table. The table will replace the placeholder in your document and display structured data with columns and rows.
+
+[Learn more about table placeholders here.](/api-reference/placeholder/update-table)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "table": {
+                "columns": ["Product", "Quantity", "Unit Price", "Total"],
+                "rows": [
+                    ["Product 1", 2, 100, 200],
+                    ["Product 2", 1, 250, 250],
+                    ["Product 3", 4, 75, 300]
+                ]
+            }
+        }
+    }
+}'
+```
+
+As a response, you will receive confirmation that the placeholder has been updated to a table:
+
+```bash json
+{
+    "placeholder": {
+        "id": "3",
+        "createTime": "2024-11-22T11:11:24.000Z",
+        "changeTime": "2024-11-22T11:28:23.000Z",
+        "name": "Product Table",
+        "value": "{\"columns\":[\"Product\",\"Quantity\",\"Unit Price\",\"Total\"],\"rows\":[[\"Product 1\",2,100,200],[\"Product 2\",1,250,250],[\"Product 3\",4,75,300]]}",
+        "isTable": true,
+        "type": "1",
+        "placeholderKey": "abc123-def456-ghi789",
+        "position": "3",
+        "fillingType": "1",
+        "externalRecipientKey": null
+    },
+    "code": 201,
+    "message": "Placeholder updated"
+}
+```
+
+Notice that the `isTable` property is now set to `true`, and the `value` contains a JSON string with the table structure including columns and rows.
+
+## View your document with the dynamic table
+
+Awesome! You've successfully added a dynamic table placeholder to your document. To view the document with the table, 
+use the [Contract Editor](/sdk/components/contracteditor) component and enter the Contract Key you've used 
+as a `contractKey` property for the component.
+
+The table will be displayed in your document at the position where the placeholder was originally placed. The table 
+will show all your columns and rows with proper formatting, making it easy for recipients to view structured data 
+like product lists, pricing information, or any other tabular content.
+
+## Understanding table structure
+
+When creating a dynamic table, you need to provide:
+
+- **Columns**: An array of strings that define the column headers (e.g., `["Product", "Quantity", "Unit Price", "Total"]`)
+- **Rows**: An array of arrays, where each inner array represents a row with values corresponding to the columns. Values can be strings or numbers (e.g., `[["Product 1", 2, 100, 200], ["Product 2", 1, 250, 250]]`)
+
+The number of values in each row should match the number of columns you've defined. This ensures the table displays correctly.
+
+## Updating table data
+
+You can update the table data at any time by making the same update request with new `columns` and `rows` values. The table 
+will be updated in the document, and if the document has already been sent to recipients, they will see the updated table 
+when they access the document.
+

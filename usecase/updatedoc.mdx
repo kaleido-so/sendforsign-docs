@@ -17,12 +17,12 @@ To do this, you can use this request. [Learn more here.](/api-reference/contract
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/contract' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "create",
-        "userKey": "USER_KEY",
+        "clientKey": "CLIENT_KEY",
         "contract": {
             "name": "New contract",
             "value": "<p>Contract text</p>"

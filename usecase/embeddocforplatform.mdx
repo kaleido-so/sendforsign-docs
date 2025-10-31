@@ -1,5 +1,5 @@
 ---
-title: 'Embed Documents to Your Platform'
+title: 'Embed Documents to Your App'
 description: 'Learn how to enhance your platform with embedded contracts.'
 ---
 
@@ -26,7 +26,7 @@ The request's payload represents details of the client to be created. In the hea
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/client' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{ 
 		  "data": {
@@ -89,11 +89,12 @@ insert them into the contract afterwards.
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/contract' \
-     -H 'Authorization: Bearer 123456789' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
      -H 'Content-Type: application/json' \
      -d '{
     "data": {
         "action": "create",
+        "clientKey": "CLIENT_KEY",
         "contract": {
             "name": "A test contract",
             "value": "<p>Hello World!</p>"
