@@ -1,0 +1,169 @@
+---
+title: "Table placeholder"
+description: "Convert any existing placeholder into a dynamic table in a HTML contract."
+api: 'POST https://api.sendforsign.com/api/placeholder'
+---
+
+### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  Key of the client.
+</ParamField>
+
+<ParamField body="contractKey" type="string" required>
+  Key of the contract.
+</ParamField>
+
+<ParamField body="placeholder" type="object" required>
+  Structure, add the fields that need to be updated and ignore the rest.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="placeholderKey" type="string" required>
+    Key of the placeholder that needs to be updated.
+  </ParamField>
+
+  <ParamField body="table" type="object" required>
+    Table structure for the placeholder.
+
+    <Expandable title="child attribute">
+
+    <ParamField body="columns" type="array" required>
+      Array of column headers (strings).
+    </ParamField>
+
+    <ParamField body="rows" type="array" required>
+      Array of rows, where each row is an array of values (strings or numbers).
+    </ParamField>
+
+    </Expandable>
+
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="placeholder" type="object">
+    Placeholder structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="id" type="string">
+    Placeholder ID.
+  </ResponseField>
+
+  <ResponseField name="createTime" type="string">
+    Creation time.
+  </ResponseField>
+
+  <ResponseField name="changeTime" type="string">
+    Change time.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Placeholder name.
+  </ResponseField>
+
+  <ResponseField name="value" type="string">
+    JSON string containing table data with columns and rows.
+  </ResponseField>
+
+  <ResponseField name="isTable" type="boolean">
+    Indicates if the placeholder is a table (true for table placeholders).
+  </ResponseField>
+
+  <ResponseField name="type" type="string">
+    Placeholder type.
+  </ResponseField>
+
+  <ResponseField name="placeholderKey" type="string">
+    Placeholder key.
+  </ResponseField>
+
+  <ResponseField name="position" type="string">
+    Position of the placeholder.
+  </ResponseField>
+
+  <ResponseField name="fillingType" type="string">
+    Filling type.
+  </ResponseField>
+
+  <ResponseField name="externalRecipientKey" type="string">
+    External recipient key (null if not set).
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="number">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "table": {
+                "columns": ["Product", "Quantity", "Unit Price", "Total"],
+                "rows": [
+                    ["Product 1", 2, 100, 200],
+                    ["Product 2", 1, 250, 250],
+                    ["Product 3", 4, 75, 333]
+                ]
+            }
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "placeholder": {
+        "id": "1",
+        "createTime": "2025-10-31T09:27:46.000Z",
+        "changeTime": "2025-10-31T09:28:23.000Z",
+        "name": "PLACEHOLDER_NAME",
+        "value": "{\"columns\":[\"Product\",\"Quantity\",\"Unit Price\",\"Total\"],\"rows\":[[\"Product 1\",2,100,200],[\"Product 2\",1,250,250],[\"Product 3\",4,75,333]]}",
+        "isTable": true,
+        "type": "1",
+        "placeholderKey": "PLACEHOLDER_KEY",
+        "position": "1",
+        "fillingType": "1",
+        "externalRecipientKey": null
+    },
+    "code": 201,
+    "message": "Placeholder updated"
+}
+```
+</ResponseExample>
+

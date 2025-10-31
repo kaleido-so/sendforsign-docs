@@ -123,6 +123,7 @@
       "pages": [
         "api-reference/placeholder/create",
         "api-reference/placeholder/update",
+        "api-reference/placeholder/update-table",
         "api-reference/placeholder/pdfbasic",
         "api-reference/placeholder/pdfspecial",
         "api-reference/placeholder/list",
