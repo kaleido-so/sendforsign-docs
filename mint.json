@@ -46,6 +46,10 @@
       "url": "changelog"
     },
     {
+      "name": "Blog",
+      "url": "blog"
+    },
+    {
       "name": "About",
       "url": "about"
     }
@@ -194,6 +198,12 @@
         "changelog/2025",
         "changelog/2024",
         "changelog/2023"
+      ]
+    },
+    {
+      "group": "Blog",
+      "pages": [
+        "blog/2025"
       ]
     },
     {
