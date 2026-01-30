@@ -1,0 +1,133 @@
+---
+title: "Create and fill in template"
+description: "Create a new template and populate it with the necessary placeholders."
+api: 'POST https://api.sendforsign.com/api/template'
+---
+
+Using this way, you can create a template and define all placeholders 
+with their names and values in a single API call.
+
+### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  Key of the client.
+</ParamField>
+
+<ParamField body="userKey" type="string">
+  ID of the user who create the template. If not specified, the default user credentials will be used.
+</ParamField>
+
+<ParamField body="template" type="object" required>
+  Template structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="name" type="string">
+    Name of the template.  
+  </ParamField>
+
+  <ParamField body="value" type="string">
+    Content of the template, use HTML.  
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+<ParamField body="placeholders" type="array">
+  Array of placeholders, optional.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="name" type="string">
+    Name of the placeholder.
+  </ParamField>
+
+  <ParamField body="value" type="string">
+    Value of the placeholder.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="template" type="string">
+    Template structure.
+
+  <Expandable title="child attribute">
+
+<ResponseField name="createTime" type="string">
+  Create time.
+</ResponseField>
+
+<ResponseField name="templateKey" type="string">
+  ID of the template.
+</ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "userKey": "USER_KEY",
+        "template": {
+            "name": "New template",
+            "value": "<p>Template text</p>"
+        },
+        "placeholders": [
+            {
+                "name": "Company Name",
+                "value": "Acme Inc."
+            },
+            {
+                "name": "Contract Date",
+                "value": "2024-01-15"
+            }
+        ]
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+     {
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY"
+                 },
+       "code": "201",
+       "message": "Template created"
+    }
+```
+</ResponseExample>

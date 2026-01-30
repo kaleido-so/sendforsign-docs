@@ -35,5 +35,8 @@ import { TemplateEditor } from 'sendforsign';
 | `token`             | `string`       |         |Client token refers to the client that is using the infrastructure. Learn more about client tokens [here](/api-reference/implementation_server#generate-client-tokens).|
 | `userKey`           | `string`       |         |User key for the user who is creating a template.|
 | `templateKey`       | `string`       |         |Unique template key of the template that needs to be rendered. If not specified, the component will allow you to create a new template from its interface.|
+| `сanReDraft`        | `boolean`      |`false`  |If `true`, users can recreate existing templates from scratch. |
+| `onStepChange`      | `function(data: {currentStep:string})`    |   |Called when component changes states and returns `currentStep: 'TypeChooseStep'` when the component is in the Type Choose state, `currentStep: 'ContractEditorStep'` when the component is in the Editor state.|
+| `onDocumentSave`    | `function(data: {documentSaved:boolean})` |   |Called when the contract body is being edited, this function returns `documentSaved: false` if the body is not saved and `documentSaved: true` if the body is saved.|
 
 

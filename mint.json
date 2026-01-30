@@ -153,6 +153,7 @@
       "group": "Template",
       "pages": [
         "api-reference/template/create",
+        "api-reference/template/create-fill",
         "api-reference/template/update",
         "api-reference/template/convert",
         "api-reference/template/read",
