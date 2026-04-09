@@ -1,0 +1,95 @@
+---
+title: "Duplicate template"
+description: "Duplicate an existing template."
+api: 'POST https://api.sendforsign.com/api/template'
+---
+
+When duplicating a template, the placeholder structure is copied, but all placeholder values are cleared.
+
+### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  Key of the client.
+</ParamField>
+
+<ParamField body="template" type="object" required>
+  Structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="templateKey" type="string" required>
+    Key of the template that needs to be duplicated.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="template" type="string">
+    Template structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="templateKey" type="string">
+    ID of the duplicated template.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "duplicate",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "template": {
+            "templateKey": "YOUR_TEMPLATE_KEY"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "template": {
+        "createTime": "2023-12-01 12:18:55",
+        "templateKey": "NEW_TEMPLATE_KEY"
+    },
+    "code": "201",
+    "message": "Template duplicated"
+}
+```
+</ResponseExample>

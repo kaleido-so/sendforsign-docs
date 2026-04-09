@@ -1,0 +1,95 @@
+---
+title: "Duplicate contract"
+description: "Duplicate an existing contract."
+api: 'POST https://api.sendforsign.com/api/contract'
+---
+
+When duplicating a contract, the placeholder structure is copied, but all placeholder values are cleared.
+
+### Body parameters
+
+<ParamField body="data" type="object" required>
+
+  <Expandable title="child attribute">
+
+<ParamField body="action" type="string" required>
+  Action type.
+</ParamField>
+
+<ParamField body="clientKey" type="string" required>
+  Key of the client.
+</ParamField>
+
+<ParamField body="contract" type="object" required>
+  Structure.
+
+  <Expandable title="child attribute">
+
+  <ParamField body="contractKey" type="string" required>
+    Key of the contract that needs to be duplicated.
+  </ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+  </Expandable>
+
+</ParamField>
+
+### Response
+
+  <ResponseField name="contract" type="string">
+    Contract structure.
+
+  <Expandable title="child attribute">
+
+  <ResponseField name="createTime" type="string">
+    Create time.
+  </ResponseField>
+
+  <ResponseField name="contractKey" type="string">
+    ID of the duplicated contract.
+  </ResponseField>
+
+  </Expandable>
+
+  </ResponseField>
+
+<ResponseField name="code" type="string">
+  The code of the answer.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message of the answer.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "duplicate",
+        "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+        "contract": {
+            "contractKey": "954a6ad1-e119-4a66-9a5e-038ef7cbc0ff"
+        }
+    }
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+    "contract": {
+        "createTime": "2023-12-01 12:18:55",
+        "contractKey": "NEW_CONTRACT_KEY"
+    },
+    "code": "201",
+    "message": "Contract duplicated"
+}
+```
+</ResponseExample>

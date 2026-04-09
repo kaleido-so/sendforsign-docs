@@ -1,0 +1,251 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Sendforsign documentation",
+  "colors": {
+    "primary": "#9563FF",
+    "light": "#AE87FF",
+    "dark": "#0D001D"
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction"
+            ]
+          },
+          {
+            "group": "Use cases",
+            "pages": [
+              "usecase/firstdoc",
+              "usecase/embeddocforplatform",
+              "usecase/firsttemplate",
+              "usecase/updatedoc",
+              "usecase/add-table-placeholder",
+              "usecase/recipientdomain"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introapi",
+              "api-reference/structure",
+              "api-reference/authentication",
+              "api-reference/implementation_server",
+              "api-reference/implementation_client"
+            ]
+          },
+          {
+            "group": "MCP",
+            "pages": [
+              "api-reference/mcp/aiapi"
+            ]
+          },
+          {
+            "group": "Client",
+            "pages": [
+              "api-reference/client/create",
+              "api-reference/client/update",
+              "api-reference/client/read",
+              "api-reference/client/list"
+            ]
+          },
+          {
+            "group": "User",
+            "pages": [
+              "api-reference/user/create",
+              "api-reference/user/update",
+              "api-reference/user/read",
+              "api-reference/user/list"
+            ]
+          },
+          {
+            "group": "Contract",
+            "pages": [
+              "api-reference/contract/create",
+              "api-reference/contract/create-from-template",
+              "api-reference/contract/create-send",
+              "api-reference/contract/create-fill",
+              "api-reference/contract/update",
+              "api-reference/contract/read",
+              "api-reference/contract/list",
+              "api-reference/contract/archive",
+              "api-reference/contract/get_timeline"
+            ]
+          },
+          {
+            "group": "PDF and Word",
+            "pages": [
+              "api-reference/pdf/download",
+              "api-reference/pdf/upload",
+              "api-reference/pdf/downloadword"
+            ]
+          },
+          {
+            "group": "Placeholder",
+            "pages": [
+              "api-reference/placeholder/create",
+              "api-reference/placeholder/update",
+              "api-reference/placeholder/update-table",
+              "api-reference/placeholder/pdfbasic",
+              "api-reference/placeholder/pdfspecial",
+              "api-reference/placeholder/list",
+              "api-reference/placeholder/delete"
+            ]
+          },
+          {
+            "group": "Recipient",
+            "pages": [
+              "api-reference/recipient/create",
+              "api-reference/recipient/update",
+              "api-reference/recipient/send",
+              "api-reference/recipient/list",
+              "api-reference/recipient/delete"
+            ]
+          },
+          {
+            "group": "Template",
+            "pages": [
+              "api-reference/template/create",
+              "api-reference/template/create-fill",
+              "api-reference/template/update",
+              "api-reference/template/convert",
+              "api-reference/template/read",
+              "api-reference/template/duplicate",
+              "api-reference/template/list",
+              "api-reference/template/delete"
+            ]
+          },
+          {
+            "group": "Webhook",
+            "pages": [
+              "api-reference/webhook/concept",
+              "api-reference/webhook/create",
+              "api-reference/webhook/update",
+              "api-reference/webhook/read",
+              "api-reference/webhook/list",
+              "api-reference/webhook/delete"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "api-reference/settings/email_notifications",
+              "api-reference/settings/branding"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "React Components",
+        "groups": [
+          {
+            "group": "Components Documentation",
+            "pages": [
+              "sdk/introsdk"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "sdk/components/contracteditor",
+              "sdk/components/contractlist",
+              "sdk/components/templateeditor",
+              "sdk/components/templatelist",
+              "sdk/components/aiassistant"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Years",
+            "pages": [
+              "changelog/2025",
+              "changelog/2024",
+              "changelog/2023"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Blog",
+        "groups": [
+          {
+            "group": "Blog",
+            "pages": [
+              "blog/2025"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "About",
+        "groups": [
+          {
+            "group": "About",
+            "pages": [
+              "about/vision",
+              "about/termsandconditions",
+              "about/privacypolicy",
+              "about/compliance"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "api": {
+    "mdx": {
+      "server": "https://api.sendforsign.com/api",
+      "auth": {
+        "method": "key",
+        "name": "X-Sendforsign-Key"
+      }
+    }
+  },
+  "appearance": {
+    "default": "light",
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "dark": "#090014"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Feedback",
+        "href": "https://airtable.com/app8jiZb9qU4pNdYb/pag9rl2atRJUkFjpS/form"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "sendforsign.com",
+      "href": "https://sendforsign.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "linkedin": "https://www.linkedin.com/company/sendforsign/about/",
+      "youtube": "https://www.youtube.com/@Sendforsign/videos"
+    }
+  }
+}

@@ -114,6 +114,7 @@
         "api-reference/contract/create-fill",
         "api-reference/contract/update",
         "api-reference/contract/read",
+        "api-reference/contract/duplicate",
         "api-reference/contract/list",
         "api-reference/contract/archive",
         "api-reference/contract/get_timeline"
@@ -157,6 +158,7 @@
         "api-reference/template/update",
         "api-reference/template/convert",
         "api-reference/template/read",
+        "api-reference/template/duplicate",
         "api-reference/template/list",
         "api-reference/template/delete"
       ]
