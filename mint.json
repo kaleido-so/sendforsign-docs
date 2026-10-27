@@ -57,7 +57,9 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction"]
+      "pages": [
+        "introduction"
+      ]
     },
     {
       "group": "Use cases",
@@ -79,7 +81,6 @@
         "api-reference/authentication",
         "api-reference/implementation_server",
         "api-reference/implementation_client"
-
       ]
     },
     {
@@ -184,7 +185,9 @@
     },
     {
       "group": "Components Documentation",
-      "pages": ["sdk/introsdk"]
+      "pages": [
+        "sdk/introsdk"
+      ]
     },
     {
       "group": "Components",
@@ -207,7 +210,14 @@
     {
       "group": "Blog",
       "pages": [
-        "blog/2025"
+        "blog/2025",
+        "blog/contract-workflows-are-a-solved-problem",
+        "blog/ai-powered-contract-assistant",
+        "blog/how-do-i-see-the-future-of-digital-agreements",
+        "blog/5-ways-to-make-better-decisions-as-a-founder",
+        "blog/ai-api-love",
+        "blog/the-core-of-sendforsign-s-business-embedded-solutions-for-other-companies",
+        "blog/ai-and-its-practical-application"
       ]
     },
     {
@@ -225,7 +235,7 @@
     "youtube": "https://www.youtube.com/@Sendforsign/videos"
   },
   "api": {
-    "baseUrl": "https://api.sendforsign.com/api", 
+    "baseUrl": "https://api.sendforsign.com/api",
     "auth": {
       "method": "key",
       "name": "X-Sendforsign-Key"
