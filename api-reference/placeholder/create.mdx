@@ -40,6 +40,17 @@ If a contract already exists, use the request below.
     Value of the placeholder.
   </ParamField>
 
+  <ParamField body="fillingType" type="number">
+    Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor):
+    `1` — nobody (default), `2` — the contract owner, `4` — a specific recipient set in `externalRecipientKey`.
+    [See the use case.](/usecase/placeholder-filler)
+  </ParamField>
+
+  <ParamField body="externalRecipientKey" type="string">
+    `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`.
+    Get it from the [list of recipients](/api-reference/recipient/list).
+  </ParamField>
+
   </Expandable>
 
 </ParamField>
@@ -87,7 +98,9 @@ curl -X POST 'https://api.sendforsign.com/api/placeholder' \
         "contractKey": "CONTRACT_KEY",
         "placeholder": {
             "name": "Placeholder name",
-            "value": "Placeholder value"
+            "value": "Placeholder value",
+            "fillingType": 4,
+            "externalRecipientKey": "RECIPIENT_KEY"
         }
     }
 }'

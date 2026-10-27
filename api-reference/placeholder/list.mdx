@@ -65,6 +65,14 @@ api: 'POST https://api.sendforsign.com/api/placeholder'
     Position of the placeholder.
   </ResponseField>
 
+  <ResponseField name="fillingType" type="string">
+    Who fills in the placeholder: `1` — nobody, `2` — the contract owner, `4` — a specific recipient.
+  </ResponseField>
+
+  <ResponseField name="externalRecipientKey" type="string">
+    `recipientKey` of the recipient who fills in the placeholder, or `null`.
+  </ResponseField>
+
   </Expandable>
 
   </ResponseField>
@@ -104,7 +112,9 @@ curl -X POST 'https://api.sendforsign.com/api/placeholder' \
             "name": "Placeholder Name",
             "value": "Placeholder Value",
             "placeholderKey": "PLACEHOLDER_KEY",
-            "position": 1
+            "position": 1,
+            "fillingType": "4",
+            "externalRecipientKey": "RECIPIENT_KEY"
         }
     ],
     "code": "200",

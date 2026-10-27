@@ -1,0 +1,108 @@
+---
+title: 'Choose Who Fills In a Placeholder'
+description: 'Assign a placeholder to the contract owner or to a specific recipient via API.'
+---
+
+In the contract editor, each placeholder has a **Who fills in this field** setting. The same setting is available
+through the API with two placeholder fields:
+
+| Field | Meaning |
+|---|---|
+| `fillingType` | `1` — nobody (default), `2` — the contract owner, `4` — a specific recipient |
+| `externalRecipientKey` | `recipientKey` of that recipient; used only with `fillingType: 4` |
+
+## Set up your account
+
+Before you start, see the [First document use case](/usecase/firstdoc) to set up your platform account and get the API key.
+You also need a contract with recipients and placeholders. See [Create recipients](/api-reference/recipient/create) and
+[Create placeholder](/api-reference/placeholder/create).
+
+## Get the recipient key
+
+Request the list of the contract's recipients. [Learn more here.](/api-reference/recipient/list)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "list",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY"
+    }
+}'
+```
+
+Each recipient in the response has a `recipientKey`. This is the value you pass as `externalRecipientKey`.
+
+## Get the placeholder key
+
+Request the list of the contract's placeholders. [Learn more here.](/api-reference/placeholder/list)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "list",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY"
+    }
+}'
+```
+
+Take the `placeholderKey` of the placeholder you want to assign. It is the same key that the editor shows at the bottom of the placeholder settings.
+
+## Assign the placeholder
+
+To a specific recipient:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "fillingType": 4,
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+
+To the contract owner, send `"fillingType": 2` instead.
+
+To unassign the placeholder, send `"fillingType": 1` together with `"externalRecipientKey": null`.
+A field left out of an update request keeps its current value, so without `null` the previous recipient stays stored.
+
+<Tip>
+  You only need to send the fields you change. The placeholder's `name` and `value` are not affected.
+  You can also pass `fillingType` and `externalRecipientKey` right away when you [create a placeholder](/api-reference/placeholder/create).
+</Tip>
+
+## Check the result
+
+Request the list of placeholders again. Each placeholder in the response has `fillingType` and `externalRecipientKey`:
+
+```bash json
+{
+    "placeholders": [
+        {
+            "name": "Contract name",
+            "value": "Value",
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "fillingType": "4",
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    ],
+    "code": 200,
+    "message": "Placeholders found"
+}
+```

@@ -67,6 +67,7 @@
         "usecase/firsttemplate",
         "usecase/updatedoc",
         "usecase/add-table-placeholder",
+        "usecase/placeholder-filler",
         "usecase/recipientdomain"
       ]
     },
