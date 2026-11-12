@@ -1,0 +1,19 @@
+# Sendforsign — full reference for language models
+
+> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://about.sendforsign.com.
+
+This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://about.sendforsign.com/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
+
+## Key facts
+
+- Authentication: header `X-Sendforsign-Key: <API key>` (from the dashboard at app.sendforsign.com, API Keys tab), or `Authorization: Bearer <token>` (see Authentication). Every resource request needs a `clientKey` in `data`.
+- Account structure: platform (you, the API key) → clients (`clientKey`, one per customer business) → users (`userKey`, end users inside a client). Templates, contracts and webhooks belong to a client.
+- REST requests are action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|convert|archive|duplicate", ...}}`. Responses carry `code` and `message`.
+- `contract` `create` WITH a `recipients` array creates the contract AND emails the recipients immediately. To prepare without emailing: `contract` `create` without recipients, then `recipient` `create` (no email). `recipient` `send` emails.
+- A contract from a template: `contract` `create` with `contract.templateKey` and optional `placeholders: [{placeholderKey | name, value}]`. `contract` `read` returns `templateKey`.
+- Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
+- Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
+- Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.
+- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. Headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
+- MCP tools: get_connection_info, list_templates, get_template, list_contracts, get_contract, create_contract (draft, never emails), update_contract, list_placeholders, fill_placeholders, add_recipients (no email), list_recipients, send_for_signature (emails; needs `confirm: true` and `send` mode), get_contract_timeline, download_contract_pdf, archive_contract (needs `confirm: true`), list_users, create_user.
+- Agents must never send for signature or archive without explicit human approval.

@@ -90,6 +90,8 @@ Sendforsign email.
    https://app.sendforsign.com/sharing/{recipientKey}
    ```
 
+   With a [recipient custom domain](/usecase/recipientdomain) the links can be on your own domain.
+
 2. Give each signer **their own** link in your UI: a button, a message, or an iframe/new tab. The link identifies the
    recipient, so treat it like a password reset link: show it only to that person.
 3. Don't call `send_for_signature`. The agent can run in `draft` mode for this flow.

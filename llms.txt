@@ -1,0 +1,106 @@
+# Sendforsign
+
+> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents. Agents and apps create contracts from templates, fill fields with per-recipient roles, add signers, send for signature or show signing links in their own UI, and get webhooks when contracts are signed, with modes, confirmations and an audit log for agent actions. Remote MCP server: https://api.sendforsign.com/mcp (Streamable HTTP). REST API: https://api.sendforsign.com/api.
+
+Key facts:
+
+- Auth: header `X-Sendforsign-Key: <API key>`; every resource request also needs a `clientKey`. Structure: platform (API key) → clients (`clientKey`, one per customer) → users (`userKey`).
+- REST is action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|archive|...", "clientKey": "...", ...}}`.
+- `contract` `create` with a `recipients` array emails them immediately. To prepare without email: `contract` `create`, then `recipient` `create`; `recipient` `send` emails.
+- Field (placeholder) roles: `fillingType` 1 nobody, 2 contract owner, 3 any recipient, 4 specific recipient (`externalRecipientKey`; send `null` explicitly to clear).
+- Signing link: `https://app.sendforsign.com/sharing/{recipientKey}`.
+- MCP: `send_for_signature` and `archive_contract` need `confirm: true` after explicit human approval; `X-Sendforsign-Agent-Mode` is `read_only`, `draft` or `send`.
+- Full reference in one file: https://about.sendforsign.com/llms-full.txt. Any page as Markdown: add `.md` to its URL.
+
+## AI agents and MCP
+
+- [Sendforsign for AI agents](https://about.sendforsign.com/ai-agents/overview.md): Why and how agent builders use Sendforsign: template field roles, embedded white-label multi-tenant signing, agent accountability.
+- [MCP quickstart](https://about.sendforsign.com/ai-agents/mcp-quickstart.md): Connect Claude Code, Claude Desktop, Cursor, the OpenAI Agents SDK, the Claude API or any MCP client.
+- [MCP tools reference](https://about.sendforsign.com/ai-agents/tools.md): Every MCP tool with arguments and results, which tools write and which email people.
+- [MCP headers reference](https://about.sendforsign.com/ai-agents/headers.md): Auth, default client and tenant, agent identity, on-behalf-of, agent mode, recipient domain allowlist.
+- [Agent modes and accountability](https://about.sendforsign.com/ai-agents/accountability.md): read_only/draft/send modes, confirm flag, allowed domains, hash-chained audit log, ESIGN/UETA context.
+- [Recipes](https://about.sendforsign.com/ai-agents/recipes.md): Template → fill → send; embedded signing without email; one tenant per customer; webhooks when fully signed.
+- [Agent skill and llms.txt](https://about.sendforsign.com/ai-agents/skills.md): Install the Sendforsign SKILL.md in Claude Code, Claude apps, Codex.
+- [SKILL.md](https://raw.githubusercontent.com/kaleido-so/sendforsign-docs/main/skills/sendforsign/SKILL.md): The agent skill itself.
+
+## Getting started
+
+- [API introduction](https://about.sendforsign.com/api-reference/introapi.md): Base URL, action-based requests, API keys, client keys, response codes.
+- [Account structure](https://about.sendforsign.com/api-reference/structure.md): Platform, clients and client users, and which keys access what.
+- [Authentication](https://about.sendforsign.com/api-reference/authentication.md): API key header, platform and client bearer tokens.
+- [Implement server side](https://about.sendforsign.com/api-reference/implementation_server.md): Create clients and users, generate client tokens.
+- [Implement client side](https://about.sendforsign.com/api-reference/implementation_client.md): Embed React components or build your own UI.
+- [Send your first document](https://about.sendforsign.com/usecase/firstdoc.md): Get an API key, create a client, create and send a contract.
+- [Embed documents in your app](https://about.sendforsign.com/usecase/embeddocforplatform.md): Contract creation and signing inside your product, under your brand.
+- [Draft a template](https://about.sendforsign.com/usecase/firsttemplate.md): Create a reusable template with placeholders and generate documents from it.
+- [Choose who fills in a placeholder](https://about.sendforsign.com/usecase/placeholder-filler.md): fillingType and externalRecipientKey.
+
+## REST API reference
+
+- [Create client](https://about.sendforsign.com/api-reference/client/create.md): Create a client (an organization or person served by your platform) with the Sendforsign API and get its client key.
+- [Update client](https://about.sendforsign.com/api-reference/client/update.md): Update an existing Sendforsign client's name, email, organization or custom key via the API.
+- [Read client](https://about.sendforsign.com/api-reference/client/read.md): Get the details of a specific Sendforsign client by its client key via the API.
+- [List of clients](https://about.sendforsign.com/api-reference/client/list.md): List all clients created with your Sendforsign API key, with their client keys and details.
+- [Create user](https://about.sendforsign.com/api-reference/user/create.md): Create a client user (an employee of your client) with the Sendforsign API to manage access to contracts and templates.
+- [Update user](https://about.sendforsign.com/api-reference/user/update.md): Update an existing Sendforsign client user's name, email or custom key via the API.
+- [Read user](https://about.sendforsign.com/api-reference/user/read.md): Get the details of a specific Sendforsign client user by user key via the API.
+- [List of users](https://about.sendforsign.com/api-reference/user/list.md): List all users created for a Sendforsign client, using the client key.
+- [Create contract](https://about.sendforsign.com/api-reference/contract/create.md): Create a new contract from HTML text with the Sendforsign API and get a contract key to share, sign or update it.
+- [Create from template](https://about.sendforsign.com/api-reference/contract/create-from-template.md): Create a new contract from an existing Sendforsign template via the API, with all of the template's placeholders.
+- [Create and send contract](https://about.sendforsign.com/api-reference/contract/create-send.md): Create a contract and send it to recipients for signing or approval in a single Sendforsign API request.
+- [Create and fill in contract](https://about.sendforsign.com/api-reference/contract/create-fill.md): Create a contract and fill in its placeholders with your data in a single Sendforsign API request.
+- [Update contract](https://about.sendforsign.com/api-reference/contract/update.md): Update the name or text of an existing contract via the Sendforsign API.
+- [Read contract](https://about.sendforsign.com/api-reference/contract/read.md): Get a contract's details, text, status and template key by contract key with the Sendforsign API.
+- [Duplicate contract](https://about.sendforsign.com/api-reference/contract/duplicate.md): Duplicate an existing contract by its contract key with the Sendforsign API.
+- [List of contracts](https://about.sendforsign.com/api-reference/contract/list.md): List all contracts created by a specific Sendforsign client, with their keys and statuses.
+- [Archive contract](https://about.sendforsign.com/api-reference/contract/archive.md): Archive a contract via the Sendforsign API by its contract key.
+- [Get Timeline](https://about.sendforsign.com/api-reference/contract/get_timeline.md): Get the audit timeline of a contract via the Sendforsign API: who viewed, approved and signed it, and when.
+- [Download PDF](https://about.sendforsign.com/api-reference/pdf/download.md): Download a contract as a PDF file, including signatures, with the Sendforsign API.
+- [Upload PDF](https://about.sendforsign.com/api-reference/pdf/upload.md): Upload a PDF file as a new contract with the Sendforsign API, then place placeholders and send it for signing.
+- [Download Word](https://about.sendforsign.com/api-reference/pdf/downloadword.md): Download a text contract as a Microsoft Word (.docx) file with the Sendforsign API.
+- [Create placeholder](https://about.sendforsign.com/api-reference/placeholder/create.md): Add a placeholder to a contract or template with the Sendforsign API, and choose who fills it in.
+- [Update placeholder](https://about.sendforsign.com/api-reference/placeholder/update.md): Update a placeholder's name, value or who fills it in (fillingType) via the Sendforsign API.
+- [Table placeholder](https://about.sendforsign.com/api-reference/placeholder/update-table.md): Convert an existing placeholder into a dynamic table in an HTML contract and fill it with rows via the Sendforsign API.
+- [Place basic placeholder](https://about.sendforsign.com/api-reference/placeholder/pdfbasic.md): Place a basic text placeholder at a position on a page of a PDF contract via the Sendforsign API.
+- [Place special placeholder](https://about.sendforsign.com/api-reference/placeholder/pdfspecial.md): Place special placeholders in a PDF contract via the Sendforsign API: each recipient's signature, full name, email and date signed.
+- [List of placeholders](https://about.sendforsign.com/api-reference/placeholder/list.md): List all placeholders of a contract or template, with their values and who fills them in, via the Sendforsign API.
+- [Delete placeholder](https://about.sendforsign.com/api-reference/placeholder/delete.md): Delete a placeholder from a contract or template via the Sendforsign API.
+- [Create recipient](https://about.sendforsign.com/api-reference/recipient/create.md): Add recipients to a contract via the Sendforsign API and choose their action: sign, approve, view or lock.
+- [Update recipient](https://about.sendforsign.com/api-reference/recipient/update.md): Update a contract recipient's name, email, message or action via the Sendforsign API.
+- [Send to recipients](https://about.sendforsign.com/api-reference/recipient/send.md): Send a contract to its recipients by email for signing, approval or viewing with the Sendforsign API.
+- [List of recipients](https://about.sendforsign.com/api-reference/recipient/list.md): List all recipients of a contract with their keys and actions via the Sendforsign API.
+- [Delete recipient](https://about.sendforsign.com/api-reference/recipient/delete.md): Remove a recipient from a contract via the Sendforsign API.
+- [Create template](https://about.sendforsign.com/api-reference/template/create.md): Create a reusable contract template from HTML text with the Sendforsign API.
+- [Create and fill in template](https://about.sendforsign.com/api-reference/template/create-fill.md): Create a contract template and add its placeholders in a single Sendforsign API request.
+- [Update template](https://about.sendforsign.com/api-reference/template/update.md): Update the name or text of an existing contract template via the Sendforsign API.
+- [Convert into template](https://about.sendforsign.com/api-reference/template/convert.md): Convert an existing contract into a reusable template via the Sendforsign API.
+- [Read template](https://about.sendforsign.com/api-reference/template/read.md): Get a template's details and text by template key with the Sendforsign API.
+- [Duplicate template](https://about.sendforsign.com/api-reference/template/duplicate.md): Duplicate a contract template with the Sendforsign API: the placeholder structure is copied, placeholder values are cleared.
+- [List of templates](https://about.sendforsign.com/api-reference/template/list.md): List all contract templates created by a specific Sendforsign client.
+- [Delete template](https://about.sendforsign.com/api-reference/template/delete.md): Delete a contract template via the Sendforsign API.
+- [Webhooks concept](https://about.sendforsign.com/api-reference/webhook/concept.md): How Sendforsign webhooks work: get real-time notifications when contracts are viewed, approved or signed.
+- [Create webhook](https://about.sendforsign.com/api-reference/webhook/create.md): Create a webhook endpoint for a client to receive Sendforsign contract events in real time.
+- [Update webhook](https://about.sendforsign.com/api-reference/webhook/update.md): Update the URL or settings of an existing Sendforsign webhook.
+- [Read webhook](https://about.sendforsign.com/api-reference/webhook/read.md): Get the details of a specific Sendforsign webhook by its key.
+- [List of webhooks](https://about.sendforsign.com/api-reference/webhook/list.md): List all webhooks configured for a Sendforsign client.
+- [Delete webhook](https://about.sendforsign.com/api-reference/webhook/delete.md): Delete a Sendforsign webhook to stop receiving contract events at its URL.
+- [Email notifications](https://about.sendforsign.com/api-reference/settings/email_notifications.md): Turn Sendforsign email notifications on or off for a client: signing and approval requests, signed and approved contracts.
+- [Custom branding](https://about.sendforsign.com/api-reference/settings/branding.md): Custom branding via API: style the emails Sendforsign sends, use your own email domain and your own domain for signing links.
+
+## React components
+
+- [Components introduction](https://about.sendforsign.com/sdk/introsdk.md): Install the `sendforsign` npm package and embed contract editing, signing, templates and an AI assistant.
+- [ContractEditor](https://about.sendforsign.com/sdk/components/contracteditor.md): Create, open, send, sign and approve contracts in your app.
+- [ContractList](https://about.sendforsign.com/sdk/components/contractlist.md): Show a client's contracts and open them in the editor.
+- [TemplateEditor](https://about.sendforsign.com/sdk/components/templateeditor.md): Create and edit templates in your app.
+- [TemplateList](https://about.sendforsign.com/sdk/components/templatelist.md): Show a client's templates.
+- [AiAssistant](https://about.sendforsign.com/sdk/components/aiassistant.md): AI drafting and contract Q&A inside your app.
+
+## Optional
+
+- [Update an existing document](https://about.sendforsign.com/usecase/updatedoc.md): Change text, name or placeholders of a document.
+- [Table placeholders](https://about.sendforsign.com/usecase/add-table-placeholder.md): Dynamic tables in HTML contracts.
+- [Recipient custom domain](https://about.sendforsign.com/usecase/recipientdomain.md): Signing links on your own domain.
+- [AI+API (beta)](https://about.sendforsign.com/api-reference/mcp/aiapi.md): Natural-language contract requests over a single HTTP endpoint.
+- [Changelog 2025](https://about.sendforsign.com/changelog/2025.md)
+- [Compliance](https://about.sendforsign.com/about/compliance.md)

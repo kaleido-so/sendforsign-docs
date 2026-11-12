@@ -1,0 +1,3660 @@
+# Sendforsign — full reference for language models
+
+> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://about.sendforsign.com.
+
+This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://about.sendforsign.com/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
+
+## Key facts
+
+- Authentication: header `X-Sendforsign-Key: <API key>` (from the dashboard at app.sendforsign.com, API Keys tab), or `Authorization: Bearer <token>` (see Authentication). Every resource request needs a `clientKey` in `data`.
+- Account structure: platform (you, the API key) → clients (`clientKey`, one per customer business) → users (`userKey`, end users inside a client). Templates, contracts and webhooks belong to a client.
+- REST requests are action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|convert|archive|duplicate", ...}}`. Responses carry `code` and `message`.
+- `contract` `create` WITH a `recipients` array creates the contract AND emails the recipients immediately. To prepare without emailing: `contract` `create` without recipients, then `recipient` `create` (no email). `recipient` `send` emails.
+- A contract from a template: `contract` `create` with `contract.templateKey` and optional `placeholders: [{placeholderKey | name, value}]`. `contract` `read` returns `templateKey`.
+- Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
+- Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
+- Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.
+- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. Headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
+- MCP tools: get_connection_info, list_templates, get_template, list_contracts, get_contract, create_contract (draft, never emails), update_contract, list_placeholders, fill_placeholders, add_recipients (no email), list_recipients, send_for_signature (emails; needs `confirm: true` and `send` mode), get_contract_timeline, download_contract_pdf, archive_contract (needs `confirm: true`), list_users, create_user.
+- Agents must never send for signature or archive without explicit human approval.
+
+# Part 1. AI agents and the MCP server
+
+## Sendforsign for AI agents
+Source: https://about.sendforsign.com/ai-agents/overview
+
+Your agent can already write a contract. What it cannot do on its own is turn that text into a signed,
+legally attributable agreement inside **your** product: the right template for **your customer**, the fields
+**the agent** may fill and the ones only the counterparty may fill, a signing link shown in **your** UI, an
+event when it is signed, and a record of what the agent did and on whose behalf.
+
+Sendforsign is that layer. It exposes the same API two ways:
+
+- a **remote MCP server** at `https://api.sendforsign.com/mcp` that any MCP client (Claude, ChatGPT, Cursor,
+  the OpenAI Agents SDK, your own agent) can connect to, and
+- the **REST API** at `https://api.sendforsign.com/api` that the MCP server itself calls, for when you want
+  deterministic code around the agent.
+
+  - [MCP quickstart](https://about.sendforsign.com/ai-agents/mcp-quickstart): Connect Claude Code, Claude Desktop, Cursor or an OpenAI agent in two minutes.
+  - [Tools reference](https://about.sendforsign.com/ai-agents/tools): Every MCP tool, what it writes, and which one emails people.
+  - [Agent modes and accountability](https://about.sendforsign.com/ai-agents/accountability): Read-only, draft and send modes, confirmations, domain allowlists and the audit log.
+  - [Recipes](https://about.sendforsign.com/ai-agents/recipes): Template → fill → send, embedded signing without email, multi-tenant, webhooks.
+
+### Why Sendforsign, if other e-signature tools also ship MCP
+
+An MCP server is table stakes; most e-signature vendors have one. What matters for a product that builds agents is
+what happens around the signature:
+
+#### 1. Templates with field roles
+
+Each field (placeholder) in a template has a **filled by** role: the owner (your agent), any recipient, or one
+specific recipient. The agent reads the template, fills only its own fields and leaves the counterparty's fields to
+the counterparty. It does not have to guess, and it cannot overwrite what a signer is supposed to enter.
+See [placeholder `fillingType`](https://about.sendforsign.com/usecase/placeholder-filler).
+
+#### 2. Embedded, white-label, multi-tenant
+
+- Every customer of your product gets its own space (a `clientKey`, and/or a `userKey` per end user) with its own
+  templates and contracts. The agent works in the right tenant because **you** set it in a header, not the model.
+- Recipients get a signing link (`https://app.sendforsign.com/sharing/{recipientKey}`) that you can show in your
+  own UI, chat or app, with no Sendforsign email at all.
+- Emails, when you do send them, carry your [branding](https://about.sendforsign.com/api-reference/settings/branding), and
+  [webhooks](https://about.sendforsign.com/api-reference/webhook/concept) tell your backend when a contract is fully signed.
+- The [React components](https://about.sendforsign.com/sdk/introsdk) let a human review and edit what the agent drafted, inside your product.
+
+#### 3. Agent accountability
+
+The integrator, not the agent, decides what an agent may do:
+
+- **Modes**: `read_only`, `draft` (prepare everything, email nobody) or `send`.
+- **Explicit confirmation**: tools that email people or archive contracts refuse to run without `confirm: true`,
+  which the agent is told to set only after a human approves.
+- **Recipient domain allowlist**: an agent cannot send a contract outside the domains you list.
+- **Audit log**: every write by an agent is recorded with the agent's name, the person or company it acted for, the
+  mode, the arguments and the outcome, in a hash-chained log.
+
+[Read how this maps to attribution rules for electronic signatures.](https://about.sendforsign.com/ai-agents/accountability#legal-context)
+
+### Who this is for
+
+- **Vertical SaaS with an agent** (creative and event businesses, staffing, real estate, logistics, agencies, HR,
+  insurance): your agent drafts your customer's contract from your customer's template, sends it or hands the link
+  to your UI, and your backend reacts to the signature.
+- **Legal-AI startups** that draft or negotiate but don't want to build execution: upload the final text, add
+  signers, send, get the signed PDF.
+- **People using Claude, ChatGPT or Cursor directly**: "make an NDA from our template and send it to Anna".
+
+### For LLMs and coding agents
+
+- [`/llms.txt`](https://about.sendforsign.com/llms.txt) — an index of these docs for language models.
+- [`/llms-full.txt`](https://about.sendforsign.com/llms-full.txt) — the API and MCP reference in one file.
+- Every page is also available as Markdown: add `.md` to its URL.
+- [Agent skill](https://about.sendforsign.com/ai-agents/skills) — a `SKILL.md` that teaches Claude Code, Codex and other agents the recipes and
+  the pitfalls.
+
+## MCP quickstart
+Source: https://about.sendforsign.com/ai-agents/mcp-quickstart
+
+The Sendforsign MCP server is a remote server over **Streamable HTTP** (stateless, no sessions):
+
+```bash
+POST https://api.sendforsign.com/mcp
+```
+
+It authenticates exactly like the [REST API](https://about.sendforsign.com/api-reference/introapi) and is configured with
+[request headers](https://about.sendforsign.com/ai-agents/headers). Credentials and guardrails live in headers set by you, so the agent cannot
+change them.
+
+### 1. Get your keys
+
+1. Sign up at [app.sendforsign.com](https://app.sendforsign.com) and open the **API Keys** tab of the dashboard.
+2. Copy your **API key** (`X-Sendforsign-Key`).
+3. Copy a **client key** (`clientKey`) — the account space the agent works in. If you embed Sendforsign for several
+   customers, [create a client](https://about.sendforsign.com/api-reference/client/create) per customer and use its key.
+
+  An API key gives full access to your account. Keep it out of prompts, repositories and chat transcripts; put it in
+  environment variables or your MCP client's secret store. Start new integrations with
+  `X-Sendforsign-Agent-Mode: draft` so the agent cannot email anyone until you are ready.
+
+The minimum set of headers:
+
+| Header | Value |
+|---|---|
+| `X-Sendforsign-Key` | Your API key |
+| `X-Sendforsign-Client-Key` | Your client key |
+
+Recommended on top: `X-Sendforsign-Agent` (a name for this agent), `X-Sendforsign-Agent-Mode` (`draft` while
+testing) and `X-Sendforsign-Allowed-Domains`. See the [headers reference](https://about.sendforsign.com/ai-agents/headers).
+
+### 2. Connect your client
+
+  **Claude Code**
+    ```bash
+    claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp \
+      --header "X-Sendforsign-Key: $SENDFORSIGN_API_KEY" \
+      --header "X-Sendforsign-Client-Key: $SENDFORSIGN_CLIENT_KEY" \
+      --header "X-Sendforsign-Agent: claude-code" \
+      --header "X-Sendforsign-Agent-Mode: draft"
+    ```
+
+    Add `--scope project` to share the server through `.mcp.json` in your repository (then keep the key in an
+    environment variable, not in the file: `"X-Sendforsign-Key": "${SENDFORSIGN_API_KEY}"`). Run `/mcp` inside
+    Claude Code to check the connection.
+
+    Install the [Sendforsign skill](https://about.sendforsign.com/ai-agents/skills) too, so Claude knows the recipes and the pitfalls.
+  
+  **Claude Desktop**
+    Claude Desktop reads remote servers with custom headers through the `mcp-remote` bridge (requires Node.js).
+    Open **Settings → Developer → Edit Config** and add:
+
+    ```json claude_desktop_config.json
+    {
+      "mcpServers": {
+        "sendforsign": {
+          "command": "npx",
+          "args": [
+            "-y", "mcp-remote", "https://api.sendforsign.com/mcp",
+            "--header", "X-Sendforsign-Key:${SFS_KEY}",
+            "--header", "X-Sendforsign-Client-Key:${SFS_CLIENT}",
+            "--header", "X-Sendforsign-Agent:claude-desktop",
+            "--header", "X-Sendforsign-Agent-Mode:draft"
+          ],
+          "env": {
+            "SFS_KEY": "YOUR_API_KEY",
+            "SFS_CLIENT": "YOUR_CLIENT_KEY"
+          }
+        }
+      }
+    }
+    ```
+
+    Restart Claude Desktop. The Sendforsign tools appear under the tools menu of the chat box.
+
+    
+      **claude.ai custom connectors** (Settings → Connectors → Add custom connector) authenticate with OAuth and do
+      not accept static API-key headers. OAuth sign-in for the Sendforsign connector is planned; until then use
+      Claude Desktop with the config above, or Claude Code.
+    
+  
+  **Cursor**
+    Add to `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project):
+
+    ```json mcp.json
+    {
+      "mcpServers": {
+        "sendforsign": {
+          "url": "https://api.sendforsign.com/mcp",
+          "headers": {
+            "X-Sendforsign-Key": "${env:SENDFORSIGN_API_KEY}",
+            "X-Sendforsign-Client-Key": "${env:SENDFORSIGN_CLIENT_KEY}",
+            "X-Sendforsign-Agent": "cursor",
+            "X-Sendforsign-Agent-Mode": "draft"
+          }
+        }
+      }
+    }
+    ```
+
+    Then enable the server in **Cursor Settings → MCP**.
+  
+  **OpenAI Agents SDK**
+    ```python agent.py
+    import asyncio, os
+    from agents import Agent, Runner
+    from agents.mcp import MCPServerStreamableHttp
+
+    async def main():
+        async with MCPServerStreamableHttp(
+            name="sendforsign",
+            params={
+                "url": "https://api.sendforsign.com/mcp",
+                "headers": {
+                    "X-Sendforsign-Key": os.environ["SENDFORSIGN_API_KEY"],
+                    "X-Sendforsign-Client-Key": os.environ["SENDFORSIGN_CLIENT_KEY"],
+                    "X-Sendforsign-Agent": "contracts-agent",
+                    "X-Sendforsign-On-Behalf-Of": "jane@customer.com",
+                    "X-Sendforsign-Agent-Mode": "draft",
+                },
+            },
+            cache_tools_list=True,
+        ) as sfs:
+            agent = Agent(
+                name="Contracts",
+                instructions="Prepare contracts from templates. Never send without the user's approval.",
+                mcp_servers=[sfs],
+            )
+            result = await Runner.run(agent, "List my templates and draft an NDA for Acme Ltd.")
+            print(result.final_output)
+
+    asyncio.run(main())
+    ```
+
+    With the **Responses API** hosted MCP tool, pass the same headers and keep approvals on:
+
+    ```json
+    {
+      "type": "mcp",
+      "server_label": "sendforsign",
+      "server_url": "https://api.sendforsign.com/mcp",
+      "headers": {
+        "X-Sendforsign-Key": "YOUR_API_KEY",
+        "X-Sendforsign-Client-Key": "YOUR_CLIENT_KEY"
+      },
+      "require_approval": "always"
+    }
+    ```
+
+    
+      ChatGPT apps and connectors in the ChatGPT UI need OAuth, which is planned. Use the API or the Agents SDK
+      for now.
+    
+  
+  **Claude API**
+    The Messages API MCP connector sends a single bearer token, so authenticate with a
+    [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client
+    is taken from the token, so no client key header is needed. Client tokens expire (see `expires_in`); mint a new
+    one per conversation from your backend.
+
+    ```bash cURL
+    curl https://api.anthropic.com/v1/messages \
+      -H "x-api-key: $ANTHROPIC_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "anthropic-beta: mcp-client-2025-11-20" \
+      -H "content-type: application/json" \
+      -d '{
+        "model": "claude-opus-5-5",
+        "max_tokens": 16000,
+        "mcp_servers": [{
+          "type": "url",
+          "url": "https://api.sendforsign.com/mcp",
+          "name": "sendforsign",
+          "authorization_token": "SENDFORSIGN_CLIENT_TOKEN"
+        }],
+        "tools": [{ "type": "mcp_toolset", "mcp_server_name": "sendforsign" }],
+        "messages": [{ "role": "user", "content": "Which of my contracts are still waiting for a signature?" }]
+      }'
+    ```
+
+    Agent mode and the other guardrail headers cannot be set through this connector, so the server runs in the
+    default `send` mode; tools that email people still require `confirm: true`. Prefer a connection with headers
+    when the agent acts without a human in the loop.
+  
+  **Any MCP client**
+    Any client that supports Streamable HTTP with custom headers works. The generic shape:
+
+    ```json
+    {
+      "mcpServers": {
+        "sendforsign": {
+          "type": "http",
+          "url": "https://api.sendforsign.com/mcp",
+          "headers": {
+            "X-Sendforsign-Key": "YOUR_API_KEY",
+            "X-Sendforsign-Client-Key": "YOUR_CLIENT_KEY",
+            "X-Sendforsign-User-Key": "OPTIONAL_TENANT_USER_KEY",
+            "X-Sendforsign-Agent": "my-agent",
+            "X-Sendforsign-On-Behalf-Of": "jane@customer.com",
+            "X-Sendforsign-Agent-Mode": "draft",
+            "X-Sendforsign-Allowed-Domains": "customer.com,partner.org"
+          }
+        }
+      }
+    }
+    ```
+
+    Raw JSON-RPC, to check the connection from a terminal:
+
+    ```bash cURL
+    curl -X POST https://api.sendforsign.com/mcp \
+      -H "Content-Type: application/json" \
+      -H "Accept: application/json, text/event-stream" \
+      -H "X-Sendforsign-Key: $SENDFORSIGN_API_KEY" \
+      -H "X-Sendforsign-Client-Key: $SENDFORSIGN_CLIENT_KEY" \
+      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    ```
+
+    The server is stateless: only `POST` is supported (`GET` and `DELETE` return `405`).
+  
+
+### 3. Try it
+
+Ask your agent:
+
+> What can you do with Sendforsign on this connection?
+
+It calls [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) and tells you its mode, tenant and
+allowed domains. Then:
+
+> List my templates. Draft an NDA from the NDA template for Acme Ltd, signer Anna Smith, anna@example.com.
+> Show me what you filled in and the signing link. Don't send it yet.
+
+The agent uses `list_templates` → `get_template` → `create_contract`, returns a draft with a `signingUrl` and lists
+the fields left for the counterparty. Nobody is emailed until you approve and the agent calls
+`send_for_signature` with `confirm: true` on a connection in `send` mode.
+
+### Troubleshooting
+
+| Error | Cause |
+|---|---|
+| `401 Missing credentials` | Neither `X-Sendforsign-Key` nor `Authorization: Bearer` was sent. Check that your client passes headers to remote servers. |
+| `400 Missing X-Sendforsign-Client-Key` | API-key auth also needs the client key header. |
+| `Blocked by policy: this connection is read_only / in draft mode` | The tool needs a higher [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes). |
+| `Not executed: ... needs confirm: true` | Expected: the agent must ask the human, then call again with `confirm: true`. |
+| `Blocked by policy: recipients outside the allowed domains` | A recipient's email is not in `X-Sendforsign-Allowed-Domains`. |
+| `405 Method not allowed` | The client tried SSE (`GET`). Use the Streamable HTTP transport. |
+
+## MCP headers reference
+Source: https://about.sendforsign.com/ai-agents/headers
+
+The MCP server is configured per connection with HTTP headers. Every MCP request carries them, and the server
+enforces them on every tool call. They are set by whoever configures the connection (you, your backend, the user
+installing the connector) and **cannot be changed by the agent** through tool arguments.
+
+| Header | Required | Meaning |
+|---|---|---|
+| `X-Sendforsign-Key` | one of the two | Your API key, as in the [REST API](https://about.sendforsign.com/api-reference/introapi). |
+| `Authorization: Bearer <client token>` | one of the two | A [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. |
+| `X-Sendforsign-Client-Key` | with the API key | The `clientKey` every tool works in. Required with `X-Sendforsign-Key`. |
+| `X-Sendforsign-User-Key` | no | Default `userKey`: the tenant or end user whose templates and contracts the agent sees. Tools also accept a `userKey` argument that overrides it per call. |
+| `X-Sendforsign-Agent` | no | A name or ID for this agent, written to the [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Defaults to the client's `User-Agent`. |
+| `X-Sendforsign-On-Behalf-Of` | no | The principal the agent acts for: an email or ID of a person or company. Written to the audit log. |
+| `X-Sendforsign-Agent-Mode` | no | `read_only`, `draft` or `send`. Default: `send`. See [agent modes](https://about.sendforsign.com/ai-agents/accountability#agent-modes). |
+| `X-Sendforsign-Allowed-Domains` | no | Comma-separated allowlist of recipient email domains, e.g. `customer.com,partner.org`. Empty means any domain. |
+
+### Examples
+
+A production agent in a multi-tenant product, acting for one of your customers' employees, allowed to prepare and
+send contracts only to that customer's domain and its client's domain:
+
+```bash
+X-Sendforsign-Key: YOUR_API_KEY
+X-Sendforsign-Client-Key: CLIENT_KEY_OF_THIS_CUSTOMER
+X-Sendforsign-User-Key: USER_KEY_OF_THIS_EMPLOYEE
+X-Sendforsign-Agent: acme-crm-assistant/2.3
+X-Sendforsign-On-Behalf-Of: jane.doe@customer.com
+X-Sendforsign-Agent-Mode: send
+X-Sendforsign-Allowed-Domains: customer.com,client-of-customer.com
+```
+
+A research or reporting agent that must never change anything:
+
+```bash
+X-Sendforsign-Key: YOUR_API_KEY
+X-Sendforsign-Client-Key: YOUR_CLIENT_KEY
+X-Sendforsign-Agent: weekly-status-report
+X-Sendforsign-Agent-Mode: read_only
+```
+
+### Notes
+
+- Header names are case-insensitive. Values for the mode are case-insensitive too (`DRAFT`, `read-only` and
+  `read_only` all work); an unknown value falls back to `send`, so spell it carefully when you mean to restrict.
+- For an allowlist, a leading `@` is ignored (`@customer.com` = `customer.com`), and subdomains are not
+  included: list `eu.customer.com` separately if needed.
+- Call the [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) tool to see how the server read your
+  headers.
+- The REST API ignores these MCP headers. Use [userKey](https://about.sendforsign.com/api-reference/user/create) and `clientKey` in the request
+  body there.
+
+## MCP tools reference
+Source: https://about.sendforsign.com/ai-agents/tools
+
+All tools return JSON (as text and as `structuredContent`). Errors come back as tool errors with a readable
+message, for example `Blocked by policy: ...` or `Sendforsign API error (404): ...`. Each tool calls the public
+[REST API](https://about.sendforsign.com/api-reference/introapi), so the same permissions apply.
+
+| Tool | What it does | Writes | Emails people | Needs mode |
+|---|---|---|---|---|
+| [`get_connection_info`](#get_connection_info) | Mode, tenant, allowed domains, audit status of this connection | no | no | any |
+| [`list_templates`](#list_templates) | Templates of the account or tenant | no | no | any |
+| [`get_template`](#get_template) | A template and its fields, with who fills each | no | no | any |
+| [`list_contracts`](#list_contracts) | Contracts with status, filterable | no | no | any |
+| [`get_contract`](#get_contract) | A contract: status, template, recipients, fields, optional body | no | no | any |
+| [`create_contract`](#create_contract) | Draft from a template or from Markdown/HTML, fill fields, attach recipients | yes | **no** | `draft` |
+| [`update_contract`](#update_contract) | Rename a draft or replace its body | yes | no | `draft` |
+| [`list_placeholders`](#list_placeholders) | Fields of a contract or template | no | no | any |
+| [`fill_placeholders`](#fill_placeholders) | Set field values; change who fills a field | yes | no | `draft` |
+| [`add_recipients`](#add_recipients) | Add signers/approvers/viewers, return signing links | yes | **no** | `draft` |
+| [`list_recipients`](#list_recipients) | Recipients with role, order and signing link | no | no | any |
+| [`send_for_signature`](#send_for_signature) | Email signing invitations; `confirm: true` required | yes | **yes** | `send` |
+| [`get_contract_timeline`](#get_contract_timeline) | Events (created, sent, seen, signed…) plus agent actions | no | no | any |
+| [`download_contract_pdf`](#download_contract_pdf) | The contract as a PDF, with signatures once signed | no | no | any |
+| [`archive_contract`](#archive_contract) | Archive a contract; `confirm: true` required | yes | no | `send` |
+| [`list_users`](#list_users) | Tenants (users) of the client, for embedded products | no | no | any |
+| [`create_user`](#create_user) | Create a tenant and return its `userKey` | yes | no | `draft` |
+
+"Needs mode" is the lowest [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes) that allows the tool: `read_only` <
+`draft` < `send`. Tools are annotated for MCP clients: read tools carry `readOnlyHint`, `archive_contract` carries
+`destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
+clients that ask before risky calls can do so.
+
+Most tools accept an optional `userKey` argument. It overrides the `X-Sendforsign-User-Key` header for that call;
+without both, the account's default user is used.
+
+### Field roles (`filledBy`)
+
+Tools describe template and contract fields with a `filledBy` value that maps to the REST
+[`fillingType`](https://about.sendforsign.com/usecase/placeholder-filler):
+
+| `filledBy` | `fillingType` | Who fills the field |
+|---|---|---|
+| `none` | `1` | Nobody; a fixed value |
+| `owner` | `2` | The contract owner — the agent or your user, before sending |
+| `any_recipient` | `3` | Whichever recipient opens the contract |
+| `specific_recipient` | `4` | One recipient, given by `recipientKey` |
+
+The agent should fill only `owner` fields and leave recipient fields to the recipients.
+
+---
+
+#### get_connection_info
+
+Shows how this connection is configured. Call it first if unsure what you are allowed to do.
+
+**Arguments:** none.
+
+**Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
+`auditLog` (`"on"`/`"off"`), `sendingRequiresConfirm: true`.
+
+#### list_templates
+
+Lists templates available to the account or tenant. Use a template whenever the user asks for a standard document
+(NDA, service agreement, offer) before drafting from scratch.
+
+**Arguments:** `userKey?`
+
+**Returns:** `templates[]` with `templateKey`, `name`, `changeTime`.
+
+#### get_template
+
+A template and its fields, including who fills each.
+
+**Arguments:** `templateKey`, `includeContent?` (default `false`; `true` adds the HTML body), `userKey?`
+
+**Returns:** `templateKey`, `name`, `placeholders[]` (`placeholderKey`, `name`, `value`, `filledBy`, `recipientKey`),
+`content?`.
+
+#### list_contracts
+
+Lists contracts with their status.
+
+**Arguments:** `status?` (e.g. `Created`, `Sent`, `Seen`, `Signed`, `Fully signed`, `Archived`; case-insensitive),
+`nameContains?`, `limit?` (1–500, default 50), `userKey?`
+
+**Returns:** `total`, `contracts[]` with `contractKey`, `name`, `status`, `createTime`, `changeTime`.
+
+#### get_contract
+
+**Arguments:** `contractKey`, `includeContent?` (default `false`), `userKey?`
+
+**Returns:** `contractKey`, `name`, `status`, `templateKey` (the template it was created from, or `null`),
+`createTime`, `changeTime`, `recipients[]` (with `signingUrl`), `placeholders[]`, `content?`.
+
+#### create_contract
+
+Creates a **draft** contract. It never emails anyone, even when you pass recipients.
+
+**Arguments:**
+
+| Name | Type | Notes |
+|---|---|---|
+| `name` | string | Contract title. Required. |
+| `templateKey` | string | Preferred. Build from this template. |
+| `content` | string | Body when not using a template. |
+| `contentFormat` | `markdown` \| `html` | Default `markdown`. |
+| `fields` | array of `{ placeholderKey? , name?, value }` | Values for template fields, matched by key or by name. Only owner fields. |
+| `recipients` | array of recipients | `{ fullname, email, action?, position?, customMessage? }`; `action` is `sign` (default), `approve`, `view` or `lock`. Checked against the domain allowlist. |
+| `userKey` | string | Tenant. |
+
+Pass `templateKey` or `content`.
+
+**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `unfilledFields[]` (owner fields
+still empty), `fieldsForRecipients[]`, and `next` — a hint for the next step.
+
+#### update_contract
+
+Renames a draft and/or replaces its body. Only for contracts that have not been sent.
+
+**Arguments:** `contractKey`, `name?`, `content?`, `contentFormat?` (default `markdown`), `userKey?`
+
+**Returns:** `contractKey`, `updated[]` (the fields changed).
+
+#### list_placeholders
+
+**Arguments:** `contractKey?` or `templateKey?` (one is required)
+
+**Returns:** `placeholders[]` with `placeholderKey`, `name`, `value`, `filledBy`, `recipientKey`.
+
+#### fill_placeholders
+
+Sets field values in a contract, by `placeholderKey` or by name (case-insensitive), and can change who fills a field.
+
+**Arguments:** `contractKey`, `fields[]` of `{ placeholderKey?, name?, value?, filledBy?, recipientKey? }`.
+`recipientKey` is required when `filledBy` is `specific_recipient`. Changing `filledBy` to anything else clears the
+assigned recipient.
+
+**Returns:** `contractKey`, `results[]` with `field`, `placeholderKey`, `ok`, `error?` per field. One failed field
+does not stop the others.
+
+#### add_recipients
+
+Adds signers, approvers or viewers **without emailing them**. Signing order continues after existing recipients
+unless you pass `position`.
+
+**Arguments:** `contractKey`, `recipients[]` (as in `create_contract`, at least one), `userKey?`
+
+**Returns:** `contractKey`, `recipients[]` (all recipients of the contract) with `recipientKey` and `signingUrl`.
+
+The `signingUrl` (`https://app.sendforsign.com/sharing/{recipientKey}`) can be shown in your own product instead of
+sending email. See [embedded signing](https://about.sendforsign.com/ai-agents/recipes#embedded-signing-without-email).
+
+#### list_recipients
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `recipients[]` with `recipientKey`, `fullname`, `email`, `action`, `position`,
+`customMessage`, `signingUrl`.
+
+#### send_for_signature
+
+**Emails** signing invitations. This contacts real people.
+
+Before calling, the agent must show the user the contract name, the recipients and their roles, get explicit
+approval, and then pass `confirm: true`. Without it the tool returns `Not executed: ... needs confirm: true` and sends
+nothing. Allowed only in `send` mode; recipients are checked against the domain allowlist.
+
+**Arguments:** `contractKey`, `confirm` (boolean, must be `true`), `recipientKeys?` (send only to these; default: all
+recipients), `customMessage?` (overrides the invitation message), `userKey?`
+
+**Returns:** `contractKey`, `sentTo[]` with `email`, `action`, `signingUrl`.
+
+#### get_contract_timeline
+
+Event history of a contract, plus the agent actions recorded for it when the audit log is on.
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `events[]` (`time`, `status`, `name`, `email`), `agentActions[]?` (`create_time`, `agent`,
+`on_behalf_of`, `mode`, `tool`, `outcome`, `message`, `hash`).
+
+#### download_contract_pdf
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `mimeType: "application/pdf"`, `bytes`, `base64`.
+
+#### archive_contract
+
+Archives a contract: it leaves active lists and can no longer be signed. Needs `confirm: true` after explicit user
+approval, and `send` mode.
+
+**Arguments:** `contractKey`, `confirm`, `userKey?`
+
+**Returns:** `contractKey`, `archived: true`.
+
+#### list_users
+
+For products that embed Sendforsign: lists tenants (users) of the client. Each has its own templates and contracts,
+addressed by `userKey`.
+
+**Arguments:** none.
+
+**Returns:** `users[]` with `userKey`, `fullname`, `email`, `customKey`.
+
+#### create_user
+
+Creates a tenant and returns its `userKey`. `customKey` is your own ID for it, so you can map back.
+
+**Arguments:** `fullname`, `email`, `customKey?`
+
+**Returns:** `userKey`, `fullname`, `email`, `customKey`.
+
+## Agent modes and accountability
+Source: https://about.sendforsign.com/ai-agents/accountability
+
+When an agent prepares and sends contracts, two questions matter later: **was it allowed to**, and **who is bound
+by what it did**. The MCP server answers both with guardrails that the integrator sets and the agent cannot change,
+and with a log of every action.
+
+All guardrails are enforced on the server for every tool call. They are configured with
+[headers](https://about.sendforsign.com/ai-agents/headers), not with prompts, so a confused or manipulated agent cannot talk its way past them.
+
+### Agent modes
+
+Set with `X-Sendforsign-Agent-Mode`.
+
+| Mode | Read tools | Create and edit drafts, fill fields, add recipients, create tenants | Email recipients (`send_for_signature`), archive |
+|---|---|---|---|
+| `read_only` | yes | blocked | blocked |
+| `draft` | yes | yes | blocked |
+| `send` (default) | yes | yes | yes, with `confirm: true` |
+
+`draft` is the right default for most products: the agent prepares the contract and the signing links, and a human
+(or your own code) sends it, or shows the links in your UI. Recipients added in `draft` mode are not emailed.
+
+A blocked call returns a tool error such as
+`Blocked by policy: this connection is in draft mode (X-Sendforsign-Agent-Mode)...`, which tells the agent to hand
+over to a human instead of retrying.
+
+### Explicit confirmation
+
+`send_for_signature` and `archive_contract` require the argument `confirm: true`. Without it, they do nothing and
+return:
+
+> Not executed: sending for signature needs confirm: true. Show the user exactly what will happen ... and call
+> again with confirm: true only after they explicitly approve.
+
+The tool descriptions tell the model the same thing. This is a second line of defence, not a substitute for modes: a
+model can still set `confirm: true` on its own. If no human is in the loop, use `draft` mode, or let your own code
+decide when to call `send_for_signature`. MCP clients that ask the user before tools marked `openWorldHint` or
+`destructiveHint` (these two tools are) add a third line.
+
+### Recipient domain allowlist
+
+`X-Sendforsign-Allowed-Domains: customer.com,partner.org` makes `create_contract`, `add_recipients` and
+`send_for_signature` reject any recipient whose email is outside those domains:
+
+> Blocked by policy: recipients outside the allowed domains (customer.com, partner.org): someone@gmail.com
+
+Use it when the agent should only ever contract with known parties, for example your customer's own staff and its
+existing clients.
+
+### Identity: agent and principal
+
+- `X-Sendforsign-Agent` names the agent (product, version, deployment).
+- `X-Sendforsign-On-Behalf-Of` names the person or company the agent acts for: the user who asked, or the customer
+  account.
+
+Both are written to the audit log with every action. Set `On-Behalf-Of` from your own authenticated session, not from
+anything the model says.
+
+### Audit log
+
+Every **write** tool call and every **blocked** call is recorded, with:
+
+| Field | Meaning |
+|---|---|
+| `create_time` | When |
+| `agent`, `on_behalf_of`, `mode` | Who acted, for whom, under which mode |
+| `client_key`, `user_key` | In which account and tenant |
+| `tool`, `args` | What was called, with which arguments. Contract bodies are stored as a SHA-256 hash and length, not verbatim. |
+| `contract_key` | Which contract |
+| `outcome`, `message` | `ok`, `error` or `blocked`, with the error text |
+| `prev_hash`, `hash` | Hash chain: each record includes the hash of the previous record of the same account, so an edited or deleted record breaks the chain |
+
+Read calls that succeed are not logged. The agent's actions for a contract are returned by
+[`get_contract_timeline`](https://about.sendforsign.com/ai-agents/tools#get_contract_timeline) as `agentActions`, next to the signing events
+(sent, seen, signed, fully signed).
+
+  The audit log is being rolled out. `get_connection_info` returns `auditLog: "on"` when it is active for your
+  connection. Contact us to enable it or to export the log.
+
+### Legal context
+
+  This section explains why the controls above exist. It is not legal advice; whether a particular contract is
+  binding depends on the jurisdiction, the parties' agreement and the facts. Ask your counsel.
+
+**United States.** The federal ESIGN Act, 15 U.S.C. §7001(h), provides that a contract may not be denied legal effect
+solely because its formation, creation or delivery involved the action of one or more electronic agents, **so long as
+the action of the agent is legally attributable to the person to be bound**. The Uniform Electronic Transactions Act
+(UETA), adopted by most states, says the same for automated transactions (§14) and lets attribution be shown in any
+manner, including by the efficacy of a security procedure (§9). UETA §10 deals with changes and errors: where the
+parties agreed on a security procedure to detect them, it allocates the consequences to the party that did not follow
+it.
+
+The practical consequence for agent builders: be able to show **which principal an agent acted for, under which
+authority, and what exactly it did**. Agent and on-behalf-of identity, explicit modes and confirmations, and a
+tamper-evident log are the evidence. Agreeing these controls with your customers (for example in your terms) makes
+them an agreed procedure rather than an internal setting.
+
+**European Union.** Sendforsign signatures are simple electronic signatures under eIDAS, which may not be denied
+legal effect solely because they are electronic. The same evidence (who acted, for whom, what was signed and when)
+supports them. Qualified signatures and seals are out of scope.
+
+Signers themselves are always humans: the agent prepares and sends; the recipient opens the signing link, reviews and
+signs.
+
+## Recipes for agent builders
+Source: https://about.sendforsign.com/ai-agents/recipes
+
+Each recipe shows the MCP tool calls an agent makes and the equivalent REST requests, for when you'd rather run the
+deterministic part in your own code and let the agent only decide *what* to send.
+
+### Template → fill → send
+
+The most common flow: a standard document from the customer's template, the agent fills its fields, a human approves,
+the recipients get an email.
+
+  **Find the template**
+    `list_templates`, then `get_template` with the chosen `templateKey`. The response lists every field with
+    `filledBy`. The agent fills `owner` fields; `any_recipient` and `specific_recipient` fields belong to the signers.
+  
+  **Create the draft with fields and recipients**
+    ```json create_contract
+    {
+      "name": "NDA — Acme Ltd",
+      "templateKey": "TEMPLATE_KEY",
+      "fields": [
+        { "name": "Company name", "value": "Acme Ltd" },
+        { "name": "Effective date", "value": "1 December 2026" }
+      ],
+      "recipients": [
+        { "fullname": "Anna Smith", "email": "anna@acme.example", "action": "sign" }
+      ]
+    }
+    ```
+    The result has `contractKey`, the recipients with `signingUrl`, and `unfilledFields` — owner fields the agent
+    still has to fill (use `fill_placeholders`) or ask the user about. Nobody has been emailed.
+  
+  **Show the user and get approval**
+    The agent shows the contract name, the filled values, each recipient and their role, and asks to send.
+  
+  **Send**
+    ```json send_for_signature
+    { "contractKey": "CONTRACT_KEY", "confirm": true }
+    ```
+    Requires `send` mode. Recipients are emailed in signing order.
+  
+  **Track**
+    `get_contract_timeline` for events, `download_contract_pdf` once the status is `Fully signed`. In production,
+    listen to the [webhook](#react-when-a-contract-is-fully-signed) instead of polling.
+  
+
+The same in REST:
+
+```bash cURL
+# 1. Draft from template, with field values (no recipients here: that would send email immediately)
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
+       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"},
+       "placeholders":[{"name":"Company name","value":"Acme Ltd"}]}}'
+
+# 2. Add recipients without emailing them
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "recipients":[{"fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
+
+# 3. After approval: send (emails the recipients)
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"send","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "recipients":[{"recipientKey":"RECIPIENT_KEY","fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
+```
+
+  In REST, `contract` `create` **with** a `recipients` array [creates and sends](https://about.sendforsign.com/api-reference/contract/create-send)
+  in one call: the recipients are emailed immediately. `recipient` `create` adds recipients **without** email;
+  `recipient` `send` emails them. The MCP `create_contract` tool always takes the safe path.
+
+### Embedded signing without email
+
+Your product already talks to the signer (in your app, a chat, a portal). Show the signing link there and never send a
+Sendforsign email.
+
+1. Create the draft and add recipients (`create_contract` with `recipients`, or `add_recipients`). Both return each
+   recipient's `signingUrl`:
+
+   ```bash
+   https://app.sendforsign.com/sharing/{recipientKey}
+   ```
+
+   With a [recipient custom domain](https://about.sendforsign.com/usecase/recipientdomain) the links can be on your own domain.
+
+2. Give each signer **their own** link in your UI: a button, a message, or an iframe/new tab. The link identifies the
+   recipient, so treat it like a password reset link: show it only to that person.
+3. Don't call `send_for_signature`. The agent can run in `draft` mode for this flow.
+4. Learn about the signature from the [webhook](#react-when-a-contract-is-fully-signed).
+
+In REST, the `recipientKey` comes from [recipient `list`](https://about.sendforsign.com/api-reference/recipient/list).
+
+For a fully embedded editor and contract list (review and edit what the agent drafted), use the
+[React components](https://about.sendforsign.com/sdk/introsdk), and set your [branding](https://about.sendforsign.com/api-reference/settings/branding) for any emails you do send.
+
+### One tenant per customer
+
+A product with many customers keeps each customer's templates and contracts apart. The tenant is chosen by **your**
+code through headers, so an agent working for customer A cannot see customer B's contracts.
+
+| Level | Key | Use it for |
+|---|---|---|
+| Client | `clientKey` | A customer business. Strongest separation: own templates, contracts, [webhooks](https://about.sendforsign.com/api-reference/webhook/concept) and branding. [Create](https://about.sendforsign.com/api-reference/client/create) |
+| User | `userKey` | An end user or team inside a client. [Create](https://about.sendforsign.com/api-reference/user/create), or `create_user` over MCP |
+
+Setup, once per customer (from your backend):
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/client' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","client":{"fullname":"Jane Doe","email":"jane@customer.example","organization":"Customer Inc.","customKey":"your-customer-id"}}}'
+```
+
+Store the returned `clientKey` with the customer. When a user of that customer starts an agent session, open the MCP
+connection with:
+
+```bash
+X-Sendforsign-Client-Key: CLIENT_KEY_OF_THAT_CUSTOMER
+X-Sendforsign-User-Key: USER_KEY_OF_THAT_USER        # optional
+X-Sendforsign-On-Behalf-Of: jane@customer.example
+```
+
+### React when a contract is fully signed
+
+Webhooks are per `clientKey`. Register one per client:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
+       "webhooks":[{"url":"https://your-app.example/hooks/sendforsign","signed":true,"fullySigned":true}]}}'
+```
+
+When the last recipient signs, your endpoint receives:
+
+```json
+{
+  "clientKey": "CLIENT_KEY",
+  "contractKey": "CONTRACT_KEY",
+  "createTime": "2026-12-01T16:06:56.000Z",
+  "status": "contract.fully_signed",
+  "contractName": "NDA — Acme Ltd"
+}
+```
+
+Then download the signed PDF ([`GET /api/download_pdf`](https://about.sendforsign.com/api-reference/pdf/download)), store it, and tell the agent or
+the user. To resume an agent conversation, pass it the `contractKey`; it can call `get_contract` and
+`get_contract_timeline`. All events: [webhooks concept](https://about.sendforsign.com/api-reference/webhook/concept).
+
+### Upload a finished text and get it signed
+
+For legal-AI products that draft elsewhere: pass the final text as `content` (Markdown by default, or
+`contentFormat: "html"`) to `create_contract`, add signers, send. For a PDF, use [PDF upload](https://about.sendforsign.com/api-reference/pdf/upload)
+and [PDF placeholders](https://about.sendforsign.com/api-reference/placeholder/pdfbasic) in REST.
+
+# Part 2. REST API concepts
+
+## Sendforsign API introduction
+Source: https://about.sendforsign.com/api-reference/introapi
+
+### Base URL
+
+Our API is organized around **REST**. It has predictable resource-oriented URLs. We enforce HTTPS in every request 
+to improve data security, integrity, and privacy. The API does not support HTTP.
+
+All requests contain the following base URL:
+```bash
+https://api.sendforsign.com/api
+```
+
+### Authentication
+
+To authenticate you need to add an `X-Sendforsign-Key` header with the contents of the header 
+being `YOUR_API` where `YOUR_API` is your API key.
+```bash
+X-Sendforsign-Key: YOUR_API_KEY
+```
+
+### Response 
+Sendforsign uses standard HTTP codes to indicate the success or failure of your requests.
+
+In general, `2xx` HTTP codes correspond to success, `4xx` codes are for user-related failures, 
+and `5xx` codes are for infrastructure issues.
+
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| `200`    | Successful request.|
+| `400`    | Check that the parameters were correct.|
+| `401`    | The API key used was missing.|
+| `403`    | The API key used was invalid.|
+| `404`    | The resource was not found.|
+| `429`    | The rate limit was exceeded.|
+| `5xx`    | Indicates an error with Sendforsign servers.|
+
+## Account structure
+Source: https://about.sendforsign.com/api-reference/structure
+
+### Structure
+
+The Sendforsign (SFS) API uses different layers to secure access to any stored data within the platform:
+
+### Platform (You)
+
+A platform is a business that integrates the SFS API into its application. This integration is an essential component.
+
+Platform development teams connect to the SFS API using admin-level access API tokens. 
+These tokens allow platforms to create, configure clients, and access all resources across various 
+platforms for which they develop software.
+
+### Client
+
+A client, who is a customer of a platform, can be either an organization or an individual. Each platform 
+serves one or more clients. Using a client's token, it is possible to gain root access to all resources exclusively 
+associated with that particular client.
+
+### Client User
+
+This refers to the employees working for a client. The optional client user access layer is designed for 
+platforms that prefer using SFS's security features for quick development, instead of creating their own 
+custom access control systems.
+
+Through the SFS API, partners can establish customizable roles and permissions at the entity level. 
+SFS then automatically oversees and enforces access policies for each API interaction.
+
+## Authentication
+Source: https://about.sendforsign.com/api-reference/authentication
+
+The SFS API offers industry-standard security controls for connecting to its platform, submitting, storing, 
+and retrieving data from SFS data servers, and conducting various business operations with this data.
+
+### API security key concepts
+
+The SFS API platform adheres to several principles to uphold the integrity and security of data:
+
+- `Secure Data Transmission:` All API requests to the SFS API platform must be made via HTTPS. Attempts to make 
+calls over plain HTTP will be unsuccessful.
+- `Bearer Token Authentication:` Each API request must authenticate using a Bearer token. This token is generated by 
+SFS using the provided API Key and Secret. This authentication method aligns with [OAuth 2.0 standards](https://oauth.net/2/), 
+the recognized protocol for API authorization. When an API request is received, 
+SFS checks whether the bearer of the token is valid and has not expired.
+
+### API Key and Secret
+
+SFS's token mechanism complies with the OAuth 2.0 standard, which allows for the generation of short-lived tokens. 
+These tokens, with customizable lifespans, are more secure than longer-lasting API keys and help reduce the risk of 
+damage from potential leaks.
+
+To generate tokens for the SFS API, platform developers must first log into their account on the SFS Portal, where 
+they can access existing API Keys and Secret.
+
+### Creating platform tokens
+
+To create a new token for accessing the SFS API, first you need to call `POST /api/token` with the request body 
+containing the `apiKey` and `Secret` values you obtained in the previous step.
+
+The `/api/token` endpoint does not require any authentication headers, which is in line with the OAuth 2.0 standard. 
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/token' \
+     -H 'Content-Type: application/json' \
+     -d '{
+         "data": {
+            "action": "create",
+            "apiKey": "YOUR_API_KEY",
+            "secret": "YOUR_SECRET"
+         }
+}'
+```
+
+The successful `201 Created` response contains the `access_token` and its validity time (in seconds):
+
+```bash JSON
+{
+  "access_token": "123456789...",
+  "token_type": "Bearer",
+  "expires_in": 1800
+}
+```
+
+### Revoking platform tokens
+
+Tokens generated within the SFS API platform have an auto-expiry based on the specified `expires_in` value 
+(in seconds). Nevertheless, in certain cases you may want to explicitly revoke an active token, such as when 
+a client logs out from your application.
+
+To revoke a token, call `POST /api/token` with a request body containing the `revoke` action, and specify the 
+`platform Bearer token` in the header:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/token' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{
+        "action": "revoke"
+     }'
+```
+
+A `201 OK` response indicates that the specified token has been revoked successfully.
+
+```bash JSON
+{
+    "code": 201,
+    "message": "Token revoked"
+}
+```
+
+### Creating client tokens
+
+A Client token is a specific token issued for an individual platform client. 
+These tokens allowing actions to be directly linked to specific client within your platform.
+
+To generate a client token, call `POST /api/token`, and specify the Key of this client in `clientKey` request field,
+and specify the `platform Bearer token` in the header:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/token' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY"
+     }'
+```
+
+The successful `201 Created` response contains the `access_token` and its validity time (in seconds):
+
+```bash JSON
+{
+  "access_token": "123456789...",
+  "token_type": "Bearer",
+  "expires_in": 1800
+}
+```
+
+### Revoking client tokens
+
+Tokens generated within the SFS API platform have an auto-expiry based on the specified `expires_in` value 
+(in seconds). Nevertheless, in certain cases you may want to explicitly revoke an active token, such as when 
+a client logs out from your application.
+
+To revoke a token, call `POST /api/token` with a request body containing the `revoke` action and the `client access token`,
+and specify the `platform Bearer token` in the header:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/token' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{
+        "action": "revoke",
+        "access_token": "eyJ0eXAiOiJKV1QiLCJhb..."
+     }'
+```
+
+A `201 OK` response indicates that the specified token has been revoked successfully.
+
+```bash JSON
+{
+    "code": 201,
+    "message": "Token revoked"
+}
+```
+
+### Authentication for testing purposes
+
+Although we always recommend using Sendforsign's token mechanism to access our infrastructure, there is an
+alternative way to send API calls and render Sendforsign's components without the need to generate tokens.
+
+You can use a combination of an API Key (in the request header) and a Client Key (in the request body) to achieve the same result
+as using the access token.
+
+Compare the two requests below; both will result in creating a new contract in Sendforsign's infrastructure.
+In the first case, you will need to use only your Bearer Access Token, and in the second case, you can use 
+your `X-Sendforsign-Key` API key in the header and your Client Key in the request body.
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'Authorization: Bearer 123456789' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+         "data": {
+         "action": "create",
+            "contract": {
+               "name": "New contract",
+               "value": "<p>Contract text</p>"
+                  }
+               }
+}'
+```
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+         "data": {
+         "action": "create",
+         "clientKey": "YOUR_CLIENT_KEY",
+            "contract": {
+               "name": "New contract",
+               "value": "<p>Contract text</p>"
+                  }
+               }
+}'
+```
+
+## Choose Who Fills In a Placeholder
+Source: https://about.sendforsign.com/usecase/placeholder-filler
+
+In the contract editor, each placeholder has a **Who fills in this field** setting. The same setting is available
+through the API with two placeholder fields:
+
+| Field | Meaning |
+|---|---|
+| `fillingType` | `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient |
+| `externalRecipientKey` | `recipientKey` of that recipient; used only with `fillingType: 4` |
+
+### Set up your account
+
+Before you start, see the [First document use case](https://about.sendforsign.com/usecase/firstdoc) to set up your platform account and get the API key.
+You also need a contract with recipients and placeholders. See [Create recipients](https://about.sendforsign.com/api-reference/recipient/create) and
+[Create placeholder](https://about.sendforsign.com/api-reference/placeholder/create).
+
+### Get the recipient key
+
+Request the list of the contract's recipients. [Learn more here.](https://about.sendforsign.com/api-reference/recipient/list)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "list",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY"
+    }
+}'
+```
+
+Each recipient in the response has a `recipientKey`. This is the value you pass as `externalRecipientKey`.
+
+### Get the placeholder key
+
+Request the list of the contract's placeholders. [Learn more here.](https://about.sendforsign.com/api-reference/placeholder/list)
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "list",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY"
+    }
+}'
+```
+
+Take the `placeholderKey` of the placeholder you want to assign. It is the same key that the editor shows at the bottom of the placeholder settings.
+
+### Assign the placeholder
+
+To a specific recipient:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "fillingType": 4,
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+
+To the contract owner, send `"fillingType": 2` instead. To let whichever recipient opens the contract fill it in, send `"fillingType": 3`. In both cases also send `"externalRecipientKey": null` if a recipient was assigned before.
+
+To unassign the placeholder, send `"fillingType": 1` together with `"externalRecipientKey": null`.
+A field left out of an update request keeps its current value, so without `null` the previous recipient stays stored.
+
+  You only need to send the fields you change. The placeholder's `name` and `value` are not affected.
+  You can also pass `fillingType` and `externalRecipientKey` right away when you [create a placeholder](https://about.sendforsign.com/api-reference/placeholder/create).
+
+### Check the result
+
+Request the list of placeholders again. Each placeholder in the response has `fillingType` and `externalRecipientKey`:
+
+```bash json
+{
+    "placeholders": [
+        {
+            "name": "Contract name",
+            "value": "Value",
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "fillingType": "4",
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    ],
+    "code": 200,
+    "message": "Placeholders found"
+}
+```
+
+## Webhooks concept
+Source: https://about.sendforsign.com/api-reference/webhook/concept
+
+Webhooks can be created via API calls by using the API references from this section. 
+Please bear in mind that webhooks are separated by Client Keys, so if you create multiple Client Keys for your platform, 
+be sure to follow this rule.
+
+When you listen for the webhooks, you will receive them with the `Content-Type: application/vnd.api+json` header.
+
+Webhooks have 6 events to listen for your purposes:
+- `Contract.created`: fires when a contract is created. 
+- `Contract.sent`: fires for every recipient to whom a contract was sent.
+- `Contract.seen`: fires every time a recipient opens a contract. 
+- `Contract.approved`: fires every time a recipient approves a contract. 
+- `Contract.signed`: fires every time a recipient signs a contract. 
+- `Contract.fully_signed`: fires once when all the recipients have signed a contract. 
+
+Below you will find the examples of webhooks.
+
+#### "contract.created"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T15:47:53.000Z",
+  "status": "contract.created"
+}
+```
+
+#### "contract.sent"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:02:27.000Z",
+  "status": "contract.sent",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+#### "contract.seen"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:03:39.000Z",
+  "status": "contract.seen",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+#### "contract.approved"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:05:06.000Z",
+  "status": "contract.approved",
+  "email": "ilia@sfs.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+#### "contract.signed"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:06:56.000Z",
+  "status": "contract.signed",
+  "email": "ilia@sendforsign.com",
+  "fullname": "Ilia Bovk",
+  "contractName": "Sales Contract",
+  "recipientKey": "b113a5ea-115b-465c-a10f-baa361378e10"
+}
+```
+
+#### "contract.fully_signed"
+
+```bash json
+{
+  "clientKey": "658599d9-bbbe-44ea-984e-0e5a766c2272",
+  "contractKey": "433e835c-0630-418c-8cd6-af223bb079d5",
+  "createTime": "2024-12-13T16:06:56.000Z",
+  "status": "contract.fully_signed",
+  "contractName": "Sales Contract"
+}
+```
+
+# Part 3. REST API reference
+
+All resource endpoints take `POST https://api.sendforsign.com/api/<resource>` with body `{"data": {"action": "...", "clientKey": "...", ...}}` and header `X-Sendforsign-Key: YOUR_API_KEY` unless stated otherwise.
+
+## Client
+
+### Create client
+
+Source: https://about.sendforsign.com/api-reference/client/create
+
+Endpoint: `POST https://api.sendforsign.com/api/client`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `client` (body, object, required): Structure, at least one of the fields must be filled.
+  - `fullname` (body, string): First and second names of the client.
+  - `email` (body, string): Email of the client.
+  - `organization` (body, string): Organization name.
+  - `customKey` (body, string): Your custom key, if you don't need to use any of the above fields.
+  - `users` (body, string): Array of users, optional.
+    - `fullname` (body, string): First and second names of the user.
+    - `email` (body, string): Email of the user.
+    - `customKey` (body, string): A custom user key, if you don't need to use any of the above fields.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "client": {
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION",
+							  "users": [{
+								"fullname": "John Johnson",
+							    "email": "john_johnson@mail.com", 
+							    "customKey": "YOUR_COMBINATION"
+							  }]
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "client": {
+                "createTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY",
+				"users": [{
+					"createTime": "2023-12-01 12:18:55",
+					"default": true,
+					"userKey": "USER_KEY"
+				}]
+                 },
+       "code": "201",
+       "message": "Client created"
+    }
+```
+
+### Update client
+
+Source: https://about.sendforsign.com/api-reference/client/update
+
+Endpoint: `POST https://api.sendforsign.com/api/client`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `client` (body, object, required): Structure, use the fields that should be updated.
+  - `clientKey` (body, string, required): ID of the client.
+  - `fullname` (body, string): First and second names of the client.
+  - `email` (body, string): Email of the client.
+  - `organization` (body, string): Organization name.
+  - `customKey` (body, string): Client custom key, if you used it when creating the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "update",
+				   "client": {
+							  "clientKey": "CLIENT_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "client": {
+                "changeTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY", 
+		},
+       "code": "201",
+       "message": "Client updated"
+    }
+```
+
+### Read client
+
+Source: https://about.sendforsign.com/api-reference/client/read
+
+Endpoint: `POST https://api.sendforsign.com/api/client`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `client` (body, object, required): Structure, at least one of the fields must be filled.
+  - `clientKey` (body, string): ID of the client.
+  - `fullname` (body, string): First and second names of the client.
+  - `email` (body, string): Email of the client.
+  - `organization` (body, string): Organization name.
+  - `customKey` (body, string): Client custom key, if you used it when creating the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/client' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "read",
+				   "client": {
+							  "clientKey": "CLIENT_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com",
+							  "organization": "Company Inc.",
+							  "customKey": "YOUR_COMBINATION"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "client": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com",
+				"organization": "Company Inc.",
+				"customKey": "YOUR_COMBINATION"
+		},
+       "code": "200",
+       "message": "Client found"
+    }
+```
+
+### List of clients
+
+Source: https://about.sendforsign.com/api-reference/client/list
+
+Endpoint: `POST https://api.sendforsign.com/api/client`
+
+Parameters:
+- `action` (body, string, required): Action type.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/client' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+				   "action": "list"
+				  }
+     }'
+```
+
+Response:
+```json
+{
+       "clients": [{
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "clientKey": "CLIENT_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com",
+				"organization": "Company Inc.",
+				"customKey": "YOUR_COMBINATION",
+				"multiple": true
+		}],
+       "code": "200",
+       "message": "Clients found"
+    }
+```
+
+## User
+
+### Create user
+
+Source: https://about.sendforsign.com/api-reference/user/create
+
+Endpoint: `POST https://api.sendforsign.com/api/user`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `user` (body, object, required): Structure, at least one of the fields must be filled.
+  - `fullname` (body, string): First and second names of the user.
+  - `email` (body, string): Email of the user.
+  - `customKey` (body, string): Your custom key, if you don't need to use any of the above fields.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/user' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "user": {
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com", 
+							  "customKey": "YOUR_COMBINATION"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "user": {
+                "createTime": "2023-12-01 12:18:55",
+                "userKey": "USER_KEY"
+                 },
+       "code": "201",
+       "message": "User created"
+    }
+```
+
+### Update user
+
+Source: https://about.sendforsign.com/api-reference/user/update
+
+Endpoint: `POST https://api.sendforsign.com/api/user`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `user` (body, object, required): Structure, use the fields that should be updated.
+  - `userKey` (body, string, required): ID of the user.
+  - `fullname` (body, string): First and second names of the user.
+  - `email` (body, string): Email of the user.
+  - `customKey` (body, string): User custom key, if you used it when creating the user.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/user' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "update",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "user": {
+							  "userKey": "USER_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com", 
+							  "customKey": "YOUR_COMBINATION"
+						    }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "user": {
+                "changeTime": "2023-12-01 12:18:55",
+                "userKey": "USER_KEY", 
+		},
+       "code": "201",
+       "message": "User updated"
+    }
+```
+
+### Read user
+
+Source: https://about.sendforsign.com/api-reference/user/read
+
+Endpoint: `POST https://api.sendforsign.com/api/user`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `user` (body, object, required): Structure, at least one of the fields must be filled.
+  - `userKey` (body, string): ID of the user.
+  - `fullname` (body, string): First and second names of the user.
+  - `email` (body, string): Email of the user.
+  - `customKey` (body, string): User custom key, if you used it when creating the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/user' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "read",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "user": {
+							  "userKey": "USER_KEY",
+							  "fullname": "John Johnson",
+							  "email": "john_johnson@mail.com", 
+							  "customKey": "YOUR_COMBINATION"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "user": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "userKey": "USER_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com", 
+				"customKey": "YOUR_COMBINATION"
+		},
+       "code": "200",
+       "message": "User found"
+    }
+```
+
+### List of users
+
+Source: https://about.sendforsign.com/api-reference/user/list
+
+Endpoint: `POST https://api.sendforsign.com/api/user`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/user' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+				   "action": "list",
+				   "clientKey": "YOUR_CLIENT_KEY"
+				  }
+     }'
+```
+
+Response:
+```json
+{
+       "users": [{
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "userKey": "USER_KEY", 
+				"fullname": "John Johnson",
+    		    "email": "john_johnson@mail.com", 
+				"customKey": "YOUR_COMBINATION"
+		}],
+       "code": "200",
+       "message": "Users found"
+    }
+```
+
+## Contract
+
+### Create contract
+
+Source: https://about.sendforsign.com/api-reference/contract/create
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the contract. If not specified, the default user credentials will be used.
+- `contract` (body, object, required): Contract structure.
+  - `name` (body, string): Name of the contract.
+  - `value` (body, string): Content of the contract, use HTML.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contract": {
+							  "name": "New contract",
+							  "value": "<p>Contract text</p>"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY"
+                 },
+       "code": "201",
+       "message": "Contract created"
+    }
+```
+
+### Create from template
+
+Source: https://about.sendforsign.com/api-reference/contract/create-from-template
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the contract. If not specified, the default user credentials will be used.
+- `contract` (body, object, required): Contract structure.
+  - `name` (body, string): Name of the contract.
+  - `templateKey` (body, string): Template from which you are creating a contract.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contract": {
+							  "name": "New contract",
+							  "templateKey": "TEMPLATE_KEY"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY"
+                 },
+       "code": "201",
+       "message": "Contract created"
+    }
+```
+
+### Create and send contract
+
+Source: https://about.sendforsign.com/api-reference/contract/create-send
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the contract. If not specified, the default user credentials will be used.
+- `contract` (body, object, required): Contract structure.
+  - `name` (body, string): Name of the contract.
+  - `value` (body, string): Content of the contract, use HTML.
+- `recipients` (body, array): Array of recipients, optional.
+  - `action` (body, string): What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  - `customMessage` (body, string): Custom note to the recipient. If not specified, the default message will be sent.
+  - `fullname` (body, string): Full name of the recipient.
+  - `email` (body, string, required): Email of the recipient.
+  - `position` (body, number): Signing order. If not specified, all requests will be sent simultaneously.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contract": {
+							  "name": "New contract",
+							  "value": "<p>Contract text</p>"
+						     },
+           "recipients":[{
+                "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson@mail.com", 
+                "position": 1
+               }] 
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY"
+                 },
+       "code": "201",
+       "message": "Contract created"
+    }
+```
+
+### Create and fill in contract
+
+Source: https://about.sendforsign.com/api-reference/contract/create-fill
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+The best way to fill in contracts is to prepare a template that already contains all the necessary 
+placeholders in the text. This way, you can populate the necessary data in the right placeholders within 
+the contracts with a single API call.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the contract. If not specified, the default user credentials will be used.
+- `contract` (body, object, required): Contract structure.
+  - `name` (body, string): Name of the contract.
+  - `templateKey` (body, string): Template from which you are creating a contract.
+- `placeholders` (body, array): Array of placeholders, optional.
+  - `placeholderKey` (body, string): A placeholder key corresponds to a specific placeholder in the template from which you create a contract. Use this parameter if you need to populate any value into this specific placeholder.
+  - `name` (body, string): Name of the placeholder.
+  - `value` (body, string): Value of the placeholder.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "userKey": "USER_KEY",
+        "contract": {
+            "name": "New contract",
+            "templateKey": "TEMPLATE_KEY"
+        },
+        "placeholders": [
+            {
+                "placeholderKey": "PLACEHOLDER_KEY",
+                "value": "Placeholder value"
+            },
+            {
+                "name": "Placeholder name",
+                "value": "Placeholder value"
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY"
+                 },
+       "code": "201",
+       "message": "Contract created"
+    }
+```
+
+### Update contract
+
+Source: https://about.sendforsign.com/api-reference/contract/update
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contract` (body, object, required): Structure, use the fields that should be updated.
+  - `contractKey` (body, string, required): Key of the contract.
+  - `name` (body, string): Name of the contract.
+  - `value` (body, string): Content of the contract, use HTML.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "update",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "contract": {
+							  "contractKey": "CONTRACT_KEY", 
+							  "name": "New contract",
+							  "value": "<p>Contract text</p>"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+                "changeTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY", 
+		},
+       "code": "201",
+       "message": "Contract updated"
+    }
+```
+
+### Read contract
+
+Source: https://about.sendforsign.com/api-reference/contract/read
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contract` (body, object, required): Structure, at least one of the fields must be filled.
+  - `contractKey` (body, string, required): Key of the contract.
+  - `name` (body, string): Name of the contract.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "read",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "contract": {
+							  "contractKey": "CONTRACT_KEY", 
+							  "name": "New contract"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "contractKey": "CONTRACT_KEY", 
+				"name": "New contract",
+                "status": "Created",
+				"value": "<p>Contract text</p>"
+		},
+       "code": "200",
+       "message": "Contract found"
+    }
+```
+
+### Duplicate contract
+
+Source: https://about.sendforsign.com/api-reference/contract/duplicate
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+When duplicating a contract, the placeholder structure is copied, but all placeholder values are cleared.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contract` (body, object, required): Structure.
+  - `contractKey` (body, string, required): Key of the contract that needs to be duplicated.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "duplicate",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contract": {
+            "contractKey": "YOUR_CONTRACT_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "contract": {
+        "createTime": "2023-12-01 12:18:55",
+        "contractKey": "NEW_CONTRACT_KEY"
+    },
+    "code": "201",
+    "message": "Contract duplicated"
+}
+```
+
+### List of contracts
+
+Source: https://about.sendforsign.com/api-reference/contract/list
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+				   "action": "list",
+				   "clientKey": "YOUR_CLIENT_KEY"
+				  }
+     }'
+```
+
+Response:
+```json
+{
+       "contracts": [
+
+        {
+            "createTime": "2024-11-25T08:07:23.000Z",
+            "changeTime": "2024-11-25T08:07:25.000Z",
+            "contractKey": "93447fb5-91ee-41ad-9f73-b4ae2d467292",
+            "name": "IPPDF",
+            "status": "Created"
+        },
+        {
+            "createTime": "2024-11-18T13:27:21.000Z",
+            "changeTime": "2024-11-21T11:29:47.000Z",
+            "contractKey": "ac2a37e8-d5d6-4468-b1bb-29152a31d85d",
+            "name": "A test contract",
+            "status": "Created"
+        }
+        ],
+       "code": "200",
+       "message": "Contracts found"
+    }
+```
+
+### Archive contract
+
+Source: https://about.sendforsign.com/api-reference/contract/archive
+
+Endpoint: `POST https://api.sendforsign.com/api/contract`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contract` (body, object, required): Structure.
+  - `contractKey` (body, string): Key of the contract.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "archive",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "contract": {
+							  "contractKey": "CONTRACT_KEY"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "contract": {
+                "contractKey": "CONTRACT_KEY", 
+				"name": "New contract"
+		},
+       "code": "200",
+       "message": "Contract archived"
+    }
+```
+
+### Get Timeline
+
+Source: https://about.sendforsign.com/api-reference/contract/get_timeline
+
+Endpoint: `GET https://api.sendforsign.com/api/contract_event`
+
+Retrieve a contract timeline.
+
+Parameters:
+- `clientKey` (query, string, required): Key of the client.
+- `contractKey` (query, string, required): Key of the contract.
+
+Example:
+```bash
+curl -X GET 'https://api.sendforsign.com/api/contract_event?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+```
+
+## PDF and Word
+
+### Download PDF
+
+Source: https://about.sendforsign.com/api-reference/pdf/download
+
+Endpoint: `GET https://api.sendforsign.com/api/download_pdf`
+
+Retrieve a contract PDF. As a response, you will receive ArrayBuffer.
+
+Parameters:
+- `clientKey` (query, string, required): Key of the client.
+- `contractKey` (query, string, required): Key of the contract.
+
+Example:
+```bash
+curl -X GET 'https://api.sendforsign.com/api/download_pdf?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+```
+
+### Upload PDF
+
+Source: https://about.sendforsign.com/api-reference/pdf/upload
+
+Endpoint: `POST https://api.sendforsign.com/api/upload_pdf`
+
+Before uploading a PDF, you need to create an empty contract and obtain its Contract Key. 
+To do this, use the [Create Contract](https://about.sendforsign.com/api-reference/contract/create) 
+request with the parameter `"contractType": "pdf"`.
+
+Here's an example:
+```bash cURL
+{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contract": {
+            "name": "Your PDF name",
+            "contractType": "pdf"
+        }
+    }
+}
+```
+
+As a response, you'll receive a ContractKey for the contract you created. 
+Use this key to upload your PDF to Sendforsign's infrastructure.
+
+Additionally, you will need to include FormData in the body of the request. 
+
+For example:
+
+```bash cURL
+-F 'pdf=@/path/to/yourfile.pdf;type=application/pdf'
+```
+
+Or in typescript:
+```bash ts
+formData.append('pdf', new Blob([pdfFile as BlobPart], {type: 'application/pdf'})) 
+```
+
+Where `pdfFile` is the ArrayBuffer of your document.
+
+Parameters:
+- `clientKey` (query, string, required): Key of the client.
+- `contractKey` (query, string, required): Key of the contract.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/upload_pdf?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: multipart/form-data' \
+     -F 'pdf=@/path/to/yourfile.pdf;type=application/pdf'
+```
+
+### Download Word
+
+Source: https://about.sendforsign.com/api-reference/pdf/downloadword
+
+Endpoint: `GET https://api.sendforsign.com/api/download_docx`
+
+Retrieve a contract Word. As a response, you will receive ArrayBuffer.
+
+Parameters:
+- `clientKey` (query, string, required): Key of the client.
+- `contractKey` (query, string, required): Key of the contract.
+
+Example:
+```bash
+curl -X GET 'https://api.sendforsign.com/api/download_docx?clientKey=658599d9-bbbe&contractKey=5cb-49c6-4f62-9b77-5c304' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+```
+
+## Placeholder
+
+### Create placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/create
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+One way to add placeholders to a contract is when you create a new contract. 
+[See this page](https://about.sendforsign.com/api-reference/contract/create-fill) to learn more.
+
+If a contract already exists, use the request below.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholder` (body, object, required): Structure, add the fields that need to be updated and ignore the rest.
+  - `name` (body, string, required): Name of the placeholder
+  - `value` (body, string): Value of the placeholder.
+  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://about.sendforsign.com/usecase/placeholder-filler)
+  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://about.sendforsign.com/api-reference/recipient/list). Leave it out (or `null`) for any other `fillingType`.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "name": "Placeholder name",
+            "value": "Placeholder value",
+            "fillingType": 4,
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "placeholder": {
+        "id": "3",
+        "createTime": "2024-11-22T11:11:24.000Z",
+        "changeTime": "2024-11-22T11:11:24.000Z",
+        "name": "1",
+        "value": "hello",
+        "type": "1",
+        "placeholderKey": "PLACEHOLDER_KEY",
+        "position": "3"
+    },
+    "code": 201,
+    "message": "Placeholder created"
+}
+```
+
+### Update placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/update
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholder` (body, object, required): Structure, add the fields that need to be updated and ignore the rest.
+  - `placeholderKey` (body, string, required): Key of the placeholder that needs to be updated.
+  - `name` (body, string): Name of the placeholder
+  - `value` (body, string): Value of the placeholder.
+  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://about.sendforsign.com/usecase/placeholder-filler)
+  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://about.sendforsign.com/api-reference/recipient/list). To unassign the recipient, send `"externalRecipientKey": null` explicitly together with the new `fillingType` (for example `1`, `2` or `3`): a field left out of an update keeps its current value, so omitting it does **not** clear it.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "name": "Name",
+            "value": "Value",
+            "fillingType": 4,
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "placeholder": {
+        "id": "1",
+        "createTime": "2024-03-14T20:34:08.000Z",
+        "changeTime": "2024-03-14T20:38:39.000Z",
+        "name": "Name",
+        "value": "Value",
+        "type": "1",
+        "placeholderKey": "PLACEHOLDER_KEY",
+        "position": null
+    },
+    "code": "201",
+    "message": "Placeholder updated"
+}
+```
+
+### Table placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/update-table
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+First, add a placeholder to the HTML document to obtain a placeholder key.
+[See this page](https://about.sendforsign.com/api-reference/placeholder/create) to learn more.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholder` (body, object, required): Structure, add the fields that need to be updated and ignore the rest.
+  - `placeholderKey` (body, string, required): Key of the placeholder that needs to be updated.
+  - `table` (body, object, required): Table structure for the placeholder.
+    - `columns` (body, array, required): Array of column headers (strings).
+    - `rows` (body, array, required): Array of rows, where each row is an array of values (strings or numbers).
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "table": {
+                "columns": ["Product", "Quantity", "Unit Price", "Total"],
+                "rows": [
+                    ["Product 1", 2, 100, 200],
+                    ["Product 2", 1, 250, 250],
+                    ["Product 3", 4, 75, 333]
+                ]
+            }
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "placeholder": {
+        "id": "1",
+        "createTime": "2025-10-31T09:27:46.000Z",
+        "changeTime": "2025-10-31T09:28:23.000Z",
+        "name": "PLACEHOLDER_NAME",
+        "value": "{\"columns\":[\"Product\",\"Quantity\",\"Unit Price\",\"Total\"],\"rows\":[[\"Product 1\",2,100,200],[\"Product 2\",1,250,250],[\"Product 3\",4,75,333]]}",
+        "isTable": true,
+        "type": "1",
+        "placeholderKey": "PLACEHOLDER_KEY",
+        "position": "1",
+        "fillingType": "1",
+        "externalRecipientKey": null
+    },
+    "code": 201,
+    "message": "Placeholder updated"
+}
+```
+
+### Place basic placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/pdfbasic
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+Basic placeholders are text placeholders that can be used to fill in HTML and PDF contracts. 
+Additionally, they can be linked to any recipient afterward.
+
+Before placing placeholders in a PDF, you need to [create them](https://about.sendforsign.com/api-reference/placeholder/create) in advance.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholders` (body, array, required): Array of placeholders.
+  - `placeholderKey` (body, string, required): Key of the placeholder that needs to be updated.
+  - `insertion` (body, array): Array of places.
+    - `id` (body, string): ID of the insertion. Provide a new ID for each insertion. If you provide the ID of an existing placeholder, the placeholder will be updated.
+    - `pageId` (body, string): Page number where you insert the placeholder, starting from 0.
+    - `width` (body, string): Width of the placeholder.
+    - `height` (body, string): Height of the placeholder.
+    - `positionX` (body, string): Position X of the placeholder, starting from the top-left corner of the page.
+    - `positionY` (body, string): Position Y of the placeholder, starting from the top-left corner of the page.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholders": [
+            {
+                "placeholderKey": "PLACEHOLDER_KEY",
+                "insertion": [
+                    {
+                        "action": "update",
+                        "clientKey": "YOUR_CLIENT_KEY",
+                        "id": 0,
+                        "pageId": 0,
+                        "width": 100,
+                        "height": 100,
+                        "positionX": 1,
+                        "positionY": 1
+                    }
+                ]
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "code": 201,
+    "message": "Placeholder updated"
+}
+```
+
+### Place special placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/pdfspecial
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+Special placeholders are four types of placeholders that are created automatically for every recipient.
+So, before placing special fields in your PDF contract, create a recipient using [this request](https://about.sendforsign.com/api-reference/recipient/create).
+After this, all the special placeholders will be created automatically with corresponding keys:
+`Recipient_Key_1`, `Recipient_Key_2`, `Recipient_Key_3`, `Recipient_Key_4`.
+
+Here's an example of a placeholder key: `"placeholderKey": "93447fb5-91ee-41ad-9f73-b4ae2d467292_4"`.
+
+Available placeholder codes:
+- <b>1</b>: Recipient's date signed.
+- <b>2</b>: Recipient's full name.
+- <b>3</b>: Recipient's email.
+- <b>4</b>: Recipient's signature.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholders` (body, array, required): Array of placeholders.
+  - `placeholderKey` (body, string, required): Key of the placeholder that needs to be updated. Generated automatically from 2 paramaters: Recipient's Key and Special Type.
+  - `isSpecial` (body, boolean, required): True for special fields.
+  - `specialType` (body, string, required): Use the following placeholder codes to create the corresponding fields: <b>1</b>: Recipient's date signed, <b>2</b>: Recipient's full name <b>3</b>: Recipient's email <b>4</b>: Recipient's signature
+  - `insertion` (body, array): Array of places.
+    - `id` (body, string): ID of the insertion. Provide a new ID for each insertion. If you provide the ID of an existing placeholder, the placeholder will be updated.
+    - `pageId` (body, string): Page number where you insert the placeholder, starting from 0.
+    - `width` (body, string): Width of the placeholder.
+    - `height` (body, string): Height of the placeholder.
+    - `positionX` (body, string): Position X of the placeholder, starting from the top-left corner of the page.
+    - `positionY` (body, string): Position Y of the placeholder, starting from the top-left corner of the page.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholders": [
+            {
+                "placeholderKey": "RECIPIENT_KEY_4",
+                "isSpecial": true,
+                "specialType": 4,
+                "insertion": [
+                    {
+                        "action": "update",
+                        "clientKey": "YOUR_CLIENT_KEY",
+                        "id": 2,
+                        "pageId": 0,
+                        "width": 150,
+                        "height": 150,
+                        "positionX": 1,
+                        "positionY": 1
+                    }
+                ]
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "code": 201,
+    "message": "Placeholder updated"
+}
+```
+
+### List of placeholders
+
+Source: https://about.sendforsign.com/api-reference/placeholder/list
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `templateKey` (body, string): ID of the template. Use this parameter if you need to retrieve a template's placeholders.
+- `contractKey` (body, string): Key of the contract. Use this parameter if you need to retrieve a contract's placeholders.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "YOUR_CLIENT_KEY",
+              "contractKey": "CONTRACT_KEY",
+              "templateKey": "TEMPLATE_KEY"
+				  }
+     }'
+```
+
+Response:
+```json
+{
+    "placeholders": [
+        {
+            "id": "1",
+            "createTime": "2024-02-26T11:07:55.000Z",
+            "changeTime": "2024-02-26T11:07:59.000Z",
+            "name": "Placeholder Name",
+            "value": "Placeholder Value",
+            "placeholderKey": "PLACEHOLDER_KEY",
+            "position": 1,
+            "fillingType": "4",
+            "externalRecipientKey": "RECIPIENT_KEY"
+        }
+    ],
+    "code": "200",
+    "message": "Placeholders found"
+}
+```
+
+### Delete placeholder
+
+Source: https://about.sendforsign.com/api-reference/placeholder/delete
+
+Endpoint: `POST https://api.sendforsign.com/api/placeholder`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `placeholder` (body, object, required): Structure.
+  - `placeholderKey` (body, string, required): Key of the placeholder that needs to be deleted.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "placeholder": {
+            "placeholderKey": "PLACEHOLDER_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "code": "200",
+    "message": "Placeholder deleted"
+}
+```
+
+## Recipient
+
+### Create recipient
+
+Source: https://about.sendforsign.com/api-reference/recipient/create
+
+Endpoint: `POST https://api.sendforsign.com/api/recipient`
+
+One way to add recipients to a contract is when you send a contract. 
+[See this page](https://about.sendforsign.com/api-reference/recipient/send) to learn more.
+
+If you need to add a recipient to a contract without sending it, use the request below.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who is sending the contract. If not specified, the default user credentials will be used.
+- `contractKey` (body, string, required): Key of the contract.
+- `recipients` (body, array): Array of recipients, optional.
+  - `action` (body, string): What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  - `customMessage` (body, string): Custom note to the recipient. If not specified, the default message will be sent.
+  - `fullname` (body, string): Full name of the recipient.
+  - `email` (body, string, required): Email of the recipient.
+  - `position` (body, number): Signing order. If not specified, all requests will be sent simultaneously.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "contractKey": "CONTRACT_KEY",
+           "recipients":[{
+                "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson@mail.com", 
+                "position": 1
+               }], 
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "result": true,
+       "code": "200",
+       "message": "Recipient created"
+    }
+```
+
+### Update recipient
+
+Source: https://about.sendforsign.com/api-reference/recipient/update
+
+Endpoint: `POST https://api.sendforsign.com/api/recipient`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `recipient` (body, object, required): Structure, add the fields that need to be updated and ignore the rest.
+  - `recipientKey` (body, string, required): Key of the recipient that needs to be updated.
+  - `action` (body, string): What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  - `customMessage` (body, string): Custom note to the recipient. If not specified, the default message will be sent.
+  - `fullname` (body, string): Full name of the recipient.
+  - `email` (body, string): Email of the recipient.
+  - `position` (body, number): Signing order. If not specified, all requests will be sent simultaneously.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "recipient": {
+            "recipientKey": "RECIPIENT_KEY",
+            "action": "view",
+            "clientKey": "YOUR_CLIENT_KEY",
+            "customMessage": "Custom message text",
+            "fullname": "Full Name",
+            "email": "email@email.com",
+            "position": 1
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+       "recipient": {
+                "changeTime": "2023-12-01 12:18:55"
+		},
+       "code": "201",
+       "message": "Recipient updated"
+    }
+```
+
+### Send to recipients
+
+Source: https://about.sendforsign.com/api-reference/recipient/send
+
+Endpoint: `POST https://api.sendforsign.com/api/recipient`
+
+One way to send a contract to recipients is when you create a contract. 
+[See this page](https://about.sendforsign.com/api-reference/contract/create-send) to learn more.
+
+If you need to send an existing contract to recipients, use the request below.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who is sending the contract. If not specified, the default user credentials will be used.
+- `contractKey` (body, string, required): Key of the contract.
+- `recipients` (body, array): Array of recipients, optional. If no array of recipients is provided, the system will send the contract to those recipients who were added previously.
+  - `recipientKey` (body, string): A recipient key corresponds to an existing recipient in the contract you are sending. Use this parameter if you need to update any parameter of this specific recipient.
+  - `action` (body, string): What the recipient needs to do with the contract. Available options: `view`, `sign`, `approve`, and `lock`.
+  - `customMessage` (body, string): Custom note to the recipient. If not specified, the default message will be sent.
+  - `fullname` (body, string): Full name of the recipient.
+  - `email` (body, string, required): Email of the recipient.
+  - `position` (body, number): Signing order. If not specified, all requests will be sent simultaneously.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "send",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "contractKey": "CONTRACT_KEY",
+           "recipients":[
+            {
+                "recipientKey": "RECIPIENT_KEY",
+                "action": "sign",
+                "clientKey": "YOUR_CLIENT_KEY",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson1@mail.com", 
+                "position": 1
+            },
+            {
+                "action": "view",
+                "clientKey": "YOUR_CLIENT_KEY",
+                "customMessage": "Custom message text",
+                "fullname": "John Johnson", 
+                "email": "john_johnson2@mail.com", 
+                "position": 2
+            }
+               ], 
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "result": true,
+       "code": "200",
+       "message": "Contract sent"
+    }
+```
+
+### List of recipients
+
+Source: https://about.sendforsign.com/api-reference/recipient/list
+
+Endpoint: `POST https://api.sendforsign.com/api/recipient`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string): Key of the contract. Use this parameter if you need to retrieve a contract's recipients.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/recipient' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "YOUR_CLIENT_KEY",
+              "contractKey": "CONTRACT_KEY"				  }
+     }'
+```
+
+Response:
+```json
+{
+    "recipients": [
+        {
+            "id": "1",
+            "createTime": "2024-02-26T11:07:55.000Z",
+            "changeTime": "2024-02-26T11:07:59.000Z",
+            "name": "Recipient Name",
+            "email": "Recipient Email",
+            "customMessage": "Custom message text",
+            "position": "1",
+            "action": "view",
+            "clientKey": "YOUR_CLIENT_KEY",
+            "recipientKey": "RECIPIENT_KEY",
+        }
+    ],
+    "code": "200",
+    "message": "Recipients found"
+}
+```
+
+### Delete recipient
+
+Source: https://about.sendforsign.com/api-reference/recipient/delete
+
+Endpoint: `POST https://api.sendforsign.com/api/recipient`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `contractKey` (body, string, required): Key of the contract.
+- `recipient` (body, object, required): Structure.
+  - `recipientKey` (body, string, required): Key of the recipient that needs to be deleted.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "contractKey": "CONTRACT_KEY",
+        "recipient": {
+            "recipientKey": "RECIPIENT_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "result": true,
+    "code": "200",
+    "message": "Recipient deleted"
+}
+```
+
+## Template
+
+### Create template
+
+Source: https://about.sendforsign.com/api-reference/template/create
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the template. If not specified, the default user credentials will be used.
+- `template` (body, object, required): Template structure.
+  - `name` (body, string): Name of the template.
+  - `value` (body, string): Content of the template, use HTML.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "create",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "template": {
+							  "name": "New template",
+							  "value": "<p>Template text</p>"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY"
+                 },
+       "code": "201",
+       "message": "Template created"
+    }
+```
+
+### Create and fill in template
+
+Source: https://about.sendforsign.com/api-reference/template/create-fill
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Using this way, you can create a template and define all placeholders 
+with their names and values in a single API call.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who create the template. If not specified, the default user credentials will be used.
+- `template` (body, object, required): Template structure.
+  - `name` (body, string): Name of the template.
+  - `value` (body, string): Content of the template, use HTML.
+- `placeholders` (body, array): Array of placeholders, optional.
+  - `name` (body, string): Name of the placeholder.
+  - `value` (body, string): Value of the placeholder.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "userKey": "USER_KEY",
+        "template": {
+            "name": "New template",
+            "value": "<p>Template text</p>"
+        },
+        "placeholders": [
+            {
+                "name": "Company Name",
+                "value": "Acme Inc."
+            },
+            {
+                "name": "Contract Date",
+                "value": "2024-01-15"
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY"
+                 },
+       "code": "201",
+       "message": "Template created"
+    }
+```
+
+### Update template
+
+Source: https://about.sendforsign.com/api-reference/template/update
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `template` (body, object, required): Structure, use the fields that should be updated.
+  - `templateKey` (body, string, required): ID of the template.
+  - `name` (body, string): Name of the template.
+  - `value` (body, string): Content of the template, use HTML.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "update",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "template": {
+							  "templateKey": "TEMPLATE_KEY", 
+							  "name": "New template",
+							  "value": "<p>Template text</p>"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "changeTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY", 
+		},
+       "code": "201",
+       "message": "Template updated"
+    }
+```
+
+### Convert into template
+
+Source: https://about.sendforsign.com/api-reference/template/convert
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+When converting a contract into a template, all content will be transferred to the template, 
+and all placeholders will be transferred with their values removed. The original contract will remain unchanged.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `userKey` (body, string): ID of the user who converts a contract into a template. If not specified, the default user credentials will be used.
+- `template` (body, object, required): Template structure.
+  - `name` (body, string, required): Name of the new template.
+  - `contractKey` (body, string, required): Key of the contract that will be converted into a template.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "convert",
+				   "clientKey": "YOUR_CLIENT_KEY",
+                   "userKey": "USER_KEY", 
+				   "template": {
+							  "name": "New template",
+							  "contractKey": "CONTRACT_KEY"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY"
+                 },
+       "code": "201",
+       "message": "Template created"
+    }
+```
+
+### Read template
+
+Source: https://about.sendforsign.com/api-reference/template/read
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `template` (body, object, required): Structure, at least one of the fields must be filled.
+  - `templateKey` (body, string): ID of the template.
+  - `name` (body, string): Name of the template.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+		  "data": {
+				   "action": "read",
+				   "clientKey": "YOUR_CLIENT_KEY",
+				   "template": {
+							  "templateKey": "TEMPLATE_KEY", 
+							  "name": "New template"
+						     }
+				  }
+       }'
+```
+
+Response:
+```json
+{
+       "template": {
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY", 
+				"name": "New template",
+				"value": "<p>Template text</p>"
+		},
+       "code": "200",
+       "message": "Template found"
+    }
+```
+
+### Duplicate template
+
+Source: https://about.sendforsign.com/api-reference/template/duplicate
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+When duplicating a template, the placeholder structure is copied, but all placeholder values are cleared.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `template` (body, object, required): Structure.
+  - `templateKey` (body, string, required): Key of the template that needs to be duplicated.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "duplicate",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "template": {
+            "templateKey": "YOUR_TEMPLATE_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "template": {
+        "createTime": "2023-12-01 12:18:55",
+        "templateKey": "NEW_TEMPLATE_KEY"
+    },
+    "code": "201",
+    "message": "Template duplicated"
+}
+```
+
+### List of templates
+
+Source: https://about.sendforsign.com/api-reference/template/list
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+				   "action": "list",
+				   "clientKey": "YOUR_CLIENT_KEY"
+				  }
+     }'
+```
+
+Response:
+```json
+{
+       "templates": [{
+                "createTime": "2023-12-01 12:18:55",
+				"changeTime": "2023-12-01 12:18:55",
+                "templateKey": "TEMPLATE_KEY", 
+				"name": "New template"
+		}],
+       "code": "200",
+       "message": "Templates found"
+    }
+```
+
+### Delete template
+
+Source: https://about.sendforsign.com/api-reference/template/delete
+
+Endpoint: `POST https://api.sendforsign.com/api/template`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `template` (body, object, required): Structure.
+  - `templateKey` (body, string, required): Key of the template that needs to be deleted.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/template' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "template": {
+            "templateKey": "TEMPLATE_KEY"
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "template": {
+        "templateKey": "TEMPLATE_KEY"
+    },
+    "code": "200",
+    "message": "Template deleted"
+}
+```
+
+## Webhook
+
+### Webhooks concept
+
+Source: https://about.sendforsign.com/api-reference/webhook/concept
+
+Webhooks can be created via API calls by using the API references from this section. 
+Please bear in mind that webhooks are separated by Client Keys, so if you create multiple Client Keys for your platform, 
+be sure to follow this rule.
+
+When you listen for the webhooks, you will receive them with the `Content-Type: application/vnd.api+json` header.
+
+Webhooks have 6 events to listen for your purposes:
+- `Contract.created`: fires when a contract is created. 
+- `Contract.sent`: fires for every recipient to whom a contract was sent.
+- `Contract.seen`: fires every time a recipient opens a contract. 
+- `Contract.approved`: fires every time a recipient approves a contract. 
+- `Contract.signed`: fires every time a recipient signs a contract. 
+- `Contract.fully_signed`: fires once when all the recipients have signed a contract. 
+
+Below you will find the examples of webhooks.
+
+### Create webhook
+
+Source: https://about.sendforsign.com/api-reference/webhook/create
+
+Endpoint: `POST https://api.sendforsign.com/api/webhook`
+
+Webhooks are created for the specific client key you use when creating a webhook.
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `webhooks` (body, array, required): Array of webhooks.
+  - `url` (body, string, required): Webhook's endpoint.
+  - `created` (body, boolean): Event to listen: `contract.created`.
+  - `seen` (body, boolean): Event to listen: `contract.seen`.
+  - `sent` (body, boolean): Event to listen: `contract.sent`.
+  - `approved` (body, boolean): Event to listen: `contract.approved`.
+  - `signed` (body, boolean): Event to listen: `contract.signed`.
+  - `fullySigned` (body, boolean): Event to listen: `contract.fully_signed`.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "create",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "webhooks": [
+            {
+                "url": "URL",
+                "created": true,
+                "seen": true,
+                "sent": false,
+                "approved": false,
+                "signed": false,
+                "fullySigned": true
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "webhooks": [
+        {
+            "createTime": "2024-04-08T08:58:54.000Z",
+            "url": "testurl1",
+            "secret": "whsec_123",
+            "webhookKey": "WEBHOOK_KEY"
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks created"
+}
+```
+
+### Update webhook
+
+Source: https://about.sendforsign.com/api-reference/webhook/update
+
+Endpoint: `POST https://api.sendforsign.com/api/webhook`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `webhooks` (body, array, required): Array of webhooks. Add the fields that need to be updated and ignore the rest.
+  - `webhookKey` (body, string, required): Webhook's key.
+  - `url` (body, string): Webhook's endpoint.
+  - `created` (body, boolean): Event to listen: `contract.created`.
+  - `seen` (body, boolean): Event to listen: `contract.seen`.
+  - `sent` (body, boolean): Event to listen: `contract.sent`.
+  - `approved` (body, boolean): Event to listen: `contract.approved`.
+  - `signed` (body, boolean): Event to listen: `contract.signed`.
+  - `fullySigned` (body, boolean): Event to listen: `contract.fully_signed`.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "update",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "webhooks": [
+            {
+                "webhookKey": "WEBHOOK_KEY",
+                "url": "URL",
+                "created": true,
+                "seen": true
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "webhooks": [
+        {
+            "webhookKey": "WEBHOOK_KEY",
+            "changeTime": "2024-04-08T09:01:12.000Z"
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks updated"
+}
+```
+
+### Read webhook
+
+Source: https://about.sendforsign.com/api-reference/webhook/read
+
+Endpoint: `POST https://api.sendforsign.com/api/webhook`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `webhooks` (body, array, required): Array of webhooks.
+  - `webhookKey` (body, string, required): Webhook's key.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "read",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "webhooks": [
+            {
+                "webhookKey": "WEBHOOK_KEY"
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "webhooks": [
+        {
+            "createTime": "2024-04-08T08:58:54.000Z",
+            "changeTime": "2024-04-08T09:01:12.000Z",
+            "url": "URL",
+            "secret": "whsec_123",
+            "webhookKey": "WEBHOOK_KEY",
+            "created": true,
+            "seen": true,
+            "sent": false,
+            "approved": false,
+            "signed": false,
+            "fullySigned": false
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks read"
+}
+```
+
+### List of webhooks
+
+Source: https://about.sendforsign.com/api-reference/webhook/list
+
+Endpoint: `POST https://api.sendforsign.com/api/webhook`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/webhook' \ 
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ 
+          "data": {
+              "action": "list",
+              "clientKey": "YOUR_CLIENT_KEY"
+              }
+     }'
+```
+
+Response:
+```json
+{
+    "webhooks": [
+        {
+            "createTime": "2024-03-29T20:02:28.000Z",
+            "changeTime": "2024-03-29T20:02:28.000Z",
+            "url": "URL",
+            "secret": "whsec_123",
+            "webhookKey": "WEBHOOK_KEY",
+            "created": true,
+            "seen": true,
+            "sent": true,
+            "approved": true,
+            "signed": true,
+            "fullySigned": true
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks found"
+}
+```
+
+### Delete webhook
+
+Source: https://about.sendforsign.com/api-reference/webhook/delete
+
+Endpoint: `POST https://api.sendforsign.com/api/webhook`
+
+Parameters:
+- `action` (body, string, required): Action type.
+- `clientKey` (body, string, required): Key of the client.
+- `webhooks` (body, array, required): Array of webhooks. Add the fields that need to be updated and ignore the rest.
+  - `webhookKey` (body, string, required): Webhook's key.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "action": "delete",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "webhooks": [
+            {
+                "webhookKey": "WEBHOOK_KEY"
+            }
+        ]
+    }
+}'
+```
+
+Response:
+```json
+{
+    "webhooks": [
+        {
+            "webhookKey": "WEBHOOK_KEY",
+        }
+    ],
+    "code": "201",
+    "message": "Webhooks deleted"
+}
+```
+
+## Settings
+
+### Email notifications
+
+Source: https://about.sendforsign.com/api-reference/settings/email_notifications
+
+Endpoint: `POST https://api.sendforsign.com/api/settings`
+
+Email notifications are updated for the specific client key you use when updating the settings.
+
+By default, Sendforsign sends email notifications for various types of events: signing and approval 
+requests, contract signed, and contract approved. You can disable these notifications if you prefer to use 
+your own email vendor. To disable notifications for `contract.approved` and `contract.signed`, 
+use the request provided below.
+
+Parameters:
+- `type` (body, string, required): Settings type.
+- `clientKey` (body, string, required): Key of the client.
+- `notification` (body, object, required): Structure.
+  - `approved` (body, boolean): Settings to change: send email notifications on `contract.approved`.
+  - `signed` (body, boolean): Settings to change: send email notifications on `contract.signed`.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/settings' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "type": "email_notifications",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "notification": 
+            {
+                "approved": false,
+                "signed": false
+            }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "code": "201",
+    "message": "Settings updated"
+}
+```
+
+### Custom branding
+
+Source: https://about.sendforsign.com/api-reference/settings/branding
+
+Endpoint: `POST https://api.sendforsign.com/api/settings`
+
+You can customize the appearance of the emails you send via Sendforsign's infrastructure, use your own email domain, 
+change the domain of recipient links you generate, and more.
+
+Parameters:
+- `type` (body, string, required): Settings type.
+- `clientKey` (body, string, required): Key of the client.
+- `branding` (body, object, required): Structure.
+  - `emailFrom` (body, string): The sender's name that will be shown in the emails you send to recipients.
+  - `emailDomain` (body, string): Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  - `recipientLinkDomain` (body, string): Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  - `emailExplainer` (body, string): A short text shown at the bottom of the emails you send to recipients.
+  - `emailLogo` (body, string): The logo that will be shown in the emails you send to recipients. Provide a public URL to a PNG, JPG, JPEG, or SVG image (W154 x H30).
+  - `emailButtonColor` (body, string): The button color that will be shown in the emails you send to recipients. Provide a hex code; the default is #1677ff.
+  - `recipientPageBranding` (body, boolean): Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+
+Example:
+```bash
+curl -X POST 'https://api.sendforsign.com/api/settings' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{
+    "data": {
+        "type": "brandings",
+        "clientKey": "YOUR_CLIENT_KEY",
+        "branding": {
+            "emailFrom": "",
+            "emailDomain": "",
+            "recipientLinkDomain": "",
+            "emailExplainer": "",
+            "emailLogo": "",
+            "emailButtonColor": "",
+            "recipientPageBranding": true
+        }
+    }
+}'
+```
+
+Response:
+```json
+{
+    "code": "201",
+    "message": "Settings updated"
+}
+```
