@@ -42,13 +42,13 @@ If a contract already exists, use the request below.
 
   <ParamField body="fillingType" type="number">
     Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor):
-    `1` — nobody (default), `2` — the contract owner, `4` — a specific recipient set in `externalRecipientKey`.
+    `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`.
     [See the use case.](/usecase/placeholder-filler)
   </ParamField>
 
   <ParamField body="externalRecipientKey" type="string">
     `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`.
-    Get it from the [list of recipients](/api-reference/recipient/list).
+    Get it from the [list of recipients](/api-reference/recipient/list). Leave it out (or `null`) for any other `fillingType`.
   </ParamField>
 
   </Expandable>

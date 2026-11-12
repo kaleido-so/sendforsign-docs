@@ -1,6 +1,6 @@
 ---
 title: 'Choose Who Fills In a Placeholder'
-description: "Choose who fills in a contract placeholder via API: nobody, the contract owner or a specific recipient, using fillingType."
+description: "Choose who fills in a contract placeholder via API: nobody, the contract owner, any recipient or a specific recipient, using fillingType."
 ---
 
 In the contract editor, each placeholder has a **Who fills in this field** setting. The same setting is available
@@ -8,7 +8,7 @@ through the API with two placeholder fields:
 
 | Field | Meaning |
 |---|---|
-| `fillingType` | `1` — nobody (default), `2` — the contract owner, `4` — a specific recipient |
+| `fillingType` | `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient |
 | `externalRecipientKey` | `recipientKey` of that recipient; used only with `fillingType: 4` |
 
 ## Set up your account
@@ -77,7 +77,7 @@ curl -X POST 'https://api.sendforsign.com/api/placeholder' \
 }'
 ```
 
-To the contract owner, send `"fillingType": 2` instead.
+To the contract owner, send `"fillingType": 2` instead. To let whichever recipient opens the contract fill it in, send `"fillingType": 3`. In both cases also send `"externalRecipientKey": null` if a recipient was assigned before.
 
 To unassign the placeholder, send `"fillingType": 1` together with `"externalRecipientKey": null`.
 A field left out of an update request keeps its current value, so without `null` the previous recipient stays stored.
