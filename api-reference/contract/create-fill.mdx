@@ -8,6 +8,13 @@ The best way to fill in contracts is to prepare a template that already contains
 placeholders in the text. This way, you can populate the necessary data in the right placeholders within 
 the contracts with a single API call.
 
+<Warning>
+  Matching placeholders by `name` here is not reliable. To be sure every value lands, create the contract, then
+  [list its placeholders](/api-reference/placeholder/list) and [update](/api-reference/placeholder/update) each one by
+  the contract's `placeholderKey`. A contract created from a template gets new placeholder keys; match them to the
+  template's placeholders by name.
+</Warning>
+
 ### Body parameters
 
 <ParamField body="data" type="object" required>

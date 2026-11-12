@@ -10,7 +10,8 @@ This file is generated from the documentation by `scripts/build-llms-full.py`. A
 - Account structure: platform (you, the API key) → clients (`clientKey`, one per customer business) → users (`userKey`, end users inside a client). Templates, contracts and webhooks belong to a client.
 - REST requests are action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|convert|archive|duplicate", ...}}`. Responses carry `code` and `message`.
 - `contract` `create` WITH a `recipients` array creates the contract AND emails the recipients immediately. To prepare without emailing: `contract` `create` without recipients, then `recipient` `create` (no email). `recipient` `send` emails.
-- A contract from a template: `contract` `create` with `contract.templateKey` and optional `placeholders: [{placeholderKey | name, value}]`. `contract` `read` returns `templateKey`.
+- A contract from a template: `contract` `create` with `contract.templateKey`; then `placeholder` `list` on the contract and `placeholder` `update` by the contract's own `placeholderKey` (new contracts get new field keys; match by name). Filling by name inside `contract` `create` is unreliable. `contract` `read` returns `templateKey`.
+- `recipient` `send`: give every recipient a `position`.
 - Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
 - Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
 - Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.

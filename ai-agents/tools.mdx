@@ -107,14 +107,15 @@ Creates a **draft** contract. It never emails anyone, even when you pass recipie
 | `templateKey` | string | Preferred. Build from this template. |
 | `content` | string | Body when not using a template. |
 | `contentFormat` | `markdown` \| `html` | Default `markdown`. |
-| `fields` | array of `{ placeholderKey? , name?, value }` | Values for template fields, matched by key or by name. Only owner fields. |
+| `fields` | array of `{ placeholderKey?, name?, value }` | Values for template fields. `placeholderKey` may be the template's key (from `get_template`); it is mapped to the contract's field of the same name, since a new contract gets new field keys. `name` matches case-insensitively. Only owner fields. |
 | `recipients` | array of recipients | `{ fullname, email, action?, position?, customMessage? }`; `action` is `sign` (default), `approve`, `view` or `lock`. Checked against the domain allowlist. |
 | `userKey` | string | Tenant. |
 
 Pass `templateKey` or `content`.
 
-**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `unfilledFields[]` (owner fields
-still empty), `fieldsForRecipients[]`, and `next` — a hint for the next step.
+**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `filled[]` (per field: `field`,
+`ok`, `error?`) when `fields` were given, `unfilledFields[]` (owner and fixed fields still empty),
+`fieldsForRecipients[]`, and `next` — a hint for the next step.
 
 ### update_contract
 

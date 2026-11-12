@@ -41,7 +41,8 @@ https://about.sendforsign.com/llms-full.txt).
 
 1. `list_templates` → choose → `get_template {templateKey}`; note which fields are `owner`.
 2. `create_contract {name, templateKey, fields:[{name|placeholderKey, value}], recipients:[{fullname, email, action:"sign"}]}`.
-   This creates a **draft** and emails nobody. It returns `contractKey`, `recipients[].signingUrl`, `unfilledFields`.
+   This creates a **draft** and emails nobody. `fields` may use the template's `placeholderKey` or the field name. It
+   returns `contractKey`, `recipients[].signingUrl`, `filled` (check for `ok: false`), `unfilledFields`.
 3. Fill anything left in `unfilledFields` with `fill_placeholders {contractKey, fields:[...]}` (ask the user for values).
 4. Summarise and ask for approval (rule 1).
 5. `send_for_signature {contractKey, confirm: true}`.
@@ -68,7 +69,10 @@ On `status: "contract.fully_signed"`, download the PDF with `GET /api/download_p
 
 - **`contract` `create` with a `recipients` array SENDS email immediately** (create-and-send). To prepare without
   emailing: `contract` `create` without recipients, then `recipient` `create`. `recipient` `send` emails.
-- A contract from a template: `contract` `create` with `contract.templateKey` and `placeholders:[{placeholderKey|name, value}]`.
+- A contract from a template: `contract` `create` with `contract.templateKey`, then `placeholder` `list` on the new
+  contract and `placeholder` `update` by the **contract's** `placeholderKey` (a new contract gets new field keys; match
+  template fields by name). Don't rely on `placeholders` by name inside `contract` `create`.
+- `recipient` `send`: give every recipient a `position` (1-based signing order).
 - `placeholder` `update` only changes the fields you send. To unassign a recipient from a field, send
   `"externalRecipientKey": null` explicitly with the new `fillingType` (1 none, 2 owner, 3 any recipient, 4 specific
   recipient).

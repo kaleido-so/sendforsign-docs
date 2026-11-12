@@ -6,7 +6,7 @@ Key facts:
 
 - Auth: header `X-Sendforsign-Key: <API key>`; every resource request also needs a `clientKey`. Structure: platform (API key) → clients (`clientKey`, one per customer) → users (`userKey`).
 - REST is action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|archive|...", "clientKey": "...", ...}}`.
-- `contract` `create` with a `recipients` array emails them immediately. To prepare without email: `contract` `create`, then `recipient` `create`; `recipient` `send` emails.
+- `contract` `create` with a `recipients` array emails them immediately. A contract from a template gets new field keys: fill it with `placeholder` `update` by the contract's keys. To prepare without email: `contract` `create`, then `recipient` `create`; `recipient` `send` emails.
 - Field (placeholder) roles: `fillingType` 1 nobody, 2 contract owner, 3 any recipient, 4 specific recipient (`externalRecipientKey`; send `null` explicitly to clear).
 - Signing link: `https://app.sendforsign.com/sharing/{recipientKey}`.
 - MCP: `send_for_signature` and `archive_contract` need `confirm: true` after explicit human approval; `X-Sendforsign-Agent-Mode` is `read_only`, `draft` or `send`.

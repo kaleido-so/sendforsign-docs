@@ -10,7 +10,8 @@ This file is generated from the documentation by `scripts/build-llms-full.py`. A
 - Account structure: platform (you, the API key) → clients (`clientKey`, one per customer business) → users (`userKey`, end users inside a client). Templates, contracts and webhooks belong to a client.
 - REST requests are action-based: `POST /api/<resource>` with `{"data": {"action": "create|read|update|list|delete|send|convert|archive|duplicate", ...}}`. Responses carry `code` and `message`.
 - `contract` `create` WITH a `recipients` array creates the contract AND emails the recipients immediately. To prepare without emailing: `contract` `create` without recipients, then `recipient` `create` (no email). `recipient` `send` emails.
-- A contract from a template: `contract` `create` with `contract.templateKey` and optional `placeholders: [{placeholderKey | name, value}]`. `contract` `read` returns `templateKey`.
+- A contract from a template: `contract` `create` with `contract.templateKey`; then `placeholder` `list` on the contract and `placeholder` `update` by the contract's own `placeholderKey` (new contracts get new field keys; match by name). Filling by name inside `contract` `create` is unreliable. `contract` `read` returns `templateKey`.
+- `recipient` `send`: give every recipient a `position`.
 - Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
 - Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
 - Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.
@@ -502,14 +503,15 @@ Creates a **draft** contract. It never emails anyone, even when you pass recipie
 | `templateKey` | string | Preferred. Build from this template. |
 | `content` | string | Body when not using a template. |
 | `contentFormat` | `markdown` \| `html` | Default `markdown`. |
-| `fields` | array of `{ placeholderKey? , name?, value }` | Values for template fields, matched by key or by name. Only owner fields. |
+| `fields` | array of `{ placeholderKey?, name?, value }` | Values for template fields. `placeholderKey` may be the template's key (from `get_template`); it is mapped to the contract's field of the same name, since a new contract gets new field keys. `name` matches case-insensitively. Only owner fields. |
 | `recipients` | array of recipients | `{ fullname, email, action?, position?, customMessage? }`; `action` is `sign` (default), `approve`, `view` or `lock`. Checked against the domain allowlist. |
 | `userKey` | string | Tenant. |
 
 Pass `templateKey` or `content`.
 
-**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `unfilledFields[]` (owner fields
-still empty), `fieldsForRecipients[]`, and `next` — a hint for the next step.
+**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `filled[]` (per field: `field`,
+`ok`, `error?`) when `fields` were given, `unfilledFields[]` (owner and fixed fields still empty),
+`fieldsForRecipients[]`, and `next` — a hint for the next step.
 
 #### update_contract
 
@@ -763,20 +765,28 @@ the recipients get an email.
 The same in REST:
 
 ```bash cURL
-# 1. Draft from template, with field values (no recipients here: that would send email immediately)
+# 1. Draft from template (no recipients here: that would send email immediately)
 curl -X POST 'https://api.sendforsign.com/api/contract' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
-       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"},
-       "placeholders":[{"name":"Company name","value":"Acme Ltd"}]}}'
+       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"}}}'
 
-# 2. Add recipients without emailing them
+# 2. Fill fields: list the contract's fields (they have new keys, not the template's), then update each by key
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"list","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY"}}'
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"update","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "placeholder":{"placeholderKey":"CONTRACT_PLACEHOLDER_KEY","value":"Acme Ltd"}}}'
+
+# 3. Add recipients without emailing them
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"create","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
        "recipients":[{"fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
 
-# 3. After approval: send (emails the recipients)
+# 4. After approval: send (emails the recipients); include position for every recipient
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"send","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
@@ -786,6 +796,11 @@ curl -X POST 'https://api.sendforsign.com/api/recipient' \
   In REST, `contract` `create` **with** a `recipients` array [creates and sends](https://about.sendforsign.com/api-reference/contract/create-send)
   in one call: the recipients are emailed immediately. `recipient` `create` adds recipients **without** email;
   `recipient` `send` emails them. The MCP `create_contract` tool always takes the safe path.
+
+  A contract made from a template gets its own field keys. Match template fields to contract fields by name (from
+  [placeholder `list`](https://about.sendforsign.com/api-reference/placeholder/list) on the contract), then fill them by the contract's
+  `placeholderKey`. Filling by `name` inside `contract` `create` is not reliable. In `recipient` `send`, give every
+  recipient a `position`.
 
 ### Embedded signing without email
 
@@ -1866,6 +1881,11 @@ Endpoint: `POST https://api.sendforsign.com/api/contract`
 The best way to fill in contracts is to prepare a template that already contains all the necessary 
 placeholders in the text. This way, you can populate the necessary data in the right placeholders within 
 the contracts with a single API call.
+
+  Matching placeholders by `name` here is not reliable. To be sure every value lands, create the contract, then
+  [list its placeholders](https://about.sendforsign.com/api-reference/placeholder/list) and [update](https://about.sendforsign.com/api-reference/placeholder/update) each one by
+  the contract's `placeholderKey`. A contract created from a template gets new placeholder keys; match them to the
+  template's placeholders by name.
 
 Parameters:
 - `action` (body, string, required): Action type.

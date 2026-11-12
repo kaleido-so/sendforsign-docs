@@ -52,20 +52,28 @@ the recipients get an email.
 The same in REST:
 
 ```bash cURL
-# 1. Draft from template, with field values (no recipients here: that would send email immediately)
+# 1. Draft from template (no recipients here: that would send email immediately)
 curl -X POST 'https://api.sendforsign.com/api/contract' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
-       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"},
-       "placeholders":[{"name":"Company name","value":"Acme Ltd"}]}}'
+       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"}}}'
 
-# 2. Add recipients without emailing them
+# 2. Fill fields: list the contract's fields (they have new keys, not the template's), then update each by key
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"list","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY"}}'
+curl -X POST 'https://api.sendforsign.com/api/placeholder' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"update","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "placeholder":{"placeholderKey":"CONTRACT_PLACEHOLDER_KEY","value":"Acme Ltd"}}}'
+
+# 3. Add recipients without emailing them
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"create","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
        "recipients":[{"fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
 
-# 3. After approval: send (emails the recipients)
+# 4. After approval: send (emails the recipients); include position for every recipient
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
   -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
   -d '{"data":{"action":"send","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
@@ -77,6 +85,13 @@ curl -X POST 'https://api.sendforsign.com/api/recipient' \
   in one call: the recipients are emailed immediately. `recipient` `create` adds recipients **without** email;
   `recipient` `send` emails them. The MCP `create_contract` tool always takes the safe path.
 </Warning>
+
+<Tip>
+  A contract made from a template gets its own field keys. Match template fields to contract fields by name (from
+  [placeholder `list`](/api-reference/placeholder/list) on the contract), then fill them by the contract's
+  `placeholderKey`. Filling by `name` inside `contract` `create` is not reliable. In `recipient` `send`, give every
+  recipient a `position`.
+</Tip>
 
 ## Embedded signing without email
 
