@@ -34,6 +34,10 @@
   },
   "tabs": [
     {
+      "name": "AI agents",
+      "url": "ai-agents"
+    },
+    {
       "name": "API Reference",
       "url": "api-reference"
     },
@@ -59,6 +63,28 @@
       "group": "Get Started",
       "pages": [
         "introduction"
+      ]
+    },
+    {
+      "group": "AI agents",
+      "pages": [
+        "ai-agents/overview",
+        "ai-agents/mcp-quickstart",
+        "ai-agents/recipes"
+      ]
+    },
+    {
+      "group": "MCP server reference",
+      "pages": [
+        "ai-agents/tools",
+        "ai-agents/headers",
+        "ai-agents/accountability"
+      ]
+    },
+    {
+      "group": "Agent tooling",
+      "pages": [
+        "ai-agents/skills"
       ]
     },
     {

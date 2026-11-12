@@ -1,0 +1,84 @@
+---
+title: "Sendforsign for AI agents"
+sidebarTitle: "Overview"
+description: "The contracts layer for products that build AI agents: templates with per-recipient field roles, embedded white-label signing, and an audit trail of what each agent did and on whose behalf."
+---
+
+Your agent can already write a contract. What it cannot do on its own is turn that text into a signed,
+legally attributable agreement inside **your** product: the right template for **your customer**, the fields
+**the agent** may fill and the ones only the counterparty may fill, a signing link shown in **your** UI, an
+event when it is signed, and a record of what the agent did and on whose behalf.
+
+Sendforsign is that layer. It exposes the same API two ways:
+
+- a **remote MCP server** at `https://api.sendforsign.com/mcp` that any MCP client (Claude, ChatGPT, Cursor,
+  the OpenAI Agents SDK, your own agent) can connect to, and
+- the **REST API** at `https://api.sendforsign.com/api` that the MCP server itself calls, for when you want
+  deterministic code around the agent.
+
+<CardGroup cols={2}>
+  <Card title="MCP quickstart" icon="plug" href="/ai-agents/mcp-quickstart">
+    Connect Claude Code, Claude Desktop, Cursor or an OpenAI agent in two minutes.
+  </Card>
+  <Card title="Tools reference" icon="screwdriver-wrench" href="/ai-agents/tools">
+    Every MCP tool, what it writes, and which one emails people.
+  </Card>
+  <Card title="Agent modes and accountability" icon="shield-check" href="/ai-agents/accountability">
+    Read-only, draft and send modes, confirmations, domain allowlists and the audit log.
+  </Card>
+  <Card title="Recipes" icon="book-open" href="/ai-agents/recipes">
+    Template → fill → send, embedded signing without email, multi-tenant, webhooks.
+  </Card>
+</CardGroup>
+
+## Why Sendforsign, if other e-signature tools also ship MCP
+
+An MCP server is table stakes; most e-signature vendors have one. What matters for a product that builds agents is
+what happens around the signature:
+
+### 1. Templates with field roles
+
+Each field (placeholder) in a template has a **filled by** role: the owner (your agent), any recipient, or one
+specific recipient. The agent reads the template, fills only its own fields and leaves the counterparty's fields to
+the counterparty. It does not have to guess, and it cannot overwrite what a signer is supposed to enter.
+See [placeholder `fillingType`](/usecase/placeholder-filler).
+
+### 2. Embedded, white-label, multi-tenant
+
+- Every customer of your product gets its own space (a `clientKey`, and/or a `userKey` per end user) with its own
+  templates and contracts. The agent works in the right tenant because **you** set it in a header, not the model.
+- Recipients get a signing link (`https://app.sendforsign.com/sharing/{recipientKey}`) that you can show in your
+  own UI, chat or app, with no Sendforsign email at all.
+- Emails, when you do send them, carry your [branding](/api-reference/settings/branding), and
+  [webhooks](/api-reference/webhook/concept) tell your backend when a contract is fully signed.
+- The [React components](/sdk/introsdk) let a human review and edit what the agent drafted, inside your product.
+
+### 3. Agent accountability
+
+The integrator, not the agent, decides what an agent may do:
+
+- **Modes**: `read_only`, `draft` (prepare everything, email nobody) or `send`.
+- **Explicit confirmation**: tools that email people or archive contracts refuse to run without `confirm: true`,
+  which the agent is told to set only after a human approves.
+- **Recipient domain allowlist**: an agent cannot send a contract outside the domains you list.
+- **Audit log**: every write by an agent is recorded with the agent's name, the person or company it acted for, the
+  mode, the arguments and the outcome, in a hash-chained log.
+
+[Read how this maps to attribution rules for electronic signatures.](/ai-agents/accountability#legal-context)
+
+## Who this is for
+
+- **Vertical SaaS with an agent** (creative and event businesses, staffing, real estate, logistics, agencies, HR,
+  insurance): your agent drafts your customer's contract from your customer's template, sends it or hands the link
+  to your UI, and your backend reacts to the signature.
+- **Legal-AI startups** that draft or negotiate but don't want to build execution: upload the final text, add
+  signers, send, get the signed PDF.
+- **People using Claude, ChatGPT or Cursor directly**: "make an NDA from our template and send it to Anna".
+
+## For LLMs and coding agents
+
+- [`/llms.txt`](https://about.sendforsign.com/llms.txt) — an index of these docs for language models.
+- [`/llms-full.txt`](https://about.sendforsign.com/llms-full.txt) — the API and MCP reference in one file.
+- Every page is also available as Markdown: add `.md` to its URL.
+- [Agent skill](/ai-agents/skills) — a `SKILL.md` that teaches Claude Code, Codex and other agents the recipes and
+  the pitfalls.

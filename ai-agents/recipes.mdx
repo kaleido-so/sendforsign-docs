@@ -1,0 +1,161 @@
+---
+title: "Recipes for agent builders"
+sidebarTitle: "Recipes"
+description: "Agent recipes with Sendforsign: contract from a template, fill and send; embedded signing links in your own UI without email; one tenant per customer; webhooks when a contract is fully signed."
+---
+
+Each recipe shows the MCP tool calls an agent makes and the equivalent REST requests, for when you'd rather run the
+deterministic part in your own code and let the agent only decide *what* to send.
+
+## Template → fill → send
+
+The most common flow: a standard document from the customer's template, the agent fills its fields, a human approves,
+the recipients get an email.
+
+<Steps>
+  <Step title="Find the template">
+    `list_templates`, then `get_template` with the chosen `templateKey`. The response lists every field with
+    `filledBy`. The agent fills `owner` fields; `any_recipient` and `specific_recipient` fields belong to the signers.
+  </Step>
+  <Step title="Create the draft with fields and recipients">
+    ```json create_contract
+    {
+      "name": "NDA — Acme Ltd",
+      "templateKey": "TEMPLATE_KEY",
+      "fields": [
+        { "name": "Company name", "value": "Acme Ltd" },
+        { "name": "Effective date", "value": "1 December 2026" }
+      ],
+      "recipients": [
+        { "fullname": "Anna Smith", "email": "anna@acme.example", "action": "sign" }
+      ]
+    }
+    ```
+    The result has `contractKey`, the recipients with `signingUrl`, and `unfilledFields` — owner fields the agent
+    still has to fill (use `fill_placeholders`) or ask the user about. Nobody has been emailed.
+  </Step>
+  <Step title="Show the user and get approval">
+    The agent shows the contract name, the filled values, each recipient and their role, and asks to send.
+  </Step>
+  <Step title="Send">
+    ```json send_for_signature
+    { "contractKey": "CONTRACT_KEY", "confirm": true }
+    ```
+    Requires `send` mode. Recipients are emailed in signing order.
+  </Step>
+  <Step title="Track">
+    `get_contract_timeline` for events, `download_contract_pdf` once the status is `Fully signed`. In production,
+    listen to the [webhook](#react-when-a-contract-is-fully-signed) instead of polling.
+  </Step>
+</Steps>
+
+The same in REST:
+
+```bash cURL
+# 1. Draft from template, with field values (no recipients here: that would send email immediately)
+curl -X POST 'https://api.sendforsign.com/api/contract' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
+       "contract":{"name":"NDA — Acme Ltd","templateKey":"TEMPLATE_KEY"},
+       "placeholders":[{"name":"Company name","value":"Acme Ltd"}]}}'
+
+# 2. Add recipients without emailing them
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "recipients":[{"fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
+
+# 3. After approval: send (emails the recipients)
+curl -X POST 'https://api.sendforsign.com/api/recipient' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"send","clientKey":"CLIENT_KEY","contractKey":"CONTRACT_KEY",
+       "recipients":[{"recipientKey":"RECIPIENT_KEY","fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
+```
+
+<Warning>
+  In REST, `contract` `create` **with** a `recipients` array [creates and sends](/api-reference/contract/create-send)
+  in one call: the recipients are emailed immediately. `recipient` `create` adds recipients **without** email;
+  `recipient` `send` emails them. The MCP `create_contract` tool always takes the safe path.
+</Warning>
+
+## Embedded signing without email
+
+Your product already talks to the signer (in your app, a chat, a portal). Show the signing link there and never send a
+Sendforsign email.
+
+1. Create the draft and add recipients (`create_contract` with `recipients`, or `add_recipients`). Both return each
+   recipient's `signingUrl`:
+
+   ```bash
+   https://app.sendforsign.com/sharing/{recipientKey}
+   ```
+
+2. Give each signer **their own** link in your UI: a button, a message, or an iframe/new tab. The link identifies the
+   recipient, so treat it like a password reset link: show it only to that person.
+3. Don't call `send_for_signature`. The agent can run in `draft` mode for this flow.
+4. Learn about the signature from the [webhook](#react-when-a-contract-is-fully-signed).
+
+In REST, the `recipientKey` comes from [recipient `list`](/api-reference/recipient/list).
+
+For a fully embedded editor and contract list (review and edit what the agent drafted), use the
+[React components](/sdk/introsdk), and set your [branding](/api-reference/settings/branding) for any emails you do send.
+
+## One tenant per customer
+
+A product with many customers keeps each customer's templates and contracts apart. The tenant is chosen by **your**
+code through headers, so an agent working for customer A cannot see customer B's contracts.
+
+| Level | Key | Use it for |
+|---|---|---|
+| Client | `clientKey` | A customer business. Strongest separation: own templates, contracts, [webhooks](/api-reference/webhook/concept) and branding. [Create](/api-reference/client/create) |
+| User | `userKey` | An end user or team inside a client. [Create](/api-reference/user/create), or `create_user` over MCP |
+
+Setup, once per customer (from your backend):
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/client' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","client":{"fullname":"Jane Doe","email":"jane@customer.example","organization":"Customer Inc.","customKey":"your-customer-id"}}}'
+```
+
+Store the returned `clientKey` with the customer. When a user of that customer starts an agent session, open the MCP
+connection with:
+
+```bash
+X-Sendforsign-Client-Key: CLIENT_KEY_OF_THAT_CUSTOMER
+X-Sendforsign-User-Key: USER_KEY_OF_THAT_USER        # optional
+X-Sendforsign-On-Behalf-Of: jane@customer.example
+```
+
+## React when a contract is fully signed
+
+Webhooks are per `clientKey`. Register one per client:
+
+```bash cURL
+curl -X POST 'https://api.sendforsign.com/api/webhook' \
+  -H "X-Sendforsign-Key: $SFS_KEY" -H 'Content-Type: application/json' \
+  -d '{"data":{"action":"create","clientKey":"CLIENT_KEY",
+       "webhooks":[{"url":"https://your-app.example/hooks/sendforsign","signed":true,"fullySigned":true}]}}'
+```
+
+When the last recipient signs, your endpoint receives:
+
+```json
+{
+  "clientKey": "CLIENT_KEY",
+  "contractKey": "CONTRACT_KEY",
+  "createTime": "2026-12-01T16:06:56.000Z",
+  "status": "contract.fully_signed",
+  "contractName": "NDA — Acme Ltd"
+}
+```
+
+Then download the signed PDF ([`GET /api/download_pdf`](/api-reference/pdf/download)), store it, and tell the agent or
+the user. To resume an agent conversation, pass it the `contractKey`; it can call `get_contract` and
+`get_contract_timeline`. All events: [webhooks concept](/api-reference/webhook/concept).
+
+## Upload a finished text and get it signed
+
+For legal-AI products that draft elsewhere: pass the final text as `content` (Markdown by default, or
+`contentFormat: "html"`) to `create_contract`, add signers, send. For a PDF, use [PDF upload](/api-reference/pdf/upload)
+and [PDF placeholders](/api-reference/placeholder/pdfbasic) in REST.

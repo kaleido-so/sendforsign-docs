@@ -1,0 +1,64 @@
+---
+title: "Agent skill and llms.txt"
+sidebarTitle: "Agent skill and llms.txt"
+description: "Install the Sendforsign agent skill (SKILL.md) in Claude Code, Claude, Codex and other agents, and point language models at llms.txt and llms-full.txt."
+---
+
+The MCP server gives an agent the **tools**. The skill gives it the **know-how**: which recipe to use, when to ask the
+user, and the pitfalls (for example, that REST `contract` `create` with recipients emails them immediately).
+
+The skill is a single [`SKILL.md`](https://github.com/kaleido-so/sendforsign-docs/blob/main/skills/sendforsign/SKILL.md)
+file in the open Agent Skills format: a `name` and `description` in the frontmatter, instructions in the body. The agent
+loads it only when a task is about contracts or signatures.
+
+## What the skill teaches
+
+- Use MCP tools when connected, the REST API when writing integration code.
+- Never send for signature, or archive, without the user's explicit approval in the conversation; `confirm: true` only
+  after that.
+- Prefer templates, fill only the owner's fields, leave recipients' fields to them, don't invent terms.
+- Recipes: template → fill → send, embedded signing links without email, multi-tenant, webhooks on fully signed.
+- REST pitfalls: create-and-send vs. create-then-add-recipients, clearing `externalRecipientKey` with an explicit
+  `null`, placeholders are edited through the API and never in the HTML.
+
+## Install
+
+<Tabs>
+  <Tab title="Claude Code">
+    For all your projects:
+
+    ```bash
+    mkdir -p ~/.claude/skills/sendforsign && curl -fsSL https://raw.githubusercontent.com/kaleido-so/sendforsign-docs/main/skills/sendforsign/SKILL.md -o ~/.claude/skills/sendforsign/SKILL.md
+    ```
+
+    Or for one repository, so your team gets it too: save it as `.claude/skills/sendforsign/SKILL.md` and commit it.
+    Claude Code picks the skill up automatically; ask "What skills do you have?" to check.
+
+    Then [connect the MCP server](/ai-agents/mcp-quickstart).
+  </Tab>
+  <Tab title="Claude apps">
+    In Claude (web or desktop), skills are uploaded as a ZIP of the skill folder:
+
+    1. Download [`SKILL.md`](https://raw.githubusercontent.com/kaleido-so/sendforsign-docs/main/skills/sendforsign/SKILL.md)
+       into a folder named `sendforsign` and zip the folder.
+    2. Open **Settings → Capabilities → Skills**, upload the ZIP and turn it on.
+  </Tab>
+  <Tab title="Codex and other agents">
+    Agents that support the Agent Skills format read `SKILL.md` files from a skills folder, for example
+    `~/.codex/skills/sendforsign/SKILL.md` for Codex. Use the same download command with that path.
+
+    An agent without skill support can still use the file: add it to the agent's instructions or system prompt.
+  </Tab>
+</Tabs>
+
+## llms.txt
+
+For models that read documentation directly:
+
+| File | What's in it |
+|---|---|
+| [`/llms.txt`](https://about.sendforsign.com/llms.txt) | A short index of the docs in the [llmstxt.org](https://llmstxt.org) format: what Sendforsign is, key facts, links to every important page |
+| [`/llms-full.txt`](https://about.sendforsign.com/llms-full.txt) | The REST API and MCP reference in one plain-text file, to paste into a prompt or a project's knowledge |
+
+Every docs page is also available as Markdown by adding `.md` to its URL, for example
+[`/ai-agents/tools.md`](https://about.sendforsign.com/ai-agents/tools.md).

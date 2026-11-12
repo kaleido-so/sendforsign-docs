@@ -1,0 +1,215 @@
+---
+title: "MCP tools reference"
+sidebarTitle: "Tools"
+description: "Every tool of the Sendforsign MCP server: arguments, what it returns, whether it writes, and whether it emails anyone."
+---
+
+All tools return JSON (as text and as `structuredContent`). Errors come back as tool errors with a readable
+message, for example `Blocked by policy: ...` or `Sendforsign API error (404): ...`. Each tool calls the public
+[REST API](/api-reference/introapi), so the same permissions apply.
+
+| Tool | What it does | Writes | Emails people | Needs mode |
+|---|---|---|---|---|
+| [`get_connection_info`](#get_connection_info) | Mode, tenant, allowed domains, audit status of this connection | no | no | any |
+| [`list_templates`](#list_templates) | Templates of the account or tenant | no | no | any |
+| [`get_template`](#get_template) | A template and its fields, with who fills each | no | no | any |
+| [`list_contracts`](#list_contracts) | Contracts with status, filterable | no | no | any |
+| [`get_contract`](#get_contract) | A contract: status, template, recipients, fields, optional body | no | no | any |
+| [`create_contract`](#create_contract) | Draft from a template or from Markdown/HTML, fill fields, attach recipients | yes | **no** | `draft` |
+| [`update_contract`](#update_contract) | Rename a draft or replace its body | yes | no | `draft` |
+| [`list_placeholders`](#list_placeholders) | Fields of a contract or template | no | no | any |
+| [`fill_placeholders`](#fill_placeholders) | Set field values; change who fills a field | yes | no | `draft` |
+| [`add_recipients`](#add_recipients) | Add signers/approvers/viewers, return signing links | yes | **no** | `draft` |
+| [`list_recipients`](#list_recipients) | Recipients with role, order and signing link | no | no | any |
+| [`send_for_signature`](#send_for_signature) | Email signing invitations; `confirm: true` required | yes | **yes** | `send` |
+| [`get_contract_timeline`](#get_contract_timeline) | Events (created, sent, seen, signed…) plus agent actions | no | no | any |
+| [`download_contract_pdf`](#download_contract_pdf) | The contract as a PDF, with signatures once signed | no | no | any |
+| [`archive_contract`](#archive_contract) | Archive a contract; `confirm: true` required | yes | no | `send` |
+| [`list_users`](#list_users) | Tenants (users) of the client, for embedded products | no | no | any |
+| [`create_user`](#create_user) | Create a tenant and return its `userKey` | yes | no | `draft` |
+
+"Needs mode" is the lowest [agent mode](/ai-agents/accountability#agent-modes) that allows the tool: `read_only` <
+`draft` < `send`. Tools are annotated for MCP clients: read tools carry `readOnlyHint`, `archive_contract` carries
+`destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
+clients that ask before risky calls can do so.
+
+Most tools accept an optional `userKey` argument. It overrides the `X-Sendforsign-User-Key` header for that call;
+without both, the account's default user is used.
+
+## Field roles (`filledBy`)
+
+Tools describe template and contract fields with a `filledBy` value that maps to the REST
+[`fillingType`](/usecase/placeholder-filler):
+
+| `filledBy` | `fillingType` | Who fills the field |
+|---|---|---|
+| `none` | `1` | Nobody; a fixed value |
+| `owner` | `2` | The contract owner — the agent or your user, before sending |
+| `any_recipient` | `3` | Whichever recipient opens the contract |
+| `specific_recipient` | `4` | One recipient, given by `recipientKey` |
+
+The agent should fill only `owner` fields and leave recipient fields to the recipients.
+
+---
+
+### get_connection_info
+
+Shows how this connection is configured. Call it first if unsure what you are allowed to do.
+
+**Arguments:** none.
+
+**Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
+`auditLog` (`"on"`/`"off"`), `sendingRequiresConfirm: true`.
+
+### list_templates
+
+Lists templates available to the account or tenant. Use a template whenever the user asks for a standard document
+(NDA, service agreement, offer) before drafting from scratch.
+
+**Arguments:** `userKey?`
+
+**Returns:** `templates[]` with `templateKey`, `name`, `changeTime`.
+
+### get_template
+
+A template and its fields, including who fills each.
+
+**Arguments:** `templateKey`, `includeContent?` (default `false`; `true` adds the HTML body), `userKey?`
+
+**Returns:** `templateKey`, `name`, `placeholders[]` (`placeholderKey`, `name`, `value`, `filledBy`, `recipientKey`),
+`content?`.
+
+### list_contracts
+
+Lists contracts with their status.
+
+**Arguments:** `status?` (e.g. `Created`, `Sent`, `Seen`, `Signed`, `Fully signed`, `Archived`; case-insensitive),
+`nameContains?`, `limit?` (1–500, default 50), `userKey?`
+
+**Returns:** `total`, `contracts[]` with `contractKey`, `name`, `status`, `createTime`, `changeTime`.
+
+### get_contract
+
+**Arguments:** `contractKey`, `includeContent?` (default `false`), `userKey?`
+
+**Returns:** `contractKey`, `name`, `status`, `templateKey` (the template it was created from, or `null`),
+`createTime`, `changeTime`, `recipients[]` (with `signingUrl`), `placeholders[]`, `content?`.
+
+### create_contract
+
+Creates a **draft** contract. It never emails anyone, even when you pass recipients.
+
+**Arguments:**
+
+| Name | Type | Notes |
+|---|---|---|
+| `name` | string | Contract title. Required. |
+| `templateKey` | string | Preferred. Build from this template. |
+| `content` | string | Body when not using a template. |
+| `contentFormat` | `markdown` \| `html` | Default `markdown`. |
+| `fields` | array of `{ placeholderKey? , name?, value }` | Values for template fields, matched by key or by name. Only owner fields. |
+| `recipients` | array of recipients | `{ fullname, email, action?, position?, customMessage? }`; `action` is `sign` (default), `approve`, `view` or `lock`. Checked against the domain allowlist. |
+| `userKey` | string | Tenant. |
+
+Pass `templateKey` or `content`.
+
+**Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `unfilledFields[]` (owner fields
+still empty), `fieldsForRecipients[]`, and `next` — a hint for the next step.
+
+### update_contract
+
+Renames a draft and/or replaces its body. Only for contracts that have not been sent.
+
+**Arguments:** `contractKey`, `name?`, `content?`, `contentFormat?` (default `markdown`), `userKey?`
+
+**Returns:** `contractKey`, `updated[]` (the fields changed).
+
+### list_placeholders
+
+**Arguments:** `contractKey?` or `templateKey?` (one is required)
+
+**Returns:** `placeholders[]` with `placeholderKey`, `name`, `value`, `filledBy`, `recipientKey`.
+
+### fill_placeholders
+
+Sets field values in a contract, by `placeholderKey` or by name (case-insensitive), and can change who fills a field.
+
+**Arguments:** `contractKey`, `fields[]` of `{ placeholderKey?, name?, value?, filledBy?, recipientKey? }`.
+`recipientKey` is required when `filledBy` is `specific_recipient`. Changing `filledBy` to anything else clears the
+assigned recipient.
+
+**Returns:** `contractKey`, `results[]` with `field`, `placeholderKey`, `ok`, `error?` per field. One failed field
+does not stop the others.
+
+### add_recipients
+
+Adds signers, approvers or viewers **without emailing them**. Signing order continues after existing recipients
+unless you pass `position`.
+
+**Arguments:** `contractKey`, `recipients[]` (as in `create_contract`, at least one), `userKey?`
+
+**Returns:** `contractKey`, `recipients[]` (all recipients of the contract) with `recipientKey` and `signingUrl`.
+
+The `signingUrl` (`https://app.sendforsign.com/sharing/{recipientKey}`) can be shown in your own product instead of
+sending email. See [embedded signing](/ai-agents/recipes#embedded-signing-without-email).
+
+### list_recipients
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `recipients[]` with `recipientKey`, `fullname`, `email`, `action`, `position`,
+`customMessage`, `signingUrl`.
+
+### send_for_signature
+
+**Emails** signing invitations. This contacts real people.
+
+Before calling, the agent must show the user the contract name, the recipients and their roles, get explicit
+approval, and then pass `confirm: true`. Without it the tool returns `Not executed: ... needs confirm: true` and sends
+nothing. Allowed only in `send` mode; recipients are checked against the domain allowlist.
+
+**Arguments:** `contractKey`, `confirm` (boolean, must be `true`), `recipientKeys?` (send only to these; default: all
+recipients), `customMessage?` (overrides the invitation message), `userKey?`
+
+**Returns:** `contractKey`, `sentTo[]` with `email`, `action`, `signingUrl`.
+
+### get_contract_timeline
+
+Event history of a contract, plus the agent actions recorded for it when the audit log is on.
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `events[]` (`time`, `status`, `name`, `email`), `agentActions[]?` (`create_time`, `agent`,
+`on_behalf_of`, `mode`, `tool`, `outcome`, `message`, `hash`).
+
+### download_contract_pdf
+
+**Arguments:** `contractKey`
+
+**Returns:** `contractKey`, `mimeType: "application/pdf"`, `bytes`, `base64`.
+
+### archive_contract
+
+Archives a contract: it leaves active lists and can no longer be signed. Needs `confirm: true` after explicit user
+approval, and `send` mode.
+
+**Arguments:** `contractKey`, `confirm`, `userKey?`
+
+**Returns:** `contractKey`, `archived: true`.
+
+### list_users
+
+For products that embed Sendforsign: lists tenants (users) of the client. Each has its own templates and contracts,
+addressed by `userKey`.
+
+**Arguments:** none.
+
+**Returns:** `users[]` with `userKey`, `fullname`, `email`, `customKey`.
+
+### create_user
+
+Creates a tenant and returns its `userKey`. `customKey` is your own ID for it, so you can map back.
+
+**Arguments:** `fullname`, `email`, `customKey?`
+
+**Returns:** `userKey`, `fullname`, `email`, `customKey`.
