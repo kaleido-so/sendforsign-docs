@@ -24,7 +24,9 @@ Every client below follows the same three steps:
 1. Add the server URL `https://api.sendforsign.com/mcp`.
 2. Sign in to Sendforsign in the browser window that opens (or create an account).
 3. On the consent screen, choose:
-   - **Account** — the client (`clientKey`) the app works in, and optionally a default **user** (tenant) inside it.
+   - **Account** — the client (`clientKey`) the app works in, and optionally a **user** (tenant) inside it. If you pick
+     a user, the connector can only act as that user and cannot list or create users. Without one, it works at the
+     account level and can address any user of the account.
    - **What the agent may do** — *read only*, *create drafts* (the default) or *send for signature*. Even with
      *send*, every email still needs your explicit approval in the chat (`confirm: true`).
    - **Allowed recipient domains** (optional) — the app cannot send contracts to anyone outside them.

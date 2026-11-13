@@ -15,7 +15,7 @@ This file is generated from the documentation by `scripts/build-llms-full.py`. A
 - Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
 - Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
 - Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.
-- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. AI apps connect with OAuth 2.1 (DCR + PKCE, discovery at `/.well-known/oauth-protected-resource/mcp`, scope `contracts`): the user signs in and picks account, default tenant, mode (default `draft`) and allowed domains on the consent screen; that grant overrides any headers. Server-side agents use headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
+- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. AI apps connect with OAuth 2.1 (DCR + PKCE, discovery at `/.well-known/oauth-protected-resource/mcp`, scope `contracts`): the user signs in and picks account, optional user (a limit: the connector then acts only as that user), mode (default `draft`) and allowed domains on the consent screen; that grant overrides any headers. Server-side agents use headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
 - MCP tools: get_connection_info, list_templates, get_template, list_contracts, get_contract, create_contract (draft, never emails), update_contract, list_placeholders, fill_placeholders, add_recipients (no email), list_recipients, send_for_signature (emails; needs `confirm: true` and `send` mode), get_contract_timeline, download_contract_pdf, archive_contract (needs `confirm: true`), list_users, create_user.
 - Agents must never send for signature or archive without explicit human approval.
 
@@ -117,7 +117,9 @@ Every client below follows the same three steps:
 1. Add the server URL `https://api.sendforsign.com/mcp`.
 2. Sign in to Sendforsign in the browser window that opens (or create an account).
 3. On the consent screen, choose:
-   - **Account** — the client (`clientKey`) the app works in, and optionally a default **user** (tenant) inside it.
+   - **Account** — the client (`clientKey`) the app works in, and optionally a **user** (tenant) inside it. If you pick
+     a user, the connector can only act as that user and cannot list or create users. Without one, it works at the
+     account level and can address any user of the account.
    - **What the agent may do** — *read only*, *create drafts* (the default) or *send for signature*. Even with
      *send*, every email still needs your explicit approval in the chat (`confirm: true`).
    - **Allowed recipient domains** (optional) — the app cannot send contracts to anyone outside them.
@@ -419,10 +421,11 @@ connection (you, your backend) and **cannot be changed by the agent** through to
 
   **OAuth connections ignore these headers.** When an AI app connects by
   [signing in with Sendforsign](https://about.sendforsign.com/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
-  consent screen is the source of truth: account, default tenant, mode (drafts only by default) and allowed domains.
+  consent screen is the source of truth: account, user (tenant) if one was picked, mode (drafts only by default) and
+  allowed domains.
   Headers such as `X-Sendforsign-Client-Key`, `X-Sendforsign-User-Key`, `X-Sendforsign-Agent-Mode`,
   `X-Sendforsign-Allowed-Domains` and `X-Sendforsign-On-Behalf-Of` have no effect there, so an app cannot change the
-  approved account, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
+  approved account, user, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
   [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Header authentication works as described below.
 
 | Header | Required | Meaning |
@@ -503,9 +506,10 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
 
-Most tools accept an optional `userKey` argument. It overrides the default tenant (the `X-Sendforsign-User-Key`
-header, or the user chosen on the OAuth consent screen) for that call; without either, the account's default user is
-used.
+Most tools accept an optional `userKey` argument that selects the tenant for that call; without it, the
+`X-Sendforsign-User-Key` header or the account's default user is used. On an OAuth connection where a user was picked
+on the consent screen, that user is a limit: a different `userKey` is refused with
+`Blocked by policy: this connection is limited to userKey …`, and `list_users` / `create_user` are blocked.
 
 ### Field roles (`filledBy`)
 
@@ -530,7 +534,8 @@ Shows how this connection is configured. Call it first if unsure what you are al
 **Arguments:** none.
 
 **Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
-`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `sendingRequiresConfirm: true`.
+`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `userKeyIsLimit` (`true` when an OAuth grant is
+restricted to one user), `sendingRequiresConfirm: true`.
 
 #### list_templates
 
@@ -698,7 +703,7 @@ manipulated agent cannot talk its way past them. Where they come from depends on
 
 | Connection | Who sets account, tenant, mode, allowed domains | Default mode |
 |---|---|---|
-| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. | `draft` |
+| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. A user picked there is a limit: the connector acts only as that user. | `draft` |
 | **API key or client token** (server-side agents) | Your code, with [headers](https://about.sendforsign.com/ai-agents/headers) on each connection | `send` |
 
 ### Agent modes

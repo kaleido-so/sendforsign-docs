@@ -17,8 +17,8 @@ New features:
   signing links, sending for signature, timeline, PDF download, archive, tenants for embedded products
 - Field roles: the agent fills its own fields and leaves the counterparty's fields to the counterparty
 - Sign in with Sendforsign: AI apps such as Claude, ChatGPT, Claude Code, Cursor and VS Code connect with OAuth 2.1
-  (dynamic client registration, PKCE) by pasting the URL. On the consent screen the user picks the account, a default
-  tenant, what the agent may do (drafts only by default) and allowed recipient domains
+  (dynamic client registration, PKCE) by pasting the URL. On the consent screen the user picks the account, optionally a
+  user the connector is limited to, what the agent may do (drafts only by default) and allowed recipient domains
 - Guardrails for server-side agents set by the integrator in headers: agent modes (`read_only`, `draft`, `send`), `confirm: true` before any
   email or archive, a recipient domain allowlist, agent and on-behalf-of identity
 - An audit log of agent actions, returned in the contract timeline (rolling out)

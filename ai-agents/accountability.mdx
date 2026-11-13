@@ -13,7 +13,7 @@ manipulated agent cannot talk its way past them. Where they come from depends on
 
 | Connection | Who sets account, tenant, mode, allowed domains | Default mode |
 |---|---|---|
-| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. | `draft` |
+| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. A user picked there is a limit: the connector acts only as that user. | `draft` |
 | **API key or client token** (server-side agents) | Your code, with [headers](/ai-agents/headers) on each connection | `send` |
 
 ## Agent modes

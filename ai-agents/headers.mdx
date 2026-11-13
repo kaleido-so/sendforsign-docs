@@ -11,10 +11,11 @@ connection (you, your backend) and **cannot be changed by the agent** through to
 <Note>
   **OAuth connections ignore these headers.** When an AI app connects by
   [signing in with Sendforsign](/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
-  consent screen is the source of truth: account, default tenant, mode (drafts only by default) and allowed domains.
+  consent screen is the source of truth: account, user (tenant) if one was picked, mode (drafts only by default) and
+  allowed domains.
   Headers such as `X-Sendforsign-Client-Key`, `X-Sendforsign-User-Key`, `X-Sendforsign-Agent-Mode`,
   `X-Sendforsign-Allowed-Domains` and `X-Sendforsign-On-Behalf-Of` have no effect there, so an app cannot change the
-  approved account, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
+  approved account, user, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
   [audit log](/ai-agents/accountability#audit-log). Header authentication works as described below.
 </Note>
 

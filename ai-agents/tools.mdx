@@ -33,9 +33,10 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
 
-Most tools accept an optional `userKey` argument. It overrides the default tenant (the `X-Sendforsign-User-Key`
-header, or the user chosen on the OAuth consent screen) for that call; without either, the account's default user is
-used.
+Most tools accept an optional `userKey` argument that selects the tenant for that call; without it, the
+`X-Sendforsign-User-Key` header or the account's default user is used. On an OAuth connection where a user was picked
+on the consent screen, that user is a limit: a different `userKey` is refused with
+`Blocked by policy: this connection is limited to userKey …`, and `list_users` / `create_user` are blocked.
 
 ## Field roles (`filledBy`)
 
@@ -60,7 +61,8 @@ Shows how this connection is configured. Call it first if unsure what you are al
 **Arguments:** none.
 
 **Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
-`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `sendingRequiresConfirm: true`.
+`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `userKeyIsLimit` (`true` when an OAuth grant is
+restricted to one user), `sendingRequiresConfirm: true`.
 
 ### list_templates
 

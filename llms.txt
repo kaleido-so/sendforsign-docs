@@ -9,7 +9,7 @@ Key facts:
 - `contract` `create` with a `recipients` array emails them immediately. A contract from a template gets new field keys: fill it with `placeholder` `update` by the contract's keys. To prepare without email: `contract` `create`, then `recipient` `create`; `recipient` `send` emails.
 - Field (placeholder) roles: `fillingType` 1 nobody, 2 contract owner, 3 any recipient, 4 specific recipient (`externalRecipientKey`; send `null` explicitly to clear).
 - Signing link: `https://app.sendforsign.com/sharing/{recipientKey}`.
-- MCP: AI apps connect by pasting `https://api.sendforsign.com/mcp` and signing in (OAuth 2.1 + DCR + PKCE; the consent screen sets account, tenant, mode — default drafts only — and allowed domains). Server-side agents use `X-Sendforsign-Key` + `X-Sendforsign-Client-Key` headers. `send_for_signature` and `archive_contract` need `confirm: true` after explicit human approval; `X-Sendforsign-Agent-Mode` is `read_only`, `draft` or `send`.
+- MCP: AI apps connect by pasting `https://api.sendforsign.com/mcp` and signing in (OAuth 2.1 + DCR + PKCE; the consent screen sets account, an optional user the connector is then limited to, mode — default drafts only — and allowed domains). Server-side agents use `X-Sendforsign-Key` + `X-Sendforsign-Client-Key` headers. `send_for_signature` and `archive_contract` need `confirm: true` after explicit human approval; `X-Sendforsign-Agent-Mode` is `read_only`, `draft` or `send`.
 - Full reference in one file: https://about.sendforsign.com/llms-full.txt. Any page as Markdown: add `.md` to its URL.
 
 ## AI agents and MCP
