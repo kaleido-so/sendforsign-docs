@@ -70,7 +70,8 @@
       "pages": [
         "ai-agents/overview",
         "ai-agents/mcp-quickstart",
-        "ai-agents/recipes"
+        "ai-agents/recipes",
+        "ai-agents/prompts"
       ]
     },
     {
@@ -107,12 +108,6 @@
         "api-reference/authentication",
         "api-reference/implementation_server",
         "api-reference/implementation_client"
-      ]
-    },
-    {
-      "group": "MCP",
-      "pages": [
-        "api-reference/mcp/aiapi"
       ]
     },
     {
@@ -228,6 +223,7 @@
     {
       "group": "Years",
       "pages": [
+        "changelog/2026",
         "changelog/2025",
         "changelog/2024",
         "changelog/2023"

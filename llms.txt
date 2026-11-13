@@ -20,6 +20,7 @@ Key facts:
 - [MCP headers reference](https://about.sendforsign.com/ai-agents/headers.md): Auth, default client and tenant, agent identity, on-behalf-of, agent mode, recipient domain allowlist.
 - [Agent modes and accountability](https://about.sendforsign.com/ai-agents/accountability.md): read_only/draft/send modes, confirm flag, allowed domains, hash-chained audit log, ESIGN/UETA context.
 - [Recipes](https://about.sendforsign.com/ai-agents/recipes.md): Template → fill → send; embedded signing without email; one tenant per customer; webhooks when fully signed.
+- [Prompt library](https://about.sendforsign.com/ai-agents/prompts.md): Ready-to-paste prompts for Claude, ChatGPT and Cursor connected to Sendforsign MCP: create, fill and send, track, multi-tenant, safe modes.
 - [Agent skill and llms.txt](https://about.sendforsign.com/ai-agents/skills.md): Install the Sendforsign SKILL.md in Claude Code, Claude apps, Codex.
 - [SKILL.md](https://raw.githubusercontent.com/kaleido-so/sendforsign-docs/main/skills/sendforsign/SKILL.md): The agent skill itself.
 
@@ -101,6 +102,6 @@ Key facts:
 - [Update an existing document](https://about.sendforsign.com/usecase/updatedoc.md): Change text, name or placeholders of a document.
 - [Table placeholders](https://about.sendforsign.com/usecase/add-table-placeholder.md): Dynamic tables in HTML contracts.
 - [Recipient custom domain](https://about.sendforsign.com/usecase/recipientdomain.md): Signing links on your own domain.
-- [AI+API (beta)](https://about.sendforsign.com/api-reference/mcp/aiapi.md): Natural-language contract requests over a single HTTP endpoint.
+- [Changelog 2026](https://about.sendforsign.com/changelog/2026.md): MCP server, agent skill, AI+API deprecation.
 - [Changelog 2025](https://about.sendforsign.com/changelog/2025.md)
 - [Compliance](https://about.sendforsign.com/about/compliance.md)

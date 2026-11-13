@@ -1,0 +1,211 @@
+---
+title: "Prompt library"
+description: "Ready-to-paste prompts for Claude, ChatGPT and Cursor connected to the Sendforsign MCP server: create contracts, fill and send them, track signatures, run a multi-tenant product and work in safe modes."
+---
+
+These prompts work in any client [connected to the Sendforsign MCP server](/ai-agents/mcp-quickstart): Claude Code,
+Claude Desktop, Cursor, ChatGPT through the API or the OpenAI Agents SDK. Replace the parts in `[brackets]`.
+
+Each prompt lists the tools the agent is expected to call and what it should ask you before anyone gets an email.
+Sending (`send_for_signature`) and archiving (`archive_contract`) always need your explicit "yes" in the chat: the
+server refuses them without `confirm: true`, and in [`draft` mode](/ai-agents/accountability#agent-modes) refuses
+them altogether.
+
+<Tip>
+  Start new connections in `draft` mode (`X-Sendforsign-Agent-Mode: draft`). The agent can prepare everything and give
+  you signing links, but cannot email anyone. Switch to `send` when you trust the flow.
+</Tip>
+
+## Create
+
+### From a template
+
+```text
+List my Sendforsign templates. Use the [NDA] template to draft a contract named
+"[NDA — Acme Ltd]". Fill in the fields I'm responsible for: company name [Acme Ltd],
+effective date [1 December 2026]. Ask me for anything else you need.
+Leave the fields meant for the other party empty. Don't send anything yet.
+```
+
+**Tools:** `list_templates` → `get_template` → `create_contract` (with `templateKey` and `fields`), then
+`fill_placeholders` for values you give later.
+
+**Confirm step:** none needed. `create_contract` makes a draft and emails nobody. The agent should show you which
+fields it filled (`filled`), which are still empty (`unfilledFields`) and which the counterparty will fill
+(`fieldsForRecipients`).
+
+### From your own text
+
+```text
+Create a Sendforsign contract named "[Consulting agreement — Jane Roe]" from the text
+below. Keep my wording; don't add clauses I didn't write. Show me the draft link when done.
+
+[paste the contract text, Markdown is fine]
+```
+
+**Tools:** `create_contract` with `content` (Markdown by default).
+
+**Confirm step:** none; it is a draft. Ask for changes and the agent uses `update_contract` while the contract has not
+been sent.
+
+### From an attached proposal
+
+```text
+Here is a proposal we agreed with [Acme Ltd] (attached). Turn it into a service
+agreement: if one of my Sendforsign templates fits, use it and fill it from the proposal;
+otherwise draft it from the proposal's terms only. List every value you took from the
+proposal and every gap, before creating anything.
+```
+
+**Tools:** `list_templates` → `get_template` → `create_contract` (template + `fields`, or `content`).
+
+**Confirm step:** the agent lists the extracted values and gaps first; you confirm or correct them, then it creates
+the draft. Nothing is emailed.
+
+## Fill and send
+
+### Agent fills its fields, the counterparty fills theirs
+
+```text
+In the contract "[NDA — Acme Ltd]", fill everything that's on our side from these
+details: [our company, address, signatory]. The fields about the other party
+(their address, their signatory's title) should be filled by [Anna Smith] when she signs.
+Show me who fills what.
+```
+
+**Tools:** `list_contracts` → `get_contract` → `fill_placeholders` with `value` for your fields and
+`filledBy: "specific_recipient"` (with Anna's `recipientKey`) or `"any_recipient"` for hers; `add_recipients` first if
+Anna is not on the contract yet.
+
+**Confirm step:** none; no email. The agent shows the field roles.
+
+### Signing link instead of email
+
+```text
+Add [Anna Smith, anna@acme.example] as signer to "[NDA — Acme Ltd]" and give me her
+signing link. Do not email her; I'll send the link myself.
+```
+
+**Tools:** `add_recipients` (returns `signingUrl`), or `list_recipients` if she is already added.
+
+**Confirm step:** none; `add_recipients` never emails. Share each link only with its recipient: the link identifies
+them. Works in `draft` mode. See [embedded signing](/ai-agents/recipes#embedded-signing-without-email).
+
+### Send after confirmation
+
+```text
+Get "[NDA — Acme Ltd]" ready to sign: signer [Anna Smith, anna@acme.example], then a copy
+for [Bob Lee, bob@ourco.example] as viewer. Show me the summary and wait for my OK
+before sending.
+```
+
+**Tools:** `add_recipients` → (summary) → `send_for_signature` with `confirm: true`.
+
+**Confirm step:** the agent shows the contract name, the filled values and each recipient with their role and order,
+and waits. Only after you reply "yes, send" does it call `send_for_signature` with `confirm: true`. In `draft` mode the
+server refuses and the agent gives you the signing links instead.
+
+## Track
+
+### What's waiting for signature
+
+```text
+Which of my Sendforsign contracts are sent but not fully signed yet? Sort by oldest first.
+```
+
+**Tools:** `list_contracts` (filters by `status`, e.g. `Sent`, `Seen`, `Signed`).
+
+**Confirm step:** none; read-only.
+
+### Timeline of one contract
+
+```text
+Show the timeline of "[NDA — Acme Ltd]": when it was sent, opened and signed, and by whom.
+Include what the agent did, if logged.
+```
+
+**Tools:** `get_contract_timeline` (events plus `agentActions` when the [audit log](/ai-agents/accountability#audit-log)
+is on).
+
+**Confirm step:** none; read-only.
+
+### Who hasn't signed
+
+```text
+For "[Master services agreement — Acme Ltd]", who has signed and who hasn't yet?
+Draft a polite reminder I can send to the ones who haven't. Don't send it.
+```
+
+**Tools:** `get_contract` → `get_contract_timeline`.
+
+**Confirm step:** none. The agent drafts text; it does not email reminders. Re-sending invitations would be
+`send_for_signature` with `recipientKeys`, which needs your confirmation.
+
+### Download the signed PDF
+
+```text
+Download the signed PDF of "[NDA — Acme Ltd]" and save it as [nda-acme-signed.pdf].
+```
+
+**Tools:** `list_contracts` → `download_contract_pdf` (returns the PDF as base64; agents with file access, such as
+Claude Code or Cursor, can save it).
+
+**Confirm step:** none; read-only. If the status is not `Fully signed` yet, the agent should say so.
+
+## Embedded and multi-tenant
+
+For products that use Sendforsign for their own customers. See
+[one tenant per customer](/ai-agents/recipes#one-tenant-per-customer).
+
+### Create a tenant per customer
+
+```text
+Create a Sendforsign user for our new customer [Northwind Events], contact
+[ops@northwind.example], with custom key [cust_1042]. Return the userKey.
+```
+
+**Tools:** `create_user` (`fullname`, `email`, `customKey`).
+
+**Confirm step:** none; no email. Store the `userKey` in your product and pass it as `X-Sendforsign-User-Key` when an
+agent works for that customer.
+
+### List a tenant's contracts
+
+```text
+List our Sendforsign users. For [Northwind Events], show all contracts that are not
+fully signed, with status and last change.
+```
+
+**Tools:** `list_users` → `list_contracts` with that tenant's `userKey`.
+
+**Confirm step:** none; read-only.
+
+## Safe modes
+
+### Connect in draft mode for review
+
+Connect with `X-Sendforsign-Agent-Mode: draft` (see the [quickstart](/ai-agents/mcp-quickstart)), then:
+
+```text
+What can you do on this Sendforsign connection? Then prepare "[NDA — Acme Ltd]" from the
+NDA template for [Anna Smith, anna@acme.example] and give me the signing link and a
+summary I can review. Don't try to send it.
+```
+
+**Tools:** `get_connection_info` (reports `mode: "draft"`) → `list_templates` → `get_template` → `create_contract`.
+
+**Confirm step:** sending is impossible on this connection; a human reviews the draft and sends it from the
+Sendforsign app or your product, or shares the link.
+
+### Read-only reporting
+
+Connect with `X-Sendforsign-Agent-Mode: read_only`, then:
+
+```text
+Give me a weekly summary of Sendforsign contracts: created, sent, fully signed, and
+anything stuck for more than 7 days.
+```
+
+**Tools:** `list_contracts` → `get_contract_timeline`.
+
+**Confirm step:** none; every write tool is blocked on this connection.

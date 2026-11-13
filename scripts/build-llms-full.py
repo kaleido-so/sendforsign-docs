@@ -19,6 +19,7 @@ AGENT_PAGES = [
     "ai-agents/tools",
     "ai-agents/accountability",
     "ai-agents/recipes",
+    "ai-agents/prompts",
 ]
 CONCEPT_PAGES = [
     "api-reference/introapi",

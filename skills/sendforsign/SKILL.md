@@ -37,6 +37,20 @@ https://about.sendforsign.com/llms-full.txt).
    offer the next step: share the signing links, or ask the account owner.
 6. Signing links identify a recipient. Give each link only to that recipient.
 
+## Example user requests
+
+Typical requests and the tools they map to (more in the prompt library: https://about.sendforsign.com/ai-agents/prompts):
+
+- "Use my NDA template for Acme, fill our side, don't send yet" → `list_templates`, `get_template`, `create_contract`.
+- "Make a contract from this text / this attached proposal" → `create_contract` with `content`, or a template + `fields`;
+  list extracted values and gaps before creating.
+- "Anna fills her address, we fill ours" → `fill_placeholders` with `filledBy: specific_recipient` + `recipientKey`.
+- "Give me Anna's signing link, don't email her" → `add_recipients` / `list_recipients`, return `signingUrl`.
+- "Send it" → summarise, wait for an explicit yes, then `send_for_signature` with `confirm: true`.
+- "What's waiting for signature? Who hasn't signed?" → `list_contracts`, `get_contract`, `get_contract_timeline`.
+- "Download the signed PDF" → `download_contract_pdf` (only once `Fully signed`).
+- "Create a tenant for our new customer" → `create_user`; "their contracts" → `list_contracts` with `userKey`.
+
 ## Recipe: template → fill → send (MCP)
 
 1. `list_templates` → choose → `get_template {templateKey}`; note which fields are `owner`.

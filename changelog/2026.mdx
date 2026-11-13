@@ -1,0 +1,39 @@
+---
+title: "Changelog 2026"
+icon: 'calendar'
+sidebarTitle: "2026"
+description: "What's new in Sendforsign in 2026: the remote MCP server for AI agents, the agent skill, the AI agents docs section and the deprecation of AI+API."
+---
+
+## 12 November
+
+### Sendforsign MCP server for AI agents
+
+Any MCP client (Claude, ChatGPT, Cursor, the OpenAI Agents SDK or your own agent) can now work with contracts through
+the remote MCP server at `https://api.sendforsign.com/mcp` (Streamable HTTP).
+
+New features:
+- 17 tools: templates and their fields, drafts from a template or from Markdown/HTML, filling fields, recipients with
+  signing links, sending for signature, timeline, PDF download, archive, tenants for embedded products
+- Field roles: the agent fills its own fields and leaves the counterparty's fields to the counterparty
+- Guardrails set by the integrator in headers: agent modes (`read_only`, `draft`, `send`), `confirm: true` before any
+  email or archive, a recipient domain allowlist, agent and on-behalf-of identity
+- An audit log of agent actions, returned in the contract timeline (rolling out)
+
+[Connect the MCP server](/ai-agents/mcp-quickstart) · [Tools reference](/ai-agents/tools) ·
+[Modes and accountability](/ai-agents/accountability)
+
+### Agent skill and AI agents docs
+
+- A new [AI agents](/ai-agents/overview) section with recipes, a [prompt library](/ai-agents/prompts) and the
+  headers and tools reference
+- A [Sendforsign agent skill](/ai-agents/skills) (`SKILL.md`) for Claude Code, Claude apps, Codex and other agents
+- [`/llms.txt`](https://about.sendforsign.com/llms.txt) and [`/llms-full.txt`](https://about.sendforsign.com/llms-full.txt)
+  for language models
+- Placeholder docs now cover `fillingType` (who fills a field) and `externalRecipientKey`
+
+### AI+API is deprecated
+
+AI+API (`aiapi.sendforsign.com`) is replaced by the MCP server and the agent skill. New integrations should use the
+[MCP server](/ai-agents/mcp-quickstart). The [AI+API page](/api-reference/mcp/aiapi) stays available for existing
+integrations.
