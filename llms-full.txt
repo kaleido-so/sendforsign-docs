@@ -15,7 +15,7 @@ This file is generated from the documentation by `scripts/build-llms-full.py`. A
 - Placeholder (field) roles: `fillingType` 1 = nobody, 2 = contract owner, 3 = any recipient, 4 = a specific recipient given in `externalRecipientKey` (that recipient's `recipientKey`). In `update`, omitted fields stay unchanged, so send `"externalRecipientKey": null` explicitly to clear it.
 - Signing link for a recipient: `https://app.sendforsign.com/sharing/{recipientKey}`. Products can show it in their own UI instead of sending email.
 - Webhook events per client: contract.created, contract.sent, contract.seen, contract.approved, contract.signed, contract.fully_signed.
-- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. Headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
+- MCP server: `POST https://api.sendforsign.com/mcp`, Streamable HTTP, stateless. AI apps connect with OAuth 2.1 (DCR + PKCE, discovery at `/.well-known/oauth-protected-resource/mcp`, scope `contracts`): the user signs in and picks account, default tenant, mode (default `draft`) and allowed domains on the consent screen; that grant overrides any headers. Server-side agents use headers: `X-Sendforsign-Key` (+ `X-Sendforsign-Client-Key`) or `Authorization: Bearer <client token>`; optional `X-Sendforsign-User-Key`, `X-Sendforsign-Agent`, `X-Sendforsign-On-Behalf-Of`, `X-Sendforsign-Agent-Mode` (`read_only` | `draft` | `send`, default `send`), `X-Sendforsign-Allowed-Domains`.
 - MCP tools: get_connection_info, list_templates, get_template, list_contracts, get_contract, create_contract (draft, never emails), update_contract, list_placeholders, fill_placeholders, add_recipients (no email), list_recipients, send_for_signature (emails; needs `confirm: true` and `send` mode), get_contract_timeline, download_contract_pdf, archive_contract (needs `confirm: true`), list_users, create_user.
 - Agents must never send for signature or archive without explicit human approval.
 
@@ -96,17 +96,148 @@ The integrator, not the agent, decides what an agent may do:
 ## MCP quickstart
 Source: https://about.sendforsign.com/ai-agents/mcp-quickstart
 
-The Sendforsign MCP server is a remote server over **Streamable HTTP** (stateless, no sessions):
+The Sendforsign MCP server is a remote server over **Streamable HTTP**:
 
 ```bash
-POST https://api.sendforsign.com/mcp
+https://api.sendforsign.com/mcp
 ```
 
-It authenticates exactly like the [REST API](https://about.sendforsign.com/api-reference/introapi) and is configured with
-[request headers](https://about.sendforsign.com/ai-agents/headers). Credentials and guardrails live in headers set by you, so the agent cannot
-change them.
+There are two ways to connect:
 
-### 1. Get your keys
+- **Sign in with Sendforsign (OAuth)** — for AI apps people use: Claude, ChatGPT, Claude Code, Cursor, VS Code. Paste
+  the URL, sign in, and choose on the consent screen which account the app may use and what it may do. No API key is
+  copied anywhere.
+- **API key in headers** — for [server-side agents](#server-side-agents-api-key) you run yourself, where your code
+  sets the account and the guardrails per connection.
+
+### Connect an AI app
+
+Every client below follows the same three steps:
+
+1. Add the server URL `https://api.sendforsign.com/mcp`.
+2. Sign in to Sendforsign in the browser window that opens (or create an account).
+3. On the consent screen, choose:
+   - **Account** — the client (`clientKey`) the app works in, and optionally a default **user** (tenant) inside it.
+   - **What the agent may do** — *read only*, *create drafts* (the default) or *send for signature*. Even with
+     *send*, every email still needs your explicit approval in the chat (`confirm: true`).
+   - **Allowed recipient domains** (optional) — the app cannot send contracts to anyone outside them.
+
+You can change these later only by disconnecting and connecting again. See
+[modes and accountability](https://about.sendforsign.com/ai-agents/accountability) for what each choice means.
+
+  **Claude**
+    In Claude on the web or desktop:
+
+    1. Open **Settings → Connectors → Add custom connector**.
+    2. Name it `Sendforsign` and paste `https://api.sendforsign.com/mcp`.
+    3. Click **Connect**, sign in to Sendforsign and approve the consent screen.
+
+    In a chat, enable Sendforsign from the tools menu. On Team and Enterprise plans, an owner may have to add the
+    connector for the organization first.
+  
+  **Claude Code**
+    ```bash
+    claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp
+    ```
+
+    Then run `/mcp` inside Claude Code, select **sendforsign** and choose **Authenticate**. Your browser opens the
+    Sendforsign sign-in and consent screen.
+
+    Add `--scope project` to share the server with your team through `.mcp.json`; each person signs in with their
+    own account. Install the [Sendforsign skill](https://about.sendforsign.com/ai-agents/skills) too, so Claude knows the recipes and pitfalls.
+  
+  **Cursor**
+    [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=sendforsign&config=eyJ1cmwiOiJodHRwczovL2FwaS5zZW5kZm9yc2lnbi5jb20vbWNwIn0%3D)
+    (opens Cursor and asks to install the server).
+
+    Or add it by hand to `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project):
+
+    ```json mcp.json
+    {
+      "mcpServers": {
+        "sendforsign": {
+          "url": "https://api.sendforsign.com/mcp"
+        }
+      }
+    }
+    ```
+
+    In **Cursor Settings → MCP**, click **Login** (or **Needs login**) next to sendforsign to sign in.
+  
+  **VS Code**
+    [Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22sendforsign%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fapi.sendforsign.com%2Fmcp%22%7D)
+    (opens VS Code and asks to install the server).
+
+    Or add it by hand to `.vscode/mcp.json` in your workspace, or with **MCP: Add Server** in the Command Palette:
+
+    ```json .vscode/mcp.json
+    {
+      "servers": {
+        "sendforsign": {
+          "type": "http",
+          "url": "https://api.sendforsign.com/mcp"
+        }
+      }
+    }
+    ```
+
+    Start the server from the file or the MCP view; VS Code asks you to sign in to Sendforsign. Use the tools from
+    Copilot Chat in agent mode.
+  
+  **ChatGPT**
+    Custom connectors in ChatGPT need **developer mode**, available on some plans and possibly limited by your
+    workspace admin. Menu names change between ChatGPT releases.
+
+    1. In **Settings → Apps & Connectors → Advanced settings**, turn on **Developer mode**.
+    2. Create a connector: name `Sendforsign`, MCP server URL `https://api.sendforsign.com/mcp`, authentication
+       **OAuth**.
+    3. Sign in to Sendforsign and approve the consent screen.
+
+    In a chat, pick the connector from the tools menu. ChatGPT asks before it runs tools that change data.
+  
+  **Any OAuth client**
+    The server implements the MCP authorization spec: **OAuth 2.1** with **dynamic client registration** (RFC 7591)
+    and **PKCE** (S256). A compliant MCP client needs only the URL.
+
+    | Step | Endpoint |
+    |---|---|
+    | Unauthenticated `POST /mcp` | `401` with `WWW-Authenticate: Bearer resource_metadata="…"` |
+    | Protected resource metadata | `https://api.sendforsign.com/.well-known/oauth-protected-resource/mcp` |
+    | Authorization server metadata | `https://api.sendforsign.com/.well-known/oauth-authorization-server` (issuer `https://api.sendforsign.com/`) |
+    | Registration, authorization, token, revocation | Listed in the metadata (`/register`, `/authorize`, `/token`, `/revoke`) |
+
+    Details:
+    - One scope: `contracts`. What the agent may do is set by the mode chosen on the consent screen, not by scopes.
+    - Send the `resource` parameter (`https://api.sendforsign.com/mcp`) in the authorization and token requests.
+    - Access tokens last 1 hour. Refresh tokens last 90 days and **rotate on every use**; reusing an old refresh token
+      or an authorization code revokes the whole connection.
+    - The OpenAI Agents SDK and other SDKs connect the same way when given an OAuth provider; for an agent that runs
+      on your servers without a person signing in, use an [API key](#server-side-agents-api-key) instead.
+  
+
+### Try it
+
+Ask the agent:
+
+> What can you do with Sendforsign on this connection?
+
+It calls [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) and tells you its mode, account and allowed
+domains. Then:
+
+> List my templates. Draft an NDA from the NDA template for Acme Ltd, signer Anna Smith, anna@example.com.
+> Show me what you filled in and the signing link. Don't send it yet.
+
+The agent uses `list_templates` → `get_template` → `create_contract`, returns a draft with a `signingUrl` and lists
+the fields left for the counterparty. Nobody is emailed until you approve and the agent calls `send_for_signature`
+with `confirm: true` on a connection allowed to send. More in the [prompt library](https://about.sendforsign.com/ai-agents/prompts).
+
+### Server-side agents (API key)
+
+For agents that run in your backend (your own product's assistant, a workflow, a scheduled job), authenticate with
+your API key and configure each connection with [headers](https://about.sendforsign.com/ai-agents/headers). Your code, not a consent screen,
+decides the account, tenant, mode and allowed domains, so you can open one connection per customer of your product.
+
+#### Get your keys
 
 1. Sign up at [app.sendforsign.com](https://app.sendforsign.com) and open the **API Keys** tab of the dashboard.
 2. Copy your **API key** (`X-Sendforsign-Key`).
@@ -114,90 +245,18 @@ change them.
    customers, [create a client](https://about.sendforsign.com/api-reference/client/create) per customer and use its key.
 
   An API key gives full access to your account. Keep it out of prompts, repositories and chat transcripts; put it in
-  environment variables or your MCP client's secret store. Start new integrations with
-  `X-Sendforsign-Agent-Mode: draft` so the agent cannot email anyone until you are ready.
-
-The minimum set of headers:
+  environment variables or a secret store. Start new integrations with `X-Sendforsign-Agent-Mode: draft` so the agent
+  cannot email anyone until you are ready.
 
 | Header | Value |
 |---|---|
 | `X-Sendforsign-Key` | Your API key |
 | `X-Sendforsign-Client-Key` | Your client key |
 
-Recommended on top: `X-Sendforsign-Agent` (a name for this agent), `X-Sendforsign-Agent-Mode` (`draft` while
-testing) and `X-Sendforsign-Allowed-Domains`. See the [headers reference](https://about.sendforsign.com/ai-agents/headers).
+Recommended on top: `X-Sendforsign-Agent` (a name for this agent), `X-Sendforsign-On-Behalf-Of` (the person or
+company it acts for), `X-Sendforsign-Agent-Mode` and `X-Sendforsign-Allowed-Domains`. Note that the header default
+mode is `send`, unlike the consent screen. See the [headers reference](https://about.sendforsign.com/ai-agents/headers).
 
-### 2. Connect your client
-
-  **Claude Code**
-    ```bash
-    claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp \
-      --header "X-Sendforsign-Key: $SENDFORSIGN_API_KEY" \
-      --header "X-Sendforsign-Client-Key: $SENDFORSIGN_CLIENT_KEY" \
-      --header "X-Sendforsign-Agent: claude-code" \
-      --header "X-Sendforsign-Agent-Mode: draft"
-    ```
-
-    Add `--scope project` to share the server through `.mcp.json` in your repository (then keep the key in an
-    environment variable, not in the file: `"X-Sendforsign-Key": "${SENDFORSIGN_API_KEY}"`). Run `/mcp` inside
-    Claude Code to check the connection.
-
-    Install the [Sendforsign skill](https://about.sendforsign.com/ai-agents/skills) too, so Claude knows the recipes and the pitfalls.
-  
-  **Claude Desktop**
-    Claude Desktop reads remote servers with custom headers through the `mcp-remote` bridge (requires Node.js).
-    Open **Settings → Developer → Edit Config** and add:
-
-    ```json claude_desktop_config.json
-    {
-      "mcpServers": {
-        "sendforsign": {
-          "command": "npx",
-          "args": [
-            "-y", "mcp-remote", "https://api.sendforsign.com/mcp",
-            "--header", "X-Sendforsign-Key:${SFS_KEY}",
-            "--header", "X-Sendforsign-Client-Key:${SFS_CLIENT}",
-            "--header", "X-Sendforsign-Agent:claude-desktop",
-            "--header", "X-Sendforsign-Agent-Mode:draft"
-          ],
-          "env": {
-            "SFS_KEY": "YOUR_API_KEY",
-            "SFS_CLIENT": "YOUR_CLIENT_KEY"
-          }
-        }
-      }
-    }
-    ```
-
-    Restart Claude Desktop. The Sendforsign tools appear under the tools menu of the chat box.
-
-    
-      **claude.ai custom connectors** (Settings → Connectors → Add custom connector) authenticate with OAuth and do
-      not accept static API-key headers. OAuth sign-in for the Sendforsign connector is planned; until then use
-      Claude Desktop with the config above, or Claude Code.
-    
-  
-  **Cursor**
-    Add to `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project):
-
-    ```json mcp.json
-    {
-      "mcpServers": {
-        "sendforsign": {
-          "url": "https://api.sendforsign.com/mcp",
-          "headers": {
-            "X-Sendforsign-Key": "${env:SENDFORSIGN_API_KEY}",
-            "X-Sendforsign-Client-Key": "${env:SENDFORSIGN_CLIENT_KEY}",
-            "X-Sendforsign-Agent": "cursor",
-            "X-Sendforsign-Agent-Mode": "draft"
-          }
-        }
-      }
-    }
-    ```
-
-    Then enable the server in **Cursor Settings → MCP**.
-  
   **OpenAI Agents SDK**
     ```python agent.py
     import asyncio, os
@@ -239,16 +298,12 @@ testing) and `X-Sendforsign-Allowed-Domains`. See the [headers reference](https:
       "server_url": "https://api.sendforsign.com/mcp",
       "headers": {
         "X-Sendforsign-Key": "YOUR_API_KEY",
-        "X-Sendforsign-Client-Key": "YOUR_CLIENT_KEY"
+        "X-Sendforsign-Client-Key": "YOUR_CLIENT_KEY",
+        "X-Sendforsign-Agent-Mode": "draft"
       },
       "require_approval": "always"
     }
     ```
-
-    
-      ChatGPT apps and connectors in the ChatGPT UI need OAuth, which is planned. Use the API or the Agents SDK
-      for now.
-    
   
   **Claude API**
     The Messages API MCP connector sends a single bearer token, so authenticate with a
@@ -276,13 +331,39 @@ testing) and `X-Sendforsign-Allowed-Domains`. See the [headers reference](https:
       }'
     ```
 
-    Agent mode and the other guardrail headers cannot be set through this connector, so the server runs in the
-    default `send` mode; tools that email people still require `confirm: true`. Prefer a connection with headers
-    when the agent acts without a human in the loop.
+    Guardrail headers cannot be set through this connector, so the server runs in the default `send` mode; tools that
+    email people still require `confirm: true`. Prefer a connection with headers when the agent acts without a human
+    in the loop.
   
-  **Any MCP client**
-    Any client that supports Streamable HTTP with custom headers works. The generic shape:
+  **Claude Code / Cursor with a key**
+    For a shared service account or CI, where nobody signs in:
 
+    ```bash
+    claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp \
+      --header "X-Sendforsign-Key: $SENDFORSIGN_API_KEY" \
+      --header "X-Sendforsign-Client-Key: $SENDFORSIGN_CLIENT_KEY" \
+      --header "X-Sendforsign-Agent: claude-code" \
+      --header "X-Sendforsign-Agent-Mode: draft"
+    ```
+
+    In Cursor's `mcp.json`, add a `headers` object next to `url`, reading secrets from the environment:
+
+    ```json mcp.json
+    {
+      "mcpServers": {
+        "sendforsign": {
+          "url": "https://api.sendforsign.com/mcp",
+          "headers": {
+            "X-Sendforsign-Key": "${env:SENDFORSIGN_API_KEY}",
+            "X-Sendforsign-Client-Key": "${env:SENDFORSIGN_CLIENT_KEY}",
+            "X-Sendforsign-Agent-Mode": "draft"
+          }
+        }
+      }
+    }
+    ```
+  
+  **Generic JSON and cURL**
     ```json
     {
       "mcpServers": {
@@ -317,44 +398,37 @@ testing) and `X-Sendforsign-Allowed-Domains`. See the [headers reference](https:
     The server is stateless: only `POST` is supported (`GET` and `DELETE` return `405`).
   
 
-### 3. Try it
-
-Ask your agent:
-
-> What can you do with Sendforsign on this connection?
-
-It calls [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) and tells you its mode, tenant and
-allowed domains. Then:
-
-> List my templates. Draft an NDA from the NDA template for Acme Ltd, signer Anna Smith, anna@example.com.
-> Show me what you filled in and the signing link. Don't send it yet.
-
-The agent uses `list_templates` → `get_template` → `create_contract`, returns a draft with a `signingUrl` and lists
-the fields left for the counterparty. Nobody is emailed until you approve and the agent calls
-`send_for_signature` with `confirm: true` on a connection in `send` mode.
-
 ### Troubleshooting
 
 | Error | Cause |
 |---|---|
-| `401 Missing credentials` | Neither `X-Sendforsign-Key` nor `Authorization: Bearer` was sent. Check that your client passes headers to remote servers. |
+| `401` and the app asks you to sign in again | The connection was disconnected or its refresh token expired or was reused. Connect again. |
+| `401 Missing credentials` | Header connection without `X-Sendforsign-Key` or `Authorization: Bearer`. Check that your client passes headers to remote servers. |
 | `400 Missing X-Sendforsign-Client-Key` | API-key auth also needs the client key header. |
-| `Blocked by policy: this connection is read_only / in draft mode` | The tool needs a higher [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes). |
+| `Blocked by policy: this connection is read_only / in draft mode` | The tool needs a higher [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes). For OAuth, reconnect and choose a different mode on the consent screen. |
 | `Not executed: ... needs confirm: true` | Expected: the agent must ask the human, then call again with `confirm: true`. |
-| `Blocked by policy: recipients outside the allowed domains` | A recipient's email is not in `X-Sendforsign-Allowed-Domains`. |
+| `Blocked by policy: recipients outside the allowed domains` | A recipient's email is outside the allowed domains of this connection. |
 | `405 Method not allowed` | The client tried SSE (`GET`). Use the Streamable HTTP transport. |
 
 ## MCP headers reference
 Source: https://about.sendforsign.com/ai-agents/headers
 
-The MCP server is configured per connection with HTTP headers. Every MCP request carries them, and the server
-enforces them on every tool call. They are set by whoever configures the connection (you, your backend, the user
-installing the connector) and **cannot be changed by the agent** through tool arguments.
+Connections authenticated with an **API key** (or a client token) are configured with HTTP headers. Every MCP
+request carries them, and the server enforces them on every tool call. They are set by whoever configures the
+connection (you, your backend) and **cannot be changed by the agent** through tool arguments.
+
+  **OAuth connections ignore these headers.** When an AI app connects by
+  [signing in with Sendforsign](https://about.sendforsign.com/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
+  consent screen is the source of truth: account, default tenant, mode (drafts only by default) and allowed domains.
+  Headers such as `X-Sendforsign-Client-Key`, `X-Sendforsign-User-Key`, `X-Sendforsign-Agent-Mode`,
+  `X-Sendforsign-Allowed-Domains` and `X-Sendforsign-On-Behalf-Of` have no effect there, so an app cannot change the
+  approved account, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
+  [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Header authentication works as described below.
 
 | Header | Required | Meaning |
 |---|---|---|
 | `X-Sendforsign-Key` | one of the two | Your API key, as in the [REST API](https://about.sendforsign.com/api-reference/introapi). |
-| `Authorization: Bearer <client token>` | one of the two | A [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. |
+| `Authorization: Bearer <client token>` | one of the two | A [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. (OAuth access tokens also travel in this header; then the grant applies, not the headers below.) |
 | `X-Sendforsign-Client-Key` | with the API key | The `clientKey` every tool works in. Required with `X-Sendforsign-Key`. |
 | `X-Sendforsign-User-Key` | no | Default `userKey`: the tenant or end user whose templates and contracts the agent sees. Tools also accept a `userKey` argument that overrides it per call. |
 | `X-Sendforsign-Agent` | no | A name or ID for this agent, written to the [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Defaults to the client's `User-Agent`. |
@@ -429,8 +503,9 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
 
-Most tools accept an optional `userKey` argument. It overrides the `X-Sendforsign-User-Key` header for that call;
-without both, the account's default user is used.
+Most tools accept an optional `userKey` argument. It overrides the default tenant (the `X-Sendforsign-User-Key`
+header, or the user chosen on the OAuth consent screen) for that call; without either, the account's default user is
+used.
 
 ### Field roles (`filledBy`)
 
@@ -455,7 +530,7 @@ Shows how this connection is configured. Call it first if unsure what you are al
 **Arguments:** none.
 
 **Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
-`auditLog` (`"on"`/`"off"`), `sendingRequiresConfirm: true`.
+`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `sendingRequiresConfirm: true`.
 
 #### list_templates
 
@@ -618,12 +693,18 @@ When an agent prepares and sends contracts, two questions matter later: **was it
 by what it did**. The MCP server answers both with guardrails that the integrator sets and the agent cannot change,
 and with a log of every action.
 
-All guardrails are enforced on the server for every tool call. They are configured with
-[headers](https://about.sendforsign.com/ai-agents/headers), not with prompts, so a confused or manipulated agent cannot talk its way past them.
+All guardrails are enforced on the server for every tool call, and they are never set by prompts, so a confused or
+manipulated agent cannot talk its way past them. Where they come from depends on how the app connected:
+
+| Connection | Who sets account, tenant, mode, allowed domains | Default mode |
+|---|---|---|
+| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. | `draft` |
+| **API key or client token** (server-side agents) | Your code, with [headers](https://about.sendforsign.com/ai-agents/headers) on each connection | `send` |
 
 ### Agent modes
 
-Set with `X-Sendforsign-Agent-Mode`.
+Chosen on the consent screen for OAuth connections ("read only", "create drafts", "send for signature"), or set
+with `X-Sendforsign-Agent-Mode` for header connections.
 
 | Mode | Read tools | Create and edit drafts, fill fields, add recipients, create tenants | Email recipients (`send_for_signature`), archive |
 |---|---|---|---|
@@ -653,7 +734,8 @@ decide when to call `send_for_signature`. MCP clients that ask the user before t
 
 ### Recipient domain allowlist
 
-`X-Sendforsign-Allowed-Domains: customer.com,partner.org` makes `create_contract`, `add_recipients` and
+Allowed domains entered on the consent screen, or `X-Sendforsign-Allowed-Domains: customer.com,partner.org` on a
+header connection, make `create_contract`, `add_recipients` and
 `send_for_signature` reject any recipient whose email is outside those domains:
 
 > Blocked by policy: recipients outside the allowed domains (customer.com, partner.org): someone@gmail.com
@@ -663,12 +745,16 @@ existing clients.
 
 ### Identity: agent and principal
 
+For **OAuth** connections both come from the grant: the agent is the AI app's registered name (for example
+"Claude"), and the principal is the email of the Sendforsign user who approved the connection.
+
+For **header** connections:
+
 - `X-Sendforsign-Agent` names the agent (product, version, deployment).
 - `X-Sendforsign-On-Behalf-Of` names the person or company the agent acts for: the user who asked, or the customer
-  account.
+  account. Set it from your own authenticated session, not from anything the model says.
 
-Both are written to the audit log with every action. Set `On-Behalf-Of` from your own authenticated session, not from
-anything the model says.
+Both are written to the audit log with every action.
 
 ### Audit log
 
@@ -690,6 +776,24 @@ Read calls that succeed are not logged. The agent's actions for a contract are r
 
   The audit log is being rolled out. `get_connection_info` returns `auditLog: "on"` when it is active for your
   connection. Contact us to enable it or to export the log.
+
+### Disconnecting an AI app
+
+**OAuth connections.** Removing the Sendforsign connector in the AI app (for example **Settings → Connectors** in
+Claude) stops that app from using it. The server side of a connection ends when:
+
+- the app revokes its tokens (the server supports OAuth token revocation, RFC 7009; many apps call it when you
+  disconnect),
+- the access token expires (after 1 hour) and the refresh token is not used for 90 days, or
+- a used refresh token or authorization code is presented again, which revokes the whole connection as a safety
+  measure.
+
+A list of connected AI apps with a **Disconnect** button in the Sendforsign app settings is planned. Until then, if you
+need a connection cut off on the server immediately (for example a lost laptop), contact Sendforsign support and we
+will revoke it.
+
+**API-key connections.** Rotate or delete the API key in the dashboard, or stop sending it. Client tokens can be
+[revoked](https://about.sendforsign.com/api-reference/authentication) through the API.
 
 ### Legal context
 

@@ -18,9 +18,11 @@ https://about.sendforsign.com/llms-full.txt).
 - **Writing code** for an integration: use the REST API, `POST https://api.sendforsign.com/api/<resource>` with body
   `{"data": {"action": "...", "clientKey": "...", ...}}` and header `X-Sendforsign-Key`. Never hardcode the key; read
   it from the environment.
-- **Neither configured**: tell the user how to connect the MCP server
-  (`claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp --header "X-Sendforsign-Key: ..." --header "X-Sendforsign-Client-Key: ..."`)
-  instead of guessing credentials.
+- **Neither configured**: tell the user how to connect the MCP server instead of guessing credentials. In AI apps it is
+  sign-in, no key: Claude → Settings → Connectors → Add custom connector → `https://api.sendforsign.com/mcp`; Claude Code
+  → `claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp`, then `/mcp` → Authenticate. The user
+  picks account, tenant and mode (drafts only by default) on the Sendforsign consent screen. Server-side agents use
+  `X-Sendforsign-Key` + `X-Sendforsign-Client-Key` headers instead. Docs: https://about.sendforsign.com/ai-agents/mcp-quickstart
 
 ## Rules
 
@@ -34,7 +36,9 @@ https://about.sendforsign.com/llms-full.txt).
    (the signer fills, leave empty), `none` (fixed). Ask the user for owner values you don't know; don't make them up.
 4. **Archive only on request**, with `confirm: true` after approval.
 5. If a tool returns `Blocked by policy`, do not retry or work around it. Explain the limit (mode, allowed domains) and
-   offer the next step: share the signing links, or ask the account owner.
+   offer the next step: share the signing links, or ask the account owner. On a sign-in (OAuth) connection the user
+   changes the mode by disconnecting and reconnecting with a different choice on the consent screen; headers cannot
+   change it.
 6. Signing links identify a recipient. Give each link only to that recipient.
 
 ## Example user requests

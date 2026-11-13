@@ -33,8 +33,9 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
 
-Most tools accept an optional `userKey` argument. It overrides the `X-Sendforsign-User-Key` header for that call;
-without both, the account's default user is used.
+Most tools accept an optional `userKey` argument. It overrides the default tenant (the `X-Sendforsign-User-Key`
+header, or the user chosen on the OAuth consent screen) for that call; without either, the account's default user is
+used.
 
 ## Field roles (`filledBy`)
 
@@ -59,7 +60,7 @@ Shows how this connection is configured. Call it first if unsure what you are al
 **Arguments:** none.
 
 **Returns:** `mode`, `clientKey`, `userKey`, `agent`, `onBehalfOf`, `allowedRecipientDomains` (`"any"` or a list),
-`auditLog` (`"on"`/`"off"`), `sendingRequiresConfirm: true`.
+`auditLog` (`"on"`/`"off"`), `auth` (`"oauth"` or `"header"`), `sendingRequiresConfirm: true`.
 
 ### list_templates
 

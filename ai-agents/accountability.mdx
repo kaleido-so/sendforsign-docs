@@ -8,12 +8,18 @@ When an agent prepares and sends contracts, two questions matter later: **was it
 by what it did**. The MCP server answers both with guardrails that the integrator sets and the agent cannot change,
 and with a log of every action.
 
-All guardrails are enforced on the server for every tool call. They are configured with
-[headers](/ai-agents/headers), not with prompts, so a confused or manipulated agent cannot talk its way past them.
+All guardrails are enforced on the server for every tool call, and they are never set by prompts, so a confused or
+manipulated agent cannot talk its way past them. Where they come from depends on how the app connected:
+
+| Connection | Who sets account, tenant, mode, allowed domains | Default mode |
+|---|---|---|
+| **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. | `draft` |
+| **API key or client token** (server-side agents) | Your code, with [headers](/ai-agents/headers) on each connection | `send` |
 
 ## Agent modes
 
-Set with `X-Sendforsign-Agent-Mode`.
+Chosen on the consent screen for OAuth connections ("read only", "create drafts", "send for signature"), or set
+with `X-Sendforsign-Agent-Mode` for header connections.
 
 | Mode | Read tools | Create and edit drafts, fill fields, add recipients, create tenants | Email recipients (`send_for_signature`), archive |
 |---|---|---|---|
@@ -43,7 +49,8 @@ decide when to call `send_for_signature`. MCP clients that ask the user before t
 
 ## Recipient domain allowlist
 
-`X-Sendforsign-Allowed-Domains: customer.com,partner.org` makes `create_contract`, `add_recipients` and
+Allowed domains entered on the consent screen, or `X-Sendforsign-Allowed-Domains: customer.com,partner.org` on a
+header connection, make `create_contract`, `add_recipients` and
 `send_for_signature` reject any recipient whose email is outside those domains:
 
 > Blocked by policy: recipients outside the allowed domains (customer.com, partner.org): someone@gmail.com
@@ -53,12 +60,16 @@ existing clients.
 
 ## Identity: agent and principal
 
+For **OAuth** connections both come from the grant: the agent is the AI app's registered name (for example
+"Claude"), and the principal is the email of the Sendforsign user who approved the connection.
+
+For **header** connections:
+
 - `X-Sendforsign-Agent` names the agent (product, version, deployment).
 - `X-Sendforsign-On-Behalf-Of` names the person or company the agent acts for: the user who asked, or the customer
-  account.
+  account. Set it from your own authenticated session, not from anything the model says.
 
-Both are written to the audit log with every action. Set `On-Behalf-Of` from your own authenticated session, not from
-anything the model says.
+Both are written to the audit log with every action.
 
 ## Audit log
 
@@ -82,6 +93,24 @@ Read calls that succeed are not logged. The agent's actions for a contract are r
   The audit log is being rolled out. `get_connection_info` returns `auditLog: "on"` when it is active for your
   connection. Contact us to enable it or to export the log.
 </Note>
+
+## Disconnecting an AI app
+
+**OAuth connections.** Removing the Sendforsign connector in the AI app (for example **Settings → Connectors** in
+Claude) stops that app from using it. The server side of a connection ends when:
+
+- the app revokes its tokens (the server supports OAuth token revocation, RFC 7009; many apps call it when you
+  disconnect),
+- the access token expires (after 1 hour) and the refresh token is not used for 90 days, or
+- a used refresh token or authorization code is presented again, which revokes the whole connection as a safety
+  measure.
+
+A list of connected AI apps with a **Disconnect** button in the Sendforsign app settings is planned. Until then, if you
+need a connection cut off on the server immediately (for example a lost laptop), contact Sendforsign support and we
+will revoke it.
+
+**API-key connections.** Rotate or delete the API key in the dashboard, or stop sending it. Client tokens can be
+[revoked](/api-reference/authentication) through the API.
 
 ## Legal context
 

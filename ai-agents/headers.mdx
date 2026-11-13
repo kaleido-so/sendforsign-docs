@@ -4,14 +4,24 @@ sidebarTitle: "Headers"
 description: "Request headers of the Sendforsign MCP server: authentication, default client and tenant, agent identity, on-behalf-of principal, agent mode and recipient domain allowlist."
 ---
 
-The MCP server is configured per connection with HTTP headers. Every MCP request carries them, and the server
-enforces them on every tool call. They are set by whoever configures the connection (you, your backend, the user
-installing the connector) and **cannot be changed by the agent** through tool arguments.
+Connections authenticated with an **API key** (or a client token) are configured with HTTP headers. Every MCP
+request carries them, and the server enforces them on every tool call. They are set by whoever configures the
+connection (you, your backend) and **cannot be changed by the agent** through tool arguments.
+
+<Note>
+  **OAuth connections ignore these headers.** When an AI app connects by
+  [signing in with Sendforsign](/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
+  consent screen is the source of truth: account, default tenant, mode (drafts only by default) and allowed domains.
+  Headers such as `X-Sendforsign-Client-Key`, `X-Sendforsign-User-Key`, `X-Sendforsign-Agent-Mode`,
+  `X-Sendforsign-Allowed-Domains` and `X-Sendforsign-On-Behalf-Of` have no effect there, so an app cannot change the
+  approved account, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
+  [audit log](/ai-agents/accountability#audit-log). Header authentication works as described below.
+</Note>
 
 | Header | Required | Meaning |
 |---|---|---|
 | `X-Sendforsign-Key` | one of the two | Your API key, as in the [REST API](/api-reference/introapi). |
-| `Authorization: Bearer <client token>` | one of the two | A [client token](/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. |
+| `Authorization: Bearer <client token>` | one of the two | A [client token](/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. (OAuth access tokens also travel in this header; then the grant applies, not the headers below.) |
 | `X-Sendforsign-Client-Key` | with the API key | The `clientKey` every tool works in. Required with `X-Sendforsign-Key`. |
 | `X-Sendforsign-User-Key` | no | Default `userKey`: the tenant or end user whose templates and contracts the agent sees. Tools also accept a `userKey` argument that overrides it per call. |
 | `X-Sendforsign-Agent` | no | A name or ID for this agent, written to the [audit log](/ai-agents/accountability#audit-log). Defaults to the client's `User-Agent`. |
