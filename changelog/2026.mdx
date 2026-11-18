@@ -7,6 +7,13 @@ description: "What's new in Sendforsign in 2026: the remote MCP server for AI ag
 
 ## 18 November (later)
 
+### MCP server: 33 tools
+- Templates: `create_template`, `update_template` (with `{{field}}` markers), `create_pdf_template`,
+  `create_template_from_contract`, `duplicate_template`, `delete_template`. `place_pdf_fields` and `fill_placeholders`
+  work on templates too.
+- Also new: `duplicate_contract`, `remove_field`, `update_recipient`, `remove_recipient`, `get_usage`, and
+  `list_webhooks` / `create_webhook` / `delete_webhook` (creating and deleting need `confirm: true`). See [MCP tools](/ai-agents/tools).
+
 ### For people who connect AI apps
 - **Settings → Connected AI apps** lists every app you connected over OAuth, its account, mode and last use, with Disconnect.
 - **Agent actions in the contract timeline** (`sendforsign` components 2.3.5): which agent did what, for whom, and whether it was allowed or blocked.
