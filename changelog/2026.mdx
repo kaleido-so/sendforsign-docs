@@ -5,6 +5,22 @@ sidebarTitle: "2026"
 description: "What's new in Sendforsign in 2026: the remote MCP server for AI agents, the agent skill, the AI agents docs section and the deprecation of AI+API."
 ---
 
+## 18 November
+
+### Fields in the agent's text and PDF contracts over MCP
+
+- `create_contract` and `update_contract` turn `{{Name}}`, `{{Name=Value}}`, `{{Name@any}}` and `{{Name@email}}`
+  markers into fields with the right owner. See [MCP tools](/ai-agents/tools#create_contract).
+- New tools `create_pdf_contract` (a PDF by https URL or base64) and `place_pdf_fields` (signature, date signed,
+  full name, email and text fields, placed in percent of the page). The server now has 19 tools.
+- The MCP server is listed in the official MCP registry as `com.sendforsign/mcp`.
+
+### Field values are inserted as text
+
+Field values written into a contract body (placeholder `update`, contract `create`/`update` with placeholders) are
+now HTML-escaped, so a value can no longer add markup to the document. A value such as `Smith & Co` looks the same as
+before. A field whose value is cleared now shows its `{{{name}}}` token instead of nothing, as in the editor.
+
 ## 12 November
 
 ### Sendforsign MCP server for AI agents

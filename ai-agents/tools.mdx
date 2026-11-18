@@ -17,6 +17,8 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 | [`get_contract`](#get_contract) | A contract: status, template, recipients, fields, optional body | no | no | any |
 | [`create_contract`](#create_contract) | Draft from a template or from Markdown/HTML, fill fields, attach recipients | yes | **no** | `draft` |
 | [`update_contract`](#update_contract) | Rename a draft or replace its body | yes | no | `draft` |
+| [`create_pdf_contract`](#create_pdf_contract) | Draft from a PDF (https URL or base64), return page sizes | yes | **no** | `draft` |
+| [`place_pdf_fields`](#place_pdf_fields) | Put signature, date, name, email and text fields on PDF pages | yes | no | `draft` |
 | [`list_placeholders`](#list_placeholders) | Fields of a contract or template | no | no | any |
 | [`fill_placeholders`](#fill_placeholders) | Set field values; change who fills a field | yes | no | `draft` |
 | [`add_recipients`](#add_recipients) | Add signers/approvers/viewers, return signing links | yes | **no** | `draft` |
@@ -116,8 +118,26 @@ Creates a **draft** contract. It never emails anyone, even when you pass recipie
 
 Pass `templateKey` or `content`.
 
+**Fields in your own text.** In `content`, mark fields with double braces and they become real fields:
+
+| Marker | Field |
+|---|---|
+| `{{Name}}` | Your side fills it later (`fill_placeholders`) |
+| `{{Name=Value}}` | Your side, filled now |
+| `{{Name@any}}` | Any recipient fills it |
+| `{{Name@jane@acme.com}}` | That recipient fills it; pass them in `recipients` |
+
+The same name used twice is one field (its value appears in both places). Values are inserted as text, never as
+HTML. Triple braces (`{{{Name}}}`) are left alone. Example:
+
+```markdown
+Fee: {{Fee=2 400 EUR}}, payable by {{Client company@any}}.
+Signed for the client by {{Signer title@jane@acme.com}}.
+```
+
 **Returns:** `contractKey`, `status: "draft"`, `recipients[]` with `signingUrl`, `filled[]` (per field: `field`,
-`ok`, `error?`) when `fields` were given, `unfilledFields[]` (owner and fixed fields still empty),
+`ok`, `error?`) when `fields` were given, `fieldsFromText[]` (name, `placeholderKey`, `filledBy`, recipient, value)
+when `content` had markers, `unfilledFields[]` (owner and fixed fields still empty),
 `fieldsForRecipients[]`, and `next` — a hint for the next step.
 
 ### update_contract
@@ -126,7 +146,57 @@ Renames a draft and/or replaces its body. Only for contracts that have not been 
 
 **Arguments:** `contractKey`, `name?`, `content?`, `contentFormat?` (default `markdown`), `userKey?`
 
-**Returns:** `contractKey`, `updated[]` (the fields changed).
+`content` may contain the same field markers as `create_contract`. A marker with the name of an existing field reuses
+that field (same `placeholderKey`, so values and roles carry over); new names create new fields.
+
+**Returns:** `contractKey`, `updated[]` (the fields changed), `fieldsFromText[]` when `content` had markers.
+
+### create_pdf_contract
+
+Creates a **draft** contract from a PDF. It never emails anyone.
+
+**Arguments:**
+
+| Name | Type | Notes |
+|---|---|---|
+| `name` | string | Contract title. Required. |
+| `pdfUrl` | string | Public `https://` URL of the PDF. Private and internal addresses are refused. |
+| `pdfBase64` | string | The PDF as base64 (a `data:application/pdf;base64,` prefix is fine). |
+| `recipients` | array of recipients | As in `create_contract`. Needed before placing their fields. |
+| `userKey` | string | Tenant. |
+
+Pass exactly one of `pdfUrl` or `pdfBase64`. Up to 20 MB.
+
+**Returns:** `contractKey`, `status: "draft"`, `pages[]` (`page`, `widthPt`, `heightPt`), `recipients[]` with
+`signingUrl`, and `next`.
+
+### place_pdf_fields
+
+Puts fields on the pages of a draft PDF contract. Calling it again adds fields; it does not remove earlier ones.
+
+**Arguments:** `contractKey`, `fields[]`, `userKey?`. Each field:
+
+| Name | Type | Notes |
+|---|---|---|
+| `kind` | `signature` \| `date_signed` \| `full_name` \| `email` \| `text` | The first four are filled from the recipient when they sign. |
+| `page` | number \| `"last"` | 1-based page. |
+| `x`, `y` | number | Top-left corner of the box, in percent of the page width and height. |
+| `width`, `height` | number | Size of the box, in percent of the page width and height. |
+| `recipient` | email | Required for `signature`, `date_signed`, `full_name`, `email`; for `text`, the recipient who fills it. |
+| `name` | string | `text` fields: the field name. The same name on several boxes is one field. |
+| `value` | string | `text` fields your side fills now. |
+| `filledBy` | `owner` \| `any_recipient` \| `specific_recipient` | `text` fields. Default `owner`, or `specific_recipient` when `recipient` is given. |
+
+Example: a signature and the signing date at the bottom right of the last page.
+
+```json
+{ "contractKey": "…", "fields": [
+  { "kind": "signature",   "page": "last", "x": 60, "y": 80, "width": 30, "height": 8, "recipient": "jane@acme.com" },
+  { "kind": "date_signed", "page": "last", "x": 60, "y": 89, "width": 30, "height": 3, "recipient": "jane@acme.com" }
+] }
+```
+
+**Returns:** `contractKey`, `placed[]` (kind, page, recipient or field name), `pages`, `next`.
 
 ### list_placeholders
 
