@@ -54,6 +54,9 @@ Typical requests and the tools they map to (more in the prompt library: https://
 - "What's waiting for signature? Who hasn't signed?" → `list_contracts`, `get_contract`, `get_contract_timeline`.
 - "Download the signed PDF" → `download_contract_pdf` (only once `Fully signed`).
 - "Create a tenant for our new customer" → `create_user`; "their contracts" → `list_contracts` with `userKey`.
+- "Make a template from this NDA / this PDF" → `create_template` (markers, `{{Name@any}}` for the other side) or
+  `create_pdf_template` + `place_pdf_fields {templateKey}` (text fields only; signatures go on each contract).
+- "Save this contract as a template" → `create_template_from_contract`. "How many contracts are left?" → `get_usage`.
 
 ## Recipe: template → fill → send (MCP)
 
