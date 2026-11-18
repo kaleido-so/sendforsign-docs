@@ -1,8 +1,8 @@
 # Sendforsign — full reference for language models
 
-> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://about.sendforsign.com.
+> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://sendforsign.com/docs.
 
-This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://about.sendforsign.com/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
+This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://sendforsign.com/docs/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
 
 ## Key facts
 
@@ -22,7 +22,7 @@ This file is generated from the documentation by `scripts/build-llms-full.py`. A
 # Part 1. AI agents and the MCP server
 
 ## Sendforsign for AI agents
-Source: https://about.sendforsign.com/ai-agents/overview
+Source: https://sendforsign.com/docs/ai-agents/overview
 
 Your agent can already write a contract. What it cannot do on its own is turn that text into a signed,
 legally attributable agreement inside **your** product: the right template for **your customer**, the fields
@@ -36,10 +36,10 @@ Sendforsign is that layer. It exposes the same API two ways:
 - the **REST API** at `https://api.sendforsign.com/api` that the MCP server itself calls, for when you want
   deterministic code around the agent.
 
-  - [MCP quickstart](https://about.sendforsign.com/ai-agents/mcp-quickstart): Connect Claude Code, Claude Desktop, Cursor or an OpenAI agent in two minutes.
-  - [Tools reference](https://about.sendforsign.com/ai-agents/tools): Every MCP tool, what it writes, and which one emails people.
-  - [Agent modes and accountability](https://about.sendforsign.com/ai-agents/accountability): Read-only, draft and send modes, confirmations, domain allowlists and the audit log.
-  - [Recipes](https://about.sendforsign.com/ai-agents/recipes): Template → fill → send, embedded signing without email, multi-tenant, webhooks.
+  - [MCP quickstart](https://sendforsign.com/docs/ai-agents/mcp-quickstart): Connect Claude Code, Claude Desktop, Cursor or an OpenAI agent in two minutes.
+  - [Tools reference](https://sendforsign.com/docs/ai-agents/tools): Every MCP tool, what it writes, and which one emails people.
+  - [Agent modes and accountability](https://sendforsign.com/docs/ai-agents/accountability): Read-only, draft and send modes, confirmations, domain allowlists and the audit log.
+  - [Recipes](https://sendforsign.com/docs/ai-agents/recipes): Template → fill → send, embedded signing without email, multi-tenant, webhooks.
 
 ### Why Sendforsign, if other e-signature tools also ship MCP
 
@@ -51,7 +51,7 @@ what happens around the signature:
 Each field (placeholder) in a template has a **filled by** role: the owner (your agent), any recipient, or one
 specific recipient. The agent reads the template, fills only its own fields and leaves the counterparty's fields to
 the counterparty. It does not have to guess, and it cannot overwrite what a signer is supposed to enter.
-See [placeholder `fillingType`](https://about.sendforsign.com/usecase/placeholder-filler).
+See [placeholder `fillingType`](https://sendforsign.com/docs/usecase/placeholder-filler).
 
 #### 2. Embedded, white-label, multi-tenant
 
@@ -59,9 +59,9 @@ See [placeholder `fillingType`](https://about.sendforsign.com/usecase/placeholde
   templates and contracts. The agent works in the right tenant because **you** set it in a header, not the model.
 - Recipients get a signing link (`https://app.sendforsign.com/sharing/{recipientKey}`) that you can show in your
   own UI, chat or app, with no Sendforsign email at all.
-- Emails, when you do send them, carry your [branding](https://about.sendforsign.com/api-reference/settings/branding), and
-  [webhooks](https://about.sendforsign.com/api-reference/webhook/concept) tell your backend when a contract is fully signed.
-- The [React components](https://about.sendforsign.com/sdk/introsdk) let a human review and edit what the agent drafted, inside your product.
+- Emails, when you do send them, carry your [branding](https://sendforsign.com/docs/api-reference/settings/branding), and
+  [webhooks](https://sendforsign.com/docs/api-reference/webhook/concept) tell your backend when a contract is fully signed.
+- The [React components](https://sendforsign.com/docs/sdk/introsdk) let a human review and edit what the agent drafted, inside your product.
 
 #### 3. Agent accountability
 
@@ -74,7 +74,7 @@ The integrator, not the agent, decides what an agent may do:
 - **Audit log**: every write by an agent is recorded with the agent's name, the person or company it acted for, the
   mode, the arguments and the outcome, in a hash-chained log.
 
-[Read how this maps to attribution rules for electronic signatures.](https://about.sendforsign.com/ai-agents/accountability#legal-context)
+[Read how this maps to attribution rules for electronic signatures.](https://sendforsign.com/docs/ai-agents/accountability#legal-context)
 
 ### Who this is for
 
@@ -87,14 +87,14 @@ The integrator, not the agent, decides what an agent may do:
 
 ### For LLMs and coding agents
 
-- [`/llms.txt`](https://about.sendforsign.com/llms.txt) — an index of these docs for language models.
-- [`/llms-full.txt`](https://about.sendforsign.com/llms-full.txt) — the API and MCP reference in one file.
+- [`/llms.txt`](https://sendforsign.com/docs/llms.txt) — an index of these docs for language models.
+- [`/llms-full.txt`](https://sendforsign.com/docs/llms-full.txt) — the API and MCP reference in one file.
 - Every page is also available as Markdown: add `.md` to its URL.
-- [Agent skill](https://about.sendforsign.com/ai-agents/skills) — a `SKILL.md` that teaches Claude Code, Codex and other agents the recipes and
+- [Agent skill](https://sendforsign.com/docs/ai-agents/skills) — a `SKILL.md` that teaches Claude Code, Codex and other agents the recipes and
   the pitfalls.
 
 ## MCP quickstart
-Source: https://about.sendforsign.com/ai-agents/mcp-quickstart
+Source: https://sendforsign.com/docs/ai-agents/mcp-quickstart
 
 The Sendforsign MCP server is a remote server over **Streamable HTTP**:
 
@@ -125,7 +125,7 @@ Every client below follows the same three steps:
    - **Allowed recipient domains** (optional) — the app cannot send contracts to anyone outside them.
 
 You can change these later only by disconnecting and connecting again. See
-[modes and accountability](https://about.sendforsign.com/ai-agents/accountability) for what each choice means.
+[modes and accountability](https://sendforsign.com/docs/ai-agents/accountability) for what each choice means.
 
   **Claude**
     In Claude on the web or desktop:
@@ -146,7 +146,7 @@ You can change these later only by disconnecting and connecting again. See
     Sendforsign sign-in and consent screen.
 
     Add `--scope project` to share the server with your team through `.mcp.json`; each person signs in with their
-    own account. Install the [Sendforsign skill](https://about.sendforsign.com/ai-agents/skills) too, so Claude knows the recipes and pitfalls.
+    own account. Install the [Sendforsign skill](https://sendforsign.com/docs/ai-agents/skills) too, so Claude knows the recipes and pitfalls.
   
   **Cursor**
     [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=sendforsign&config=eyJ1cmwiOiJodHRwczovL2FwaS5zZW5kZm9yc2lnbi5jb20vbWNwIn0%3D)
@@ -223,7 +223,7 @@ Ask the agent:
 
 > What can you do with Sendforsign on this connection?
 
-It calls [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) and tells you its mode, account and allowed
+It calls [`get_connection_info`](https://sendforsign.com/docs/ai-agents/tools#get_connection_info) and tells you its mode, account and allowed
 domains. Then:
 
 > List my templates. Draft an NDA from the NDA template for Acme Ltd, signer Anna Smith, anna@example.com.
@@ -231,12 +231,12 @@ domains. Then:
 
 The agent uses `list_templates` → `get_template` → `create_contract`, returns a draft with a `signingUrl` and lists
 the fields left for the counterparty. Nobody is emailed until you approve and the agent calls `send_for_signature`
-with `confirm: true` on a connection allowed to send. More in the [prompt library](https://about.sendforsign.com/ai-agents/prompts).
+with `confirm: true` on a connection allowed to send. More in the [prompt library](https://sendforsign.com/docs/ai-agents/prompts).
 
 ### Server-side agents (API key)
 
 For agents that run in your backend (your own product's assistant, a workflow, a scheduled job), authenticate with
-your API key and configure each connection with [headers](https://about.sendforsign.com/ai-agents/headers). Your code, not a consent screen,
+your API key and configure each connection with [headers](https://sendforsign.com/docs/ai-agents/headers). Your code, not a consent screen,
 decides the account, tenant, mode and allowed domains, so you can open one connection per customer of your product.
 
 #### Get your keys
@@ -244,7 +244,7 @@ decides the account, tenant, mode and allowed domains, so you can open one conne
 1. Sign up at [app.sendforsign.com](https://app.sendforsign.com) and open the **API Keys** tab of the dashboard.
 2. Copy your **API key** (`X-Sendforsign-Key`).
 3. Copy a **client key** (`clientKey`) — the account space the agent works in. If you embed Sendforsign for several
-   customers, [create a client](https://about.sendforsign.com/api-reference/client/create) per customer and use its key.
+   customers, [create a client](https://sendforsign.com/docs/api-reference/client/create) per customer and use its key.
 
   An API key gives full access to your account. Keep it out of prompts, repositories and chat transcripts; put it in
   environment variables or a secret store. Start new integrations with `X-Sendforsign-Agent-Mode: draft` so the agent
@@ -257,7 +257,7 @@ decides the account, tenant, mode and allowed domains, so you can open one conne
 
 Recommended on top: `X-Sendforsign-Agent` (a name for this agent), `X-Sendforsign-On-Behalf-Of` (the person or
 company it acts for), `X-Sendforsign-Agent-Mode` and `X-Sendforsign-Allowed-Domains`. Note that the header default
-mode is `send`, unlike the consent screen. See the [headers reference](https://about.sendforsign.com/ai-agents/headers).
+mode is `send`, unlike the consent screen. See the [headers reference](https://sendforsign.com/docs/ai-agents/headers).
 
   **OpenAI Agents SDK**
     ```python agent.py
@@ -309,7 +309,7 @@ mode is `send`, unlike the consent screen. See the [headers reference](https://a
   
   **Claude API**
     The Messages API MCP connector sends a single bearer token, so authenticate with a
-    [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client
+    [client token](https://sendforsign.com/docs/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client
     is taken from the token, so no client key header is needed. Client tokens expire (see `expires_in`); mint a new
     one per conversation from your backend.
 
@@ -407,36 +407,36 @@ mode is `send`, unlike the consent screen. See the [headers reference](https://a
 | `401` and the app asks you to sign in again | The connection was disconnected or its refresh token expired or was reused. Connect again. |
 | `401 Missing credentials` | Header connection without `X-Sendforsign-Key` or `Authorization: Bearer`. Check that your client passes headers to remote servers. |
 | `400 Missing X-Sendforsign-Client-Key` | API-key auth also needs the client key header. |
-| `Blocked by policy: this connection is read_only / in draft mode` | The tool needs a higher [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes). For OAuth, reconnect and choose a different mode on the consent screen. |
+| `Blocked by policy: this connection is read_only / in draft mode` | The tool needs a higher [agent mode](https://sendforsign.com/docs/ai-agents/accountability#agent-modes). For OAuth, reconnect and choose a different mode on the consent screen. |
 | `Not executed: ... needs confirm: true` | Expected: the agent must ask the human, then call again with `confirm: true`. |
 | `Blocked by policy: recipients outside the allowed domains` | A recipient's email is outside the allowed domains of this connection. |
 | `405 Method not allowed` | The client tried SSE (`GET`). Use the Streamable HTTP transport. |
 
 ## MCP headers reference
-Source: https://about.sendforsign.com/ai-agents/headers
+Source: https://sendforsign.com/docs/ai-agents/headers
 
 Connections authenticated with an **API key** (or a client token) are configured with HTTP headers. Every MCP
 request carries them, and the server enforces them on every tool call. They are set by whoever configures the
 connection (you, your backend) and **cannot be changed by the agent** through tool arguments.
 
   **OAuth connections ignore these headers.** When an AI app connects by
-  [signing in with Sendforsign](https://about.sendforsign.com/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
+  [signing in with Sendforsign](https://sendforsign.com/docs/ai-agents/mcp-quickstart#connect-an-ai-app), the grant the user approved on the
   consent screen is the source of truth: account, user (tenant) if one was picked, mode (drafts only by default) and
   allowed domains.
   Headers such as `X-Sendforsign-Client-Key`, `X-Sendforsign-User-Key`, `X-Sendforsign-Agent-Mode`,
   `X-Sendforsign-Allowed-Domains` and `X-Sendforsign-On-Behalf-Of` have no effect there, so an app cannot change the
   approved account, user, mode or allowed domains. `X-Sendforsign-Agent`, if sent, is only appended to the app's name in the
-  [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Header authentication works as described below.
+  [audit log](https://sendforsign.com/docs/ai-agents/accountability#audit-log). Header authentication works as described below.
 
 | Header | Required | Meaning |
 |---|---|---|
-| `X-Sendforsign-Key` | one of the two | Your API key, as in the [REST API](https://about.sendforsign.com/api-reference/introapi). |
-| `Authorization: Bearer <client token>` | one of the two | A [client token](https://about.sendforsign.com/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. (OAuth access tokens also travel in this header; then the grant applies, not the headers below.) |
+| `X-Sendforsign-Key` | one of the two | Your API key, as in the [REST API](https://sendforsign.com/docs/api-reference/introapi). |
+| `Authorization: Bearer <client token>` | one of the two | A [client token](https://sendforsign.com/docs/api-reference/implementation_server#generate-client-tokens) instead of the API key. The client comes from the token. (OAuth access tokens also travel in this header; then the grant applies, not the headers below.) |
 | `X-Sendforsign-Client-Key` | with the API key | The `clientKey` every tool works in. Required with `X-Sendforsign-Key`. |
 | `X-Sendforsign-User-Key` | no | Default `userKey`: the tenant or end user whose templates and contracts the agent sees. Tools also accept a `userKey` argument that overrides it per call. |
-| `X-Sendforsign-Agent` | no | A name or ID for this agent, written to the [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log). Defaults to the client's `User-Agent`. |
+| `X-Sendforsign-Agent` | no | A name or ID for this agent, written to the [audit log](https://sendforsign.com/docs/ai-agents/accountability#audit-log). Defaults to the client's `User-Agent`. |
 | `X-Sendforsign-On-Behalf-Of` | no | The principal the agent acts for: an email or ID of a person or company. Written to the audit log. |
-| `X-Sendforsign-Agent-Mode` | no | `read_only`, `draft` or `send`. Default: `send`. See [agent modes](https://about.sendforsign.com/ai-agents/accountability#agent-modes). |
+| `X-Sendforsign-Agent-Mode` | no | `read_only`, `draft` or `send`. Default: `send`. See [agent modes](https://sendforsign.com/docs/ai-agents/accountability#agent-modes). |
 | `X-Sendforsign-Allowed-Domains` | no | Comma-separated allowlist of recipient email domains, e.g. `customer.com,partner.org`. Empty means any domain. |
 
 ### Examples
@@ -469,17 +469,17 @@ X-Sendforsign-Agent-Mode: read_only
   `read_only` all work); an unknown value falls back to `send`, so spell it carefully when you mean to restrict.
 - For an allowlist, a leading `@` is ignored (`@customer.com` = `customer.com`), and subdomains are not
   included: list `eu.customer.com` separately if needed.
-- Call the [`get_connection_info`](https://about.sendforsign.com/ai-agents/tools#get_connection_info) tool to see how the server read your
+- Call the [`get_connection_info`](https://sendforsign.com/docs/ai-agents/tools#get_connection_info) tool to see how the server read your
   headers.
-- The REST API ignores these MCP headers. Use [userKey](https://about.sendforsign.com/api-reference/user/create) and `clientKey` in the request
+- The REST API ignores these MCP headers. Use [userKey](https://sendforsign.com/docs/api-reference/user/create) and `clientKey` in the request
   body there.
 
 ## MCP tools reference
-Source: https://about.sendforsign.com/ai-agents/tools
+Source: https://sendforsign.com/docs/ai-agents/tools
 
 All tools return JSON (as text and as `structuredContent`). Errors come back as tool errors with a readable
 message, for example `Blocked by policy: ...` or `Sendforsign API error (404): ...`. Each tool calls the public
-[REST API](https://about.sendforsign.com/api-reference/introapi), so the same permissions apply.
+[REST API](https://sendforsign.com/docs/api-reference/introapi), so the same permissions apply.
 
 | Tool | What it does | Writes | Emails people | Needs mode |
 |---|---|---|---|---|
@@ -503,7 +503,7 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 | [`list_users`](#list_users) | Tenants (users) of the client, for embedded products | no | no | any |
 | [`create_user`](#create_user) | Create a tenant and return its `userKey` | yes | no | `draft` |
 
-"Needs mode" is the lowest [agent mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes) that allows the tool: `read_only` <
+"Needs mode" is the lowest [agent mode](https://sendforsign.com/docs/ai-agents/accountability#agent-modes) that allows the tool: `read_only` <
 `draft` < `send`. Tools are annotated for MCP clients: read tools carry `readOnlyHint`, `archive_contract` carries
 `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
@@ -516,7 +516,7 @@ on the consent screen, that user is a limit: a different `userKey` is refused wi
 ### Field roles (`filledBy`)
 
 Tools describe template and contract fields with a `filledBy` value that maps to the REST
-[`fillingType`](https://about.sendforsign.com/usecase/placeholder-filler):
+[`fillingType`](https://sendforsign.com/docs/usecase/placeholder-filler):
 
 | `filledBy` | `fillingType` | Who fills the field |
 |---|---|---|
@@ -698,7 +698,7 @@ unless you pass `position`.
 **Returns:** `contractKey`, `recipients[]` (all recipients of the contract) with `recipientKey` and `signingUrl`.
 
 The `signingUrl` (`https://app.sendforsign.com/sharing/{recipientKey}`) can be shown in your own product instead of
-sending email. See [embedded signing](https://about.sendforsign.com/ai-agents/recipes#embedded-signing-without-email).
+sending email. See [embedded signing](https://sendforsign.com/docs/ai-agents/recipes#embedded-signing-without-email).
 
 #### list_recipients
 
@@ -762,7 +762,7 @@ Creates a tenant and returns its `userKey`. `customKey` is your own ID for it, s
 **Returns:** `userKey`, `fullname`, `email`, `customKey`.
 
 ## Agent modes and accountability
-Source: https://about.sendforsign.com/ai-agents/accountability
+Source: https://sendforsign.com/docs/ai-agents/accountability
 
 When an agent prepares and sends contracts, two questions matter later: **was it allowed to**, and **who is bound
 by what it did**. The MCP server answers both with guardrails that the integrator sets and the agent cannot change,
@@ -774,7 +774,7 @@ manipulated agent cannot talk its way past them. Where they come from depends on
 | Connection | Who sets account, tenant, mode, allowed domains | Default mode |
 |---|---|---|
 | **OAuth** (Claude, ChatGPT, Cursor, VS Code, Claude Code signed in) | The user, on the Sendforsign consent screen. This grant is the source of truth; integrator headers are ignored. A user picked there is a limit: the connector acts only as that user. | `draft` |
-| **API key or client token** (server-side agents) | Your code, with [headers](https://about.sendforsign.com/ai-agents/headers) on each connection | `send` |
+| **API key or client token** (server-side agents) | Your code, with [headers](https://sendforsign.com/docs/ai-agents/headers) on each connection | `send` |
 
 ### Agent modes
 
@@ -846,7 +846,7 @@ Every **write** tool call and every **blocked** call is recorded, with:
 | `prev_hash`, `hash` | Hash chain: each record includes the hash of the previous record of the same account, so an edited or deleted record breaks the chain |
 
 Read calls that succeed are not logged. The agent's actions for a contract are returned by
-[`get_contract_timeline`](https://about.sendforsign.com/ai-agents/tools#get_contract_timeline) as `agentActions`, next to the signing events
+[`get_contract_timeline`](https://sendforsign.com/docs/ai-agents/tools#get_contract_timeline) as `agentActions`, next to the signing events
 (sent, seen, signed, fully signed).
 
   The audit log is being rolled out. `get_connection_info` returns `auditLog: "on"` when it is active for your
@@ -868,7 +868,7 @@ need a connection cut off on the server immediately (for example a lost laptop),
 will revoke it.
 
 **API-key connections.** Rotate or delete the API key in the dashboard, or stop sending it. Client tokens can be
-[revoked](https://about.sendforsign.com/api-reference/authentication) through the API.
+[revoked](https://sendforsign.com/docs/api-reference/authentication) through the API.
 
 ### Legal context
 
@@ -896,7 +896,7 @@ Signers themselves are always humans: the agent prepares and sends; the recipien
 signs.
 
 ## Recipes for agent builders
-Source: https://about.sendforsign.com/ai-agents/recipes
+Source: https://sendforsign.com/docs/ai-agents/recipes
 
 Each recipe shows the MCP tool calls an agent makes and the equivalent REST requests, for when you'd rather run the
 deterministic part in your own code and let the agent only decide *what* to send.
@@ -972,12 +972,12 @@ curl -X POST 'https://api.sendforsign.com/api/recipient' \
        "recipients":[{"recipientKey":"RECIPIENT_KEY","fullname":"Anna Smith","email":"anna@acme.example","action":"sign","position":1}]}}'
 ```
 
-  In REST, `contract` `create` **with** a `recipients` array [creates and sends](https://about.sendforsign.com/api-reference/contract/create-send)
+  In REST, `contract` `create` **with** a `recipients` array [creates and sends](https://sendforsign.com/docs/api-reference/contract/create-send)
   in one call: the recipients are emailed immediately. `recipient` `create` adds recipients **without** email;
   `recipient` `send` emails them. The MCP `create_contract` tool always takes the safe path.
 
   A contract made from a template gets its own field keys. Match template fields to contract fields by name (from
-  [placeholder `list`](https://about.sendforsign.com/api-reference/placeholder/list) on the contract), then fill them by the contract's
+  [placeholder `list`](https://sendforsign.com/docs/api-reference/placeholder/list) on the contract), then fill them by the contract's
   `placeholderKey`. Filling by `name` inside `contract` `create` is not reliable. In `recipient` `send`, give every
   recipient a `position`.
 
@@ -993,17 +993,17 @@ Sendforsign email.
    https://app.sendforsign.com/sharing/{recipientKey}
    ```
 
-   With a [recipient custom domain](https://about.sendforsign.com/usecase/recipientdomain) the links can be on your own domain.
+   With a [recipient custom domain](https://sendforsign.com/docs/usecase/recipientdomain) the links can be on your own domain.
 
 2. Give each signer **their own** link in your UI: a button, a message, or an iframe/new tab. The link identifies the
    recipient, so treat it like a password reset link: show it only to that person.
 3. Don't call `send_for_signature`. The agent can run in `draft` mode for this flow.
 4. Learn about the signature from the [webhook](#react-when-a-contract-is-fully-signed).
 
-In REST, the `recipientKey` comes from [recipient `list`](https://about.sendforsign.com/api-reference/recipient/list).
+In REST, the `recipientKey` comes from [recipient `list`](https://sendforsign.com/docs/api-reference/recipient/list).
 
 For a fully embedded editor and contract list (review and edit what the agent drafted), use the
-[React components](https://about.sendforsign.com/sdk/introsdk), and set your [branding](https://about.sendforsign.com/api-reference/settings/branding) for any emails you do send.
+[React components](https://sendforsign.com/docs/sdk/introsdk), and set your [branding](https://sendforsign.com/docs/api-reference/settings/branding) for any emails you do send.
 
 ### One tenant per customer
 
@@ -1012,8 +1012,8 @@ code through headers, so an agent working for customer A cannot see customer B's
 
 | Level | Key | Use it for |
 |---|---|---|
-| Client | `clientKey` | A customer business. Strongest separation: own templates, contracts, [webhooks](https://about.sendforsign.com/api-reference/webhook/concept) and branding. [Create](https://about.sendforsign.com/api-reference/client/create) |
-| User | `userKey` | An end user or team inside a client. [Create](https://about.sendforsign.com/api-reference/user/create), or `create_user` over MCP |
+| Client | `clientKey` | A customer business. Strongest separation: own templates, contracts, [webhooks](https://sendforsign.com/docs/api-reference/webhook/concept) and branding. [Create](https://sendforsign.com/docs/api-reference/client/create) |
+| User | `userKey` | An end user or team inside a client. [Create](https://sendforsign.com/docs/api-reference/user/create), or `create_user` over MCP |
 
 Setup, once per customer (from your backend):
 
@@ -1055,25 +1055,25 @@ When the last recipient signs, your endpoint receives:
 }
 ```
 
-Then download the signed PDF ([`GET /api/download_pdf`](https://about.sendforsign.com/api-reference/pdf/download)), store it, and tell the agent or
+Then download the signed PDF ([`GET /api/download_pdf`](https://sendforsign.com/docs/api-reference/pdf/download)), store it, and tell the agent or
 the user. To resume an agent conversation, pass it the `contractKey`; it can call `get_contract` and
-`get_contract_timeline`. All events: [webhooks concept](https://about.sendforsign.com/api-reference/webhook/concept).
+`get_contract_timeline`. All events: [webhooks concept](https://sendforsign.com/docs/api-reference/webhook/concept).
 
 ### Upload a finished text and get it signed
 
 For legal-AI products that draft elsewhere: pass the final text as `content` (Markdown by default, or
-`contentFormat: "html"`) to `create_contract`, add signers, send. For a PDF, use [PDF upload](https://about.sendforsign.com/api-reference/pdf/upload)
-and [PDF placeholders](https://about.sendforsign.com/api-reference/placeholder/pdfbasic) in REST.
+`contentFormat: "html"`) to `create_contract`, add signers, send. For a PDF, use [PDF upload](https://sendforsign.com/docs/api-reference/pdf/upload)
+and [PDF placeholders](https://sendforsign.com/docs/api-reference/placeholder/pdfbasic) in REST.
 
 ## Prompt library
-Source: https://about.sendforsign.com/ai-agents/prompts
+Source: https://sendforsign.com/docs/ai-agents/prompts
 
-These prompts work in any client [connected to the Sendforsign MCP server](https://about.sendforsign.com/ai-agents/mcp-quickstart): Claude Code,
+These prompts work in any client [connected to the Sendforsign MCP server](https://sendforsign.com/docs/ai-agents/mcp-quickstart): Claude Code,
 Claude Desktop, Cursor, ChatGPT through the API or the OpenAI Agents SDK. Replace the parts in `[brackets]`.
 
 Each prompt lists the tools the agent is expected to call and what it should ask you before anyone gets an email.
 Sending (`send_for_signature`) and archiving (`archive_contract`) always need your explicit "yes" in the chat: the
-server refuses them without `confirm: true`, and in [`draft` mode](https://about.sendforsign.com/ai-agents/accountability#agent-modes) refuses
+server refuses them without `confirm: true`, and in [`draft` mode](https://sendforsign.com/docs/ai-agents/accountability#agent-modes) refuses
 them altogether.
 
   Start new connections in `draft` mode (`X-Sendforsign-Agent-Mode: draft`). The agent can prepare everything and give
@@ -1152,7 +1152,7 @@ signing link. Do not email her; I'll send the link myself.
 **Tools:** `add_recipients` (returns `signingUrl`), or `list_recipients` if she is already added.
 
 **Confirm step:** none; `add_recipients` never emails. Share each link only with its recipient: the link identifies
-them. Works in `draft` mode. See [embedded signing](https://about.sendforsign.com/ai-agents/recipes#embedded-signing-without-email).
+them. Works in `draft` mode. See [embedded signing](https://sendforsign.com/docs/ai-agents/recipes#embedded-signing-without-email).
 
 #### Send after confirmation
 
@@ -1187,7 +1187,7 @@ Show the timeline of "[NDA — Acme Ltd]": when it was sent, opened and signed, 
 Include what the agent did, if logged.
 ```
 
-**Tools:** `get_contract_timeline` (events plus `agentActions` when the [audit log](https://about.sendforsign.com/ai-agents/accountability#audit-log)
+**Tools:** `get_contract_timeline` (events plus `agentActions` when the [audit log](https://sendforsign.com/docs/ai-agents/accountability#audit-log)
 is on).
 
 **Confirm step:** none; read-only.
@@ -1218,7 +1218,7 @@ Claude Code or Cursor, can save it).
 ### Embedded and multi-tenant
 
 For products that use Sendforsign for their own customers. See
-[one tenant per customer](https://about.sendforsign.com/ai-agents/recipes#one-tenant-per-customer).
+[one tenant per customer](https://sendforsign.com/docs/ai-agents/recipes#one-tenant-per-customer).
 
 #### Create a tenant per customer
 
@@ -1247,7 +1247,7 @@ fully signed, with status and last change.
 
 #### Connect in draft mode for review
 
-Connect with `X-Sendforsign-Agent-Mode: draft` (see the [quickstart](https://about.sendforsign.com/ai-agents/mcp-quickstart)), then:
+Connect with `X-Sendforsign-Agent-Mode: draft` (see the [quickstart](https://sendforsign.com/docs/ai-agents/mcp-quickstart)), then:
 
 ```text
 What can you do on this Sendforsign connection? Then prepare "[NDA — Acme Ltd]" from the
@@ -1276,7 +1276,7 @@ anything stuck for more than 7 days.
 # Part 2. REST API concepts
 
 ## Sendforsign API introduction
-Source: https://about.sendforsign.com/api-reference/introapi
+Source: https://sendforsign.com/docs/api-reference/introapi
 
 ### Base URL
 
@@ -1313,7 +1313,7 @@ and `5xx` codes are for infrastructure issues.
 | `5xx`    | Indicates an error with Sendforsign servers.|
 
 ## Account structure
-Source: https://about.sendforsign.com/api-reference/structure
+Source: https://sendforsign.com/docs/api-reference/structure
 
 ### Structure
 
@@ -1343,7 +1343,7 @@ Through the SFS API, partners can establish customizable roles and permissions a
 SFS then automatically oversees and enforces access policies for each API interaction.
 
 ## Authentication
-Source: https://about.sendforsign.com/api-reference/authentication
+Source: https://sendforsign.com/docs/api-reference/authentication
 
 The SFS API offers industry-standard security controls for connecting to its platform, submitting, storing, 
 and retrieving data from SFS data servers, and conducting various business operations with this data.
@@ -1524,7 +1524,7 @@ curl -X POST 'https://api.sendforsign.com/api/contract' \
 ```
 
 ## Choose Who Fills In a Placeholder
-Source: https://about.sendforsign.com/usecase/placeholder-filler
+Source: https://sendforsign.com/docs/usecase/placeholder-filler
 
 In the contract editor, each placeholder has a **Who fills in this field** setting. The same setting is available
 through the API with two placeholder fields:
@@ -1536,13 +1536,13 @@ through the API with two placeholder fields:
 
 ### Set up your account
 
-Before you start, see the [First document use case](https://about.sendforsign.com/usecase/firstdoc) to set up your platform account and get the API key.
-You also need a contract with recipients and placeholders. See [Create recipients](https://about.sendforsign.com/api-reference/recipient/create) and
-[Create placeholder](https://about.sendforsign.com/api-reference/placeholder/create).
+Before you start, see the [First document use case](https://sendforsign.com/docs/usecase/firstdoc) to set up your platform account and get the API key.
+You also need a contract with recipients and placeholders. See [Create recipients](https://sendforsign.com/docs/api-reference/recipient/create) and
+[Create placeholder](https://sendforsign.com/docs/api-reference/placeholder/create).
 
 ### Get the recipient key
 
-Request the list of the contract's recipients. [Learn more here.](https://about.sendforsign.com/api-reference/recipient/list)
+Request the list of the contract's recipients. [Learn more here.](https://sendforsign.com/docs/api-reference/recipient/list)
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/recipient' \
@@ -1561,7 +1561,7 @@ Each recipient in the response has a `recipientKey`. This is the value you pass 
 
 ### Get the placeholder key
 
-Request the list of the contract's placeholders. [Learn more here.](https://about.sendforsign.com/api-reference/placeholder/list)
+Request the list of the contract's placeholders. [Learn more here.](https://sendforsign.com/docs/api-reference/placeholder/list)
 
 ```bash cURL
 curl -X POST 'https://api.sendforsign.com/api/placeholder' \
@@ -1606,7 +1606,7 @@ To unassign the placeholder, send `"fillingType": 1` together with `"externalRec
 A field left out of an update request keeps its current value, so without `null` the previous recipient stays stored.
 
   You only need to send the fields you change. The placeholder's `name` and `value` are not affected.
-  You can also pass `fillingType` and `externalRecipientKey` right away when you [create a placeholder](https://about.sendforsign.com/api-reference/placeholder/create).
+  You can also pass `fillingType` and `externalRecipientKey` right away when you [create a placeholder](https://sendforsign.com/docs/api-reference/placeholder/create).
 
 ### Check the result
 
@@ -1629,7 +1629,7 @@ Request the list of placeholders again. Each placeholder in the response has `fi
 ```
 
 ## Webhooks concept
-Source: https://about.sendforsign.com/api-reference/webhook/concept
+Source: https://sendforsign.com/docs/api-reference/webhook/concept
 
 Webhooks can be created via API calls by using the API references from this section. 
 Please bear in mind that webhooks are separated by Client Keys, so if you create multiple Client Keys for your platform, 
@@ -1738,7 +1738,7 @@ All resource endpoints take `POST https://api.sendforsign.com/api/<resource>` wi
 
 ### Create client
 
-Source: https://about.sendforsign.com/api-reference/client/create
+Source: https://sendforsign.com/docs/api-reference/client/create
 
 Endpoint: `POST https://api.sendforsign.com/api/client`
 
@@ -1796,7 +1796,7 @@ Response:
 
 ### Update client
 
-Source: https://about.sendforsign.com/api-reference/client/update
+Source: https://sendforsign.com/docs/api-reference/client/update
 
 Endpoint: `POST https://api.sendforsign.com/api/client`
 
@@ -1842,7 +1842,7 @@ Response:
 
 ### Read client
 
-Source: https://about.sendforsign.com/api-reference/client/read
+Source: https://sendforsign.com/docs/api-reference/client/read
 
 Endpoint: `POST https://api.sendforsign.com/api/client`
 
@@ -1893,7 +1893,7 @@ Response:
 
 ### List of clients
 
-Source: https://about.sendforsign.com/api-reference/client/list
+Source: https://sendforsign.com/docs/api-reference/client/list
 
 Endpoint: `POST https://api.sendforsign.com/api/client`
 
@@ -1934,7 +1934,7 @@ Response:
 
 ### Create user
 
-Source: https://about.sendforsign.com/api-reference/user/create
+Source: https://sendforsign.com/docs/api-reference/user/create
 
 Endpoint: `POST https://api.sendforsign.com/api/user`
 
@@ -1978,7 +1978,7 @@ Response:
 
 ### Update user
 
-Source: https://about.sendforsign.com/api-reference/user/update
+Source: https://sendforsign.com/docs/api-reference/user/update
 
 Endpoint: `POST https://api.sendforsign.com/api/user`
 
@@ -2024,7 +2024,7 @@ Response:
 
 ### Read user
 
-Source: https://about.sendforsign.com/api-reference/user/read
+Source: https://sendforsign.com/docs/api-reference/user/read
 
 Endpoint: `POST https://api.sendforsign.com/api/user`
 
@@ -2074,7 +2074,7 @@ Response:
 
 ### List of users
 
-Source: https://about.sendforsign.com/api-reference/user/list
+Source: https://sendforsign.com/docs/api-reference/user/list
 
 Endpoint: `POST https://api.sendforsign.com/api/user`
 
@@ -2115,7 +2115,7 @@ Response:
 
 ### Create contract
 
-Source: https://about.sendforsign.com/api-reference/contract/create
+Source: https://sendforsign.com/docs/api-reference/contract/create
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2159,7 +2159,7 @@ Response:
 
 ### Create from template
 
-Source: https://about.sendforsign.com/api-reference/contract/create-from-template
+Source: https://sendforsign.com/docs/api-reference/contract/create-from-template
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2203,7 +2203,7 @@ Response:
 
 ### Create and send contract
 
-Source: https://about.sendforsign.com/api-reference/contract/create-send
+Source: https://sendforsign.com/docs/api-reference/contract/create-send
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2261,7 +2261,7 @@ Response:
 
 ### Create and fill in contract
 
-Source: https://about.sendforsign.com/api-reference/contract/create-fill
+Source: https://sendforsign.com/docs/api-reference/contract/create-fill
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2270,7 +2270,7 @@ placeholders in the text. This way, you can populate the necessary data in the r
 the contracts with a single API call.
 
   Matching placeholders by `name` here is not reliable. To be sure every value lands, create the contract, then
-  [list its placeholders](https://about.sendforsign.com/api-reference/placeholder/list) and [update](https://about.sendforsign.com/api-reference/placeholder/update) each one by
+  [list its placeholders](https://sendforsign.com/docs/api-reference/placeholder/list) and [update](https://sendforsign.com/docs/api-reference/placeholder/update) each one by
   the contract's `placeholderKey`. A contract created from a template gets new placeholder keys; match them to the
   template's placeholders by name.
 
@@ -2328,7 +2328,7 @@ Response:
 
 ### Update contract
 
-Source: https://about.sendforsign.com/api-reference/contract/update
+Source: https://sendforsign.com/docs/api-reference/contract/update
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2373,7 +2373,7 @@ Response:
 
 ### Read contract
 
-Source: https://about.sendforsign.com/api-reference/contract/read
+Source: https://sendforsign.com/docs/api-reference/contract/read
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2419,7 +2419,7 @@ Response:
 
 ### Duplicate contract
 
-Source: https://about.sendforsign.com/api-reference/contract/duplicate
+Source: https://sendforsign.com/docs/api-reference/contract/duplicate
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2461,7 +2461,7 @@ Response:
 
 ### List of contracts
 
-Source: https://about.sendforsign.com/api-reference/contract/list
+Source: https://sendforsign.com/docs/api-reference/contract/list
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2509,7 +2509,7 @@ Response:
 
 ### Archive contract
 
-Source: https://about.sendforsign.com/api-reference/contract/archive
+Source: https://sendforsign.com/docs/api-reference/contract/archive
 
 Endpoint: `POST https://api.sendforsign.com/api/contract`
 
@@ -2549,7 +2549,7 @@ Response:
 
 ### Get Timeline
 
-Source: https://about.sendforsign.com/api-reference/contract/get_timeline
+Source: https://sendforsign.com/docs/api-reference/contract/get_timeline
 
 Endpoint: `GET https://api.sendforsign.com/api/contract_event`
 
@@ -2570,7 +2570,7 @@ curl -X GET 'https://api.sendforsign.com/api/contract_event?clientKey=658599d9-b
 
 ### Download PDF
 
-Source: https://about.sendforsign.com/api-reference/pdf/download
+Source: https://sendforsign.com/docs/api-reference/pdf/download
 
 Endpoint: `GET https://api.sendforsign.com/api/download_pdf`
 
@@ -2589,12 +2589,12 @@ curl -X GET 'https://api.sendforsign.com/api/download_pdf?clientKey=658599d9-bbb
 
 ### Upload PDF
 
-Source: https://about.sendforsign.com/api-reference/pdf/upload
+Source: https://sendforsign.com/docs/api-reference/pdf/upload
 
 Endpoint: `POST https://api.sendforsign.com/api/upload_pdf`
 
 Before uploading a PDF, you need to create an empty contract and obtain its Contract Key. 
-To do this, use the [Create Contract](https://about.sendforsign.com/api-reference/contract/create) 
+To do this, use the [Create Contract](https://sendforsign.com/docs/api-reference/contract/create) 
 request with the parameter `"contractType": "pdf"`.
 
 Here's an example:
@@ -2643,7 +2643,7 @@ curl -X POST 'https://api.sendforsign.com/api/upload_pdf?clientKey=658599d9-bbbe
 
 ### Download Word
 
-Source: https://about.sendforsign.com/api-reference/pdf/downloadword
+Source: https://sendforsign.com/docs/api-reference/pdf/downloadword
 
 Endpoint: `GET https://api.sendforsign.com/api/download_docx`
 
@@ -2664,12 +2664,12 @@ curl -X GET 'https://api.sendforsign.com/api/download_docx?clientKey=658599d9-bb
 
 ### Create placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/create
+Source: https://sendforsign.com/docs/api-reference/placeholder/create
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
 One way to add placeholders to a contract is when you create a new contract. 
-[See this page](https://about.sendforsign.com/api-reference/contract/create-fill) to learn more.
+[See this page](https://sendforsign.com/docs/api-reference/contract/create-fill) to learn more.
 
 If a contract already exists, use the request below.
 
@@ -2680,8 +2680,8 @@ Parameters:
 - `placeholder` (body, object, required): Structure, add the fields that need to be updated and ignore the rest.
   - `name` (body, string, required): Name of the placeholder
   - `value` (body, string): Value of the placeholder.
-  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://about.sendforsign.com/usecase/placeholder-filler)
-  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://about.sendforsign.com/api-reference/recipient/list). Leave it out (or `null`) for any other `fillingType`.
+  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://sendforsign.com/docs/usecase/placeholder-filler)
+  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://sendforsign.com/docs/api-reference/recipient/list). Leave it out (or `null`) for any other `fillingType`.
 
 Example:
 ```bash
@@ -2723,7 +2723,7 @@ Response:
 
 ### Update placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/update
+Source: https://sendforsign.com/docs/api-reference/placeholder/update
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
@@ -2735,8 +2735,8 @@ Parameters:
   - `placeholderKey` (body, string, required): Key of the placeholder that needs to be updated.
   - `name` (body, string): Name of the placeholder
   - `value` (body, string): Value of the placeholder.
-  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://about.sendforsign.com/usecase/placeholder-filler)
-  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://about.sendforsign.com/api-reference/recipient/list). To unassign the recipient, send `"externalRecipientKey": null` explicitly together with the new `fillingType` (for example `1`, `2` or `3`): a field left out of an update keeps its current value, so omitting it does **not** clear it.
+  - `fillingType` (body, number): Who fills in this placeholder when the contract is shared ("Who fills in this field" in the editor): `1` — nobody (default), `2` — the contract owner, `3` — any recipient, `4` — a specific recipient set in `externalRecipientKey`. [See the use case.](https://sendforsign.com/docs/usecase/placeholder-filler)
+  - `externalRecipientKey` (body, string): `recipientKey` of the recipient who fills in this placeholder. Required when `fillingType` is `4`. Get it from the [list of recipients](https://sendforsign.com/docs/api-reference/recipient/list). To unassign the recipient, send `"externalRecipientKey": null` explicitly together with the new `fillingType` (for example `1`, `2` or `3`): a field left out of an update keeps its current value, so omitting it does **not** clear it.
 
 Example:
 ```bash
@@ -2779,12 +2779,12 @@ Response:
 
 ### Table placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/update-table
+Source: https://sendforsign.com/docs/api-reference/placeholder/update-table
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
 First, add a placeholder to the HTML document to obtain a placeholder key.
-[See this page](https://about.sendforsign.com/api-reference/placeholder/create) to learn more.
+[See this page](https://sendforsign.com/docs/api-reference/placeholder/create) to learn more.
 
 Parameters:
 - `action` (body, string, required): Action type.
@@ -2844,14 +2844,14 @@ Response:
 
 ### Place basic placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/pdfbasic
+Source: https://sendforsign.com/docs/api-reference/placeholder/pdfbasic
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
 Basic placeholders are text placeholders that can be used to fill in HTML and PDF contracts. 
 Additionally, they can be linked to any recipient afterward.
 
-Before placing placeholders in a PDF, you need to [create them](https://about.sendforsign.com/api-reference/placeholder/create) in advance.
+Before placing placeholders in a PDF, you need to [create them](https://sendforsign.com/docs/api-reference/placeholder/create) in advance.
 
 Parameters:
 - `action` (body, string, required): Action type.
@@ -2908,12 +2908,12 @@ Response:
 
 ### Place special placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/pdfspecial
+Source: https://sendforsign.com/docs/api-reference/placeholder/pdfspecial
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
 Special placeholders are four types of placeholders that are created automatically for every recipient.
-So, before placing special fields in your PDF contract, create a recipient using [this request](https://about.sendforsign.com/api-reference/recipient/create).
+So, before placing special fields in your PDF contract, create a recipient using [this request](https://sendforsign.com/docs/api-reference/recipient/create).
 After this, all the special placeholders will be created automatically with corresponding keys:
 `Recipient_Key_1`, `Recipient_Key_2`, `Recipient_Key_3`, `Recipient_Key_4`.
 
@@ -2984,7 +2984,7 @@ Response:
 
 ### List of placeholders
 
-Source: https://about.sendforsign.com/api-reference/placeholder/list
+Source: https://sendforsign.com/docs/api-reference/placeholder/list
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
@@ -3032,7 +3032,7 @@ Response:
 
 ### Delete placeholder
 
-Source: https://about.sendforsign.com/api-reference/placeholder/delete
+Source: https://sendforsign.com/docs/api-reference/placeholder/delete
 
 Endpoint: `POST https://api.sendforsign.com/api/placeholder`
 
@@ -3072,12 +3072,12 @@ Response:
 
 ### Create recipient
 
-Source: https://about.sendforsign.com/api-reference/recipient/create
+Source: https://sendforsign.com/docs/api-reference/recipient/create
 
 Endpoint: `POST https://api.sendforsign.com/api/recipient`
 
 One way to add recipients to a contract is when you send a contract. 
-[See this page](https://about.sendforsign.com/api-reference/recipient/send) to learn more.
+[See this page](https://sendforsign.com/docs/api-reference/recipient/send) to learn more.
 
 If you need to add a recipient to a contract without sending it, use the request below.
 
@@ -3126,7 +3126,7 @@ Response:
 
 ### Update recipient
 
-Source: https://about.sendforsign.com/api-reference/recipient/update
+Source: https://sendforsign.com/docs/api-reference/recipient/update
 
 Endpoint: `POST https://api.sendforsign.com/api/recipient`
 
@@ -3178,12 +3178,12 @@ Response:
 
 ### Send to recipients
 
-Source: https://about.sendforsign.com/api-reference/recipient/send
+Source: https://sendforsign.com/docs/api-reference/recipient/send
 
 Endpoint: `POST https://api.sendforsign.com/api/recipient`
 
 One way to send a contract to recipients is when you create a contract. 
-[See this page](https://about.sendforsign.com/api-reference/contract/create-send) to learn more.
+[See this page](https://sendforsign.com/docs/api-reference/contract/create-send) to learn more.
 
 If you need to send an existing contract to recipients, use the request below.
 
@@ -3245,7 +3245,7 @@ Response:
 
 ### List of recipients
 
-Source: https://about.sendforsign.com/api-reference/recipient/list
+Source: https://sendforsign.com/docs/api-reference/recipient/list
 
 Endpoint: `POST https://api.sendforsign.com/api/recipient`
 
@@ -3291,7 +3291,7 @@ Response:
 
 ### Delete recipient
 
-Source: https://about.sendforsign.com/api-reference/recipient/delete
+Source: https://sendforsign.com/docs/api-reference/recipient/delete
 
 Endpoint: `POST https://api.sendforsign.com/api/recipient`
 
@@ -3332,7 +3332,7 @@ Response:
 
 ### Create template
 
-Source: https://about.sendforsign.com/api-reference/template/create
+Source: https://sendforsign.com/docs/api-reference/template/create
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3376,7 +3376,7 @@ Response:
 
 ### Create and fill in template
 
-Source: https://about.sendforsign.com/api-reference/template/create-fill
+Source: https://sendforsign.com/docs/api-reference/template/create-fill
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3436,7 +3436,7 @@ Response:
 
 ### Update template
 
-Source: https://about.sendforsign.com/api-reference/template/update
+Source: https://sendforsign.com/docs/api-reference/template/update
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3481,7 +3481,7 @@ Response:
 
 ### Convert into template
 
-Source: https://about.sendforsign.com/api-reference/template/convert
+Source: https://sendforsign.com/docs/api-reference/template/convert
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3528,7 +3528,7 @@ Response:
 
 ### Read template
 
-Source: https://about.sendforsign.com/api-reference/template/read
+Source: https://sendforsign.com/docs/api-reference/template/read
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3573,7 +3573,7 @@ Response:
 
 ### Duplicate template
 
-Source: https://about.sendforsign.com/api-reference/template/duplicate
+Source: https://sendforsign.com/docs/api-reference/template/duplicate
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3615,7 +3615,7 @@ Response:
 
 ### List of templates
 
-Source: https://about.sendforsign.com/api-reference/template/list
+Source: https://sendforsign.com/docs/api-reference/template/list
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3652,7 +3652,7 @@ Response:
 
 ### Delete template
 
-Source: https://about.sendforsign.com/api-reference/template/delete
+Source: https://sendforsign.com/docs/api-reference/template/delete
 
 Endpoint: `POST https://api.sendforsign.com/api/template`
 
@@ -3693,7 +3693,7 @@ Response:
 
 ### Webhooks concept
 
-Source: https://about.sendforsign.com/api-reference/webhook/concept
+Source: https://sendforsign.com/docs/api-reference/webhook/concept
 
 Webhooks can be created via API calls by using the API references from this section. 
 Please bear in mind that webhooks are separated by Client Keys, so if you create multiple Client Keys for your platform, 
@@ -3713,7 +3713,7 @@ Below you will find the examples of webhooks.
 
 ### Create webhook
 
-Source: https://about.sendforsign.com/api-reference/webhook/create
+Source: https://sendforsign.com/docs/api-reference/webhook/create
 
 Endpoint: `POST https://api.sendforsign.com/api/webhook`
 
@@ -3773,7 +3773,7 @@ Response:
 
 ### Update webhook
 
-Source: https://about.sendforsign.com/api-reference/webhook/update
+Source: https://sendforsign.com/docs/api-reference/webhook/update
 
 Endpoint: `POST https://api.sendforsign.com/api/webhook`
 
@@ -3827,7 +3827,7 @@ Response:
 
 ### Read webhook
 
-Source: https://about.sendforsign.com/api-reference/webhook/read
+Source: https://sendforsign.com/docs/api-reference/webhook/read
 
 Endpoint: `POST https://api.sendforsign.com/api/webhook`
 
@@ -3880,7 +3880,7 @@ Response:
 
 ### List of webhooks
 
-Source: https://about.sendforsign.com/api-reference/webhook/list
+Source: https://sendforsign.com/docs/api-reference/webhook/list
 
 Endpoint: `POST https://api.sendforsign.com/api/webhook`
 
@@ -3926,7 +3926,7 @@ Response:
 
 ### Delete webhook
 
-Source: https://about.sendforsign.com/api-reference/webhook/delete
+Source: https://sendforsign.com/docs/api-reference/webhook/delete
 
 Endpoint: `POST https://api.sendforsign.com/api/webhook`
 
@@ -3971,7 +3971,7 @@ Response:
 
 ### Email notifications
 
-Source: https://about.sendforsign.com/api-reference/settings/email_notifications
+Source: https://sendforsign.com/docs/api-reference/settings/email_notifications
 
 Endpoint: `POST https://api.sendforsign.com/api/settings`
 
@@ -4017,7 +4017,7 @@ Response:
 
 ### Custom branding
 
-Source: https://about.sendforsign.com/api-reference/settings/branding
+Source: https://sendforsign.com/docs/api-reference/settings/branding
 
 Endpoint: `POST https://api.sendforsign.com/api/settings`
 

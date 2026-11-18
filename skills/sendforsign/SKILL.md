@@ -8,8 +8,8 @@ description: Create contracts from templates, fill their fields, add signers and
 Sendforsign turns contract templates into signed agreements: pick a template, fill the owner's fields, add recipients
 (signers, approvers, viewers), send or hand out signing links, and get notified when everyone has signed.
 
-Docs: https://about.sendforsign.com (append `.md` to any page for Markdown; full reference in
-https://about.sendforsign.com/llms-full.txt).
+Docs: https://sendforsign.com/docs (append `.md` to any page for Markdown; full reference in
+https://sendforsign.com/docs/llms-full.txt).
 
 ## Choose the interface
 
@@ -22,7 +22,7 @@ https://about.sendforsign.com/llms-full.txt).
   sign-in, no key: Claude → Settings → Connectors → Add custom connector → `https://api.sendforsign.com/mcp`; Claude Code
   → `claude mcp add --transport http sendforsign https://api.sendforsign.com/mcp`, then `/mcp` → Authenticate. The user
   picks account, optionally one user (then the connector acts only as that user and cannot list or create users), and mode (drafts only by default) on the Sendforsign consent screen. Server-side agents use
-  `X-Sendforsign-Key` + `X-Sendforsign-Client-Key` headers instead. Docs: https://about.sendforsign.com/ai-agents/mcp-quickstart
+  `X-Sendforsign-Key` + `X-Sendforsign-Client-Key` headers instead. Docs: https://sendforsign.com/docs/ai-agents/mcp-quickstart
 
 ## Rules
 
@@ -43,7 +43,7 @@ https://about.sendforsign.com/llms-full.txt).
 
 ## Example user requests
 
-Typical requests and the tools they map to (more in the prompt library: https://about.sendforsign.com/ai-agents/prompts):
+Typical requests and the tools they map to (more in the prompt library: https://sendforsign.com/docs/ai-agents/prompts):
 
 - "Use my NDA template for Acme, fill our side, don't send yet" → `list_templates`, `get_template`, `create_contract`.
 - "Make a contract from this text / this attached proposal" → `create_contract` with `content`, or a template + `fields`;

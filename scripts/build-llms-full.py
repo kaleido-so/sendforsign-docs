@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE = "https://about.sendforsign.com"
+SITE = "https://sendforsign.com/docs"
 
 AGENT_PAGES = [
     "ai-agents/overview",

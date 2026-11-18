@@ -287,5 +287,8 @@
       "source": "/blog/the-core-of-sendforsign-s-business-embedded-solutions-for-other-companies",
       "destination": "https://sendforsign.com/blog/the-core-of-sendforsign-s-business-embedded-solutions-for-other-companies"
     }
-  ]
+  ],
+  "metadata": {
+    "canonical": "https://sendforsign.com/docs"
+  }
 }

@@ -1,8 +1,8 @@
 # Sendforsign — full reference for language models
 
-> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://about.sendforsign.com.
+> Sendforsign is an API-first contract creation and e-signature platform, and the contracts layer for products that build AI agents: create contracts from templates, fill fields with per-recipient roles, add signers, send or embed signing links in your own product, receive webhooks when signed, with an audit trail of what each agent did and on whose behalf. Remote MCP server: https://api.sendforsign.com/mcp. REST API: https://api.sendforsign.com/api. Docs: https://sendforsign.com/docs.
 
-This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://about.sendforsign.com/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
+This file is generated from the documentation by `scripts/build-llms-full.py`. A shorter index is at https://sendforsign.com/docs/llms.txt. Every docs page is also available as Markdown at its URL plus `.md`.
 
 ## Key facts
 
