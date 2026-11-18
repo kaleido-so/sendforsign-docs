@@ -1,0 +1,50 @@
+---
+title: "Usage"
+api: 'GET https://api.sendforsign.com/api/usage'
+description: "Contracts sent this billing period against your plan limit, in total and per client, so platforms can bill their own customers."
+---
+
+Returns how many contracts reached a recipient in the current billing period, the plan limit, and the same count for each
+client (tenant) of your account. A contract counts once: when it is first sent, opened, approved or signed. Drafts never count.
+
+Use your API key; client tokens are not accepted, because usage covers the whole account.
+
+### Query parameters
+
+<ParamField query="clientKey" type="string">
+  Only this client. Returns 404 if the client is not yours.
+</ParamField>
+
+### Response
+
+<ResponseField name="periodStart" type="string">Start of the current billing period.</ResponseField>
+<ResponseField name="periodEnd" type="string">End of the current billing period.</ResponseField>
+<ResponseField name="limit" type="number">Contracts included this period, packs included.</ResponseField>
+<ResponseField name="used" type="number">Contracts that reached a recipient this period.</ResponseField>
+<ResponseField name="remaining" type="number">`limit` minus `used`, never below 0. At 0, sending a new contract returns 400 with a message about the monthly limit.</ResponseField>
+<ResponseField name="clients" type="object[]">
+  One entry per client: `clientKey`, `customKey`, `name` and `contracts` (sent this period).
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.sendforsign.com/api/usage' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "periodStart": "2026-11-03 09:12:00",
+  "periodEnd": "2026-12-02 09:12:00",
+  "limit": 300,
+  "used": 41,
+  "remaining": 259,
+  "clients": [
+    { "clientKey": "CLIENT_KEY_1", "customKey": "customer_4812", "name": "Studio Nord", "contracts": 29 },
+    { "clientKey": "CLIENT_KEY_2", "customKey": "customer_4813", "name": "Berg & Co", "contracts": 12 }
+  ]
+}
+```
+</ResponseExample>

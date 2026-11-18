@@ -140,7 +140,8 @@
         "api-reference/contract/duplicate",
         "api-reference/contract/list",
         "api-reference/contract/archive",
-        "api-reference/contract/get_timeline"
+        "api-reference/contract/get_timeline",
+        "api-reference/contract/agent_actions"
       ]
     },
     {
@@ -201,7 +202,8 @@
       "group": "Settings",
       "pages": [
         "api-reference/settings/email_notifications",
-        "api-reference/settings/branding"
+        "api-reference/settings/branding",
+        "api-reference/usage"
       ]
     },
     {

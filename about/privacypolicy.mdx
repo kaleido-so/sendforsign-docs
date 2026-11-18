@@ -1,6 +1,6 @@
 ---
 title: "Privacy Policy"
-description: "Sendforsign Privacy Policy: what data we collect and how we use and protect it. Last updated: September 15, 2023."
+description: "Sendforsign Privacy Policy: what data we collect and how we use and protect it. Last updated: November 18, 2026."
 ---
 
 This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.
@@ -100,6 +100,16 @@ We may share Your personal information in the following situations:
 - With other users: when You share personal information or otherwise interact in the public areas with other users, such information may be viewed by all users and may be publicly distributed outside.
 
 - With Your consent: We may disclose Your personal information for any other purpose with Your consent.
+
+## AI connectors and agents
+
+You can connect AI applications (such as Claude, ChatGPT, Cursor or your own agent) to Your Sendforsign account through Our MCP server, either by signing in from the application (OAuth) or with an API key.
+
+- **What an AI application can access.** Only the account, client and user You choose when connecting, and only in the mode You choose: read only, drafts, or drafts and sending. It can read and create contracts, templates, fields and recipients in that scope. It cannot change Your billing, API keys or account settings. Sending and archiving also require an explicit confirmation in each request, and You can limit recipients to domains You allow.
+- **What We record.** Every action an AI application takes that changes something is written to an action log on the contract: the application's name, the person it acts for, the tool used, its arguments (long document text is stored as a fingerprint, not verbatim), the result, and the time. Entries are chained so later edits can be detected. The log is shown in the contract timeline.
+- **What We do not do.** We do not use the content of Your contracts or the agent's requests to train AI models, and We do not share them with the AI application beyond what it asks for in Your scope. The AI application's own provider processes what You send to it under its own privacy policy.
+- **Retention.** Access tokens expire after one hour; a connection that is not used for 90 days must be approved again. The action log is kept while Your account is active and is deleted with Your account on request.
+- **Disconnecting.** You can see every connected application, when it was last used, and disconnect it at any time in Settings → Connected AI apps at app.sendforsign.com. Access stops immediately.
 
 ## Retention of Your Personal Data
 

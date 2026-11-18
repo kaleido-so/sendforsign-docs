@@ -5,6 +5,28 @@ sidebarTitle: "2026"
 description: "What's new in Sendforsign in 2026: the remote MCP server for AI agents, the agent skill, the AI agents docs section and the deprecation of AI+API."
 ---
 
+## 18 November (later)
+
+### For people who connect AI apps
+- **Settings → Connected AI apps** lists every app you connected over OAuth, its account, mode and last use, with Disconnect.
+- **Agent actions in the contract timeline**: which agent did what, for whom, and whether it was allowed or blocked.
+  Also over the API: [Get agent actions](/api-reference/contract/agent_actions).
+- The [privacy policy](/about/privacypolicy#ai-connectors-and-agents) now says what an AI app can access, what is logged and how to disconnect.
+
+### Getting started
+- The overview shows contracts sent this period against your plan, starter templates (Mutual NDA, Service agreement,
+  Freelance contract) with field owners already set, and how to connect Claude, ChatGPT, Cursor or VS Code.
+
+### Platforms
+- [Usage](/api-reference/usage): contracts sent this period, in total and per client, so you can bill your own customers.
+- Branding can be [read back](/api-reference/settings/branding#read-the-current-branding), and a custom signing domain is
+  [checked](/api-reference/settings/branding#check-a-custom-signing-domain) before it is used. In the app: Settings → White-label.
+
+### Fixes
+- A recipient can sign only once, and only with a signing link.
+- "Seen" is recorded once per recipient, also when your own UI loads the contract by its link, and fires your `seen` webhook.
+- A PDF field at coordinate 0 is no longer treated as unset.
+
 ## 18 November
 
 ### Fields in the agent's text and PDF contracts over MCP

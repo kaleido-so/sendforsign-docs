@@ -1,0 +1,45 @@
+---
+title: "Get agent actions"
+api: 'GET https://api.sendforsign.com/api/agent_action'
+description: "Every action an AI agent took on a contract through the Sendforsign MCP server: which agent, on whose behalf, what it did, and whether it was allowed."
+---
+
+Returns the agent action log of one contract, oldest first. Each change an AI agent makes through the
+[MCP server](/ai-agents/overview) is recorded, including actions that were blocked by the connection's mode or domain
+allowlist. The same entries appear in the contract timeline of the editor. See [Accountability](/ai-agents/accountability).
+
+### Query parameters
+
+<ParamField query="clientKey" type="string" required>Key of the client.</ParamField>
+<ParamField query="contractKey" type="string" required>Key of the contract.</ParamField>
+
+### Response
+
+An array of actions:
+
+<ResponseField name="createTime" type="string">When the action happened.</ResponseField>
+<ResponseField name="agent" type="string">The agent or AI application (the OAuth app name or `X-Sendforsign-Agent`).</ResponseField>
+<ResponseField name="onBehalfOf" type="string">The person the agent acted for, when known.</ResponseField>
+<ResponseField name="mode" type="string">`read_only`, `draft` or `send`.</ResponseField>
+<ResponseField name="tool" type="string">The MCP tool, such as `create_contract` or `send_for_signature`.</ResponseField>
+<ResponseField name="outcome" type="string">`ok`, `blocked` or `error`.</ResponseField>
+<ResponseField name="message" type="string">Why it was blocked or failed.</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.sendforsign.com/api/agent_action?clientKey=CLIENT_KEY&contractKey=CONTRACT_KEY' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+[
+  { "createTime": "2026-11-18T10:02:11Z", "agent": "Claude", "onBehalfOf": "mia@studionord.example",
+    "mode": "send", "tool": "create_contract", "outcome": "ok", "message": null },
+  { "createTime": "2026-11-18T10:03:40Z", "agent": "Claude", "onBehalfOf": "mia@studionord.example",
+    "mode": "send", "tool": "send_for_signature", "outcome": "blocked",
+    "message": "<why the connection's rules refused it>" }
+]
+```
+</ResponseExample>

@@ -35,7 +35,10 @@ change the domain of recipient links you generate, and more.
   </ParamField>
 
   <ParamField body="recipientLinkDomain" type="string">
-    Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+    Your own domain for signing links, such as `sign.yourcompany.com`. Ask us for a DNS target, add a CNAME record, then
+    check it with `"action": "check_domain"` (below). The domain is saved only once it serves the signing page over
+    HTTPS; otherwise the request returns 400 and signing links keep working on the current domain. In the app:
+    Settings → White-label.
   </ParamField>
 
   <ParamField body="emailExplainer" type="string">
@@ -103,3 +106,55 @@ curl -X POST 'https://api.sendforsign.com/api/settings' \
 }
 ```
 </ResponseExample>
+
+
+## Read the current branding
+
+Send `"action": "read"` with the `clientKey` to get the client's settings, with Sendforsign's defaults for anything not set.
+
+```bash
+curl -X POST 'https://api.sendforsign.com/api/settings' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ "data": { "action": "read", "clientKey": "YOUR_CLIENT_KEY" } }'
+```
+
+```json
+{
+  "code": 200,
+  "settings": {
+    "notification": { "signed": true, "approved": false },
+    "branding": {
+      "emailFrom": "Acme via Sendforsign",
+      "emailDomain": "email.sendforsign.com",
+      "recipientLinkDomain": "app.sendforsign.com",
+      "emailLogo": "https://acme.example/logo.png",
+      "emailButtonColor": "#1677ff",
+      "recipientPageBranding": false
+    }
+  }
+}
+```
+
+## Check a custom signing domain
+
+```bash
+curl -X POST 'https://api.sendforsign.com/api/settings' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY' \
+     -H 'Content-Type: application/json' \
+     -d '{ "data": { "action": "check_domain", "clientKey": "YOUR_CLIENT_KEY", "domain": "sign.acme.example" } }'
+```
+
+```json
+{
+  "code": 200,
+  "check": {
+    "domain": "sign.acme.example",
+    "ok": false,
+    "dns": true,
+    "https": false,
+    "cname": ["xyz.herokudns.com"],
+    "message": "DNS is set. HTTPS is not active yet: we switch it on after you ask, and the certificate takes a few minutes."
+  }
+}
+```
