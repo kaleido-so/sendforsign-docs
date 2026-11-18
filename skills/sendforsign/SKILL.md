@@ -37,8 +37,7 @@ https://sendforsign.com/docs/llms-full.txt).
 4. **Archive only on request**, with `confirm: true` after approval.
 5. If a tool returns `Blocked by policy`, do not retry or work around it. Explain the limit (mode, allowed domains) and
    offer the next step: share the signing links, or ask the account owner. On a sign-in (OAuth) connection the user
-   changes the mode by disconnecting and reconnecting with a different choice on the consent screen; headers cannot
-   change it.
+   changes the mode in Sendforsign → Settings → Connected AI apps (it applies to the next call); headers cannot change it.
 6. Signing links identify a recipient. Give each link only to that recipient.
 
 ## Example user requests
