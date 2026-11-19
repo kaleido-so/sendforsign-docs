@@ -4,7 +4,8 @@ sidebarTitle: "Tools"
 description: "Every tool of the Sendforsign MCP server: arguments, what it returns, whether it writes, and whether it emails anyone."
 ---
 
-All tools return JSON (as text and as `structuredContent`). Errors come back as tool errors with a readable
+All tools return JSON (as text and as `structuredContent`). In apps that support MCP Apps, many of them also open an
+[interactive view](/ai-agents/interactive-views). Errors come back as tool errors with a readable
 message, for example `Blocked by policy: ...` or `Sendforsign API error (404): ...`. Each tool calls the public
 [REST API](/api-reference/introapi), so the same permissions apply.
 
@@ -24,6 +25,7 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 | [`add_recipients`](#add_recipients) | Add signers/approvers/viewers, return signing links | yes | **no** | `draft` |
 | [`list_recipients`](#list_recipients) | Recipients with role, order and signing link | no | no | any |
 | [`send_for_signature`](#send_for_signature) | Email signing invitations; `confirm: true` required | yes | **yes** | `send` |
+| [`get_pdf_fields`](#get_pdf_fields) | Boxes on a PDF contract or template, in percent of the page | no | no | any |
 | [`get_contract_timeline`](#get_contract_timeline) | Events (created, sent, seen, signed…) plus agent actions | no | no | any |
 | [`download_contract_pdf`](#download_contract_pdf) | The contract as a PDF, with signatures once signed | no | no | any |
 | [`archive_contract`](#archive_contract) | Archive a contract; `confirm: true` required | yes | no | `send` |
@@ -263,6 +265,17 @@ nothing. Allowed only in `send` mode; recipients are checked against the domain 
 recipients), `customMessage?` (overrides the invitation message), `userKey?`
 
 **Returns:** `contractKey`, `sentTo[]` with `email`, `action`, `signingUrl`.
+
+### get_pdf_fields
+
+Lists every box on a PDF contract or PDF template, in the same units as `place_pdf_fields` (percent of the page from
+the top-left corner, pages 1-based). In apps with [interactive views](/ai-agents/interactive-views) it also opens the
+PDF, where the person can drag and resize the boxes; call it again afterwards to read where they put them.
+
+**Arguments:** `contractKey` or `templateKey`, `userKey?`
+
+**Returns:** `name`, `status`, `pages[]` (`page`, `widthPt`, `heightPt`), `fields[]` (`kind`, `name`, `value` and
+`filledBy` for text fields, `recipient`, `page`, `x`, `y`, `width`, `height`), `recipients[]`.
 
 ### get_contract_timeline
 

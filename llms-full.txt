@@ -477,7 +477,8 @@ X-Sendforsign-Agent-Mode: read_only
 ## MCP tools reference
 Source: https://sendforsign.com/docs/ai-agents/tools
 
-All tools return JSON (as text and as `structuredContent`). Errors come back as tool errors with a readable
+All tools return JSON (as text and as `structuredContent`). In apps that support MCP Apps, many of them also open an
+[interactive view](https://sendforsign.com/docs/ai-agents/interactive-views). Errors come back as tool errors with a readable
 message, for example `Blocked by policy: ...` or `Sendforsign API error (404): ...`. Each tool calls the public
 [REST API](https://sendforsign.com/docs/api-reference/introapi), so the same permissions apply.
 
@@ -497,15 +498,30 @@ message, for example `Blocked by policy: ...` or `Sendforsign API error (404): .
 | [`add_recipients`](#add_recipients) | Add signers/approvers/viewers, return signing links | yes | **no** | `draft` |
 | [`list_recipients`](#list_recipients) | Recipients with role, order and signing link | no | no | any |
 | [`send_for_signature`](#send_for_signature) | Email signing invitations; `confirm: true` required | yes | **yes** | `send` |
+| [`get_pdf_fields`](#get_pdf_fields) | Boxes on a PDF contract or template, in percent of the page | no | no | any |
 | [`get_contract_timeline`](#get_contract_timeline) | Events (created, sent, seen, signed…) plus agent actions | no | no | any |
 | [`download_contract_pdf`](#download_contract_pdf) | The contract as a PDF, with signatures once signed | no | no | any |
 | [`archive_contract`](#archive_contract) | Archive a contract; `confirm: true` required | yes | no | `send` |
 | [`list_users`](#list_users) | Tenants (users) of the client, for embedded products | no | no | any |
 | [`create_user`](#create_user) | Create a tenant and return its `userKey` | yes | no | `draft` |
+| [`create_template`](#create_template) | Template from Markdown/HTML with `{{field}}` markers | yes | no | `draft` |
+| [`update_template`](#update_template) | Rename a template or replace its body | yes | no | `draft` |
+| [`create_pdf_template`](#create_pdf_template) | Template from a PDF (https URL or base64) | yes | no | `draft` |
+| [`create_template_from_contract`](#create_template_from_contract) | Save a contract as a template | yes | no | `draft` |
+| [`duplicate_template`](#duplicate_template) | Copy a template with its fields | yes | no | `draft` |
+| [`delete_template`](#delete_template) | Delete a template; `confirm: true` required | yes | no | `send` |
+| [`duplicate_contract`](#duplicate_contract) | Copy a contract as a new draft | yes | no | `draft` |
+| [`remove_field`](#remove_field) | Delete a field from a contract or template | yes | no | `draft` |
+| [`update_recipient`](#update_recipient) | Change a recipient's name, email, role, order or message | yes | no | `draft` |
+| [`remove_recipient`](#remove_recipient) | Remove a recipient from a contract | yes | no | `draft` |
+| [`get_usage`](#get_usage) | Contracts sent this period vs the plan limit | no | no | any |
+| [`list_webhooks`](#list_webhooks) | Webhook URLs and their events (no secrets) | no | no | any |
+| [`create_webhook`](#create_webhook) | Register a webhook URL; `confirm: true` required | yes | no | `send` |
+| [`delete_webhook`](#delete_webhook) | Remove a webhook; `confirm: true` required | yes | no | `send` |
 
 "Needs mode" is the lowest [agent mode](https://sendforsign.com/docs/ai-agents/accountability#agent-modes) that allows the tool: `read_only` <
-`draft` < `send`. Tools are annotated for MCP clients: read tools carry `readOnlyHint`, `archive_contract` carries
-`destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
+`draft` < `send`. Tools are annotated for MCP clients: read tools carry `readOnlyHint`, `archive_contract`, `delete_template` and the webhook
+tools carry `destructiveHint`, and `send_for_signature` carries `openWorldHint` (it reaches people outside the conversation), so
 clients that ask before risky calls can do so.
 
 Most tools accept an optional `userKey` argument that selects the tenant for that call; without it, the
@@ -645,9 +661,11 @@ Pass exactly one of `pdfUrl` or `pdfBase64`. Up to 20 MB.
 
 #### place_pdf_fields
 
-Puts fields on the pages of a draft PDF contract. Calling it again adds fields; it does not remove earlier ones.
+Puts fields on the pages of a draft PDF contract, or of a PDF template. Calling it again adds fields; it does not
+remove earlier ones. On a template (`templateKey`) only `text` fields with `filledBy` `owner` or `any_recipient` are
+allowed: a template has no recipients yet, so signature, date, name and email boxes go on each contract made from it.
 
-**Arguments:** `contractKey`, `fields[]`, `userKey?`. Each field:
+**Arguments:** `contractKey` or `templateKey`, `fields[]`, `userKey?`. Each field:
 
 | Name | Type | Notes |
 |---|---|---|
@@ -679,9 +697,10 @@ Example: a signature and the signing date at the bottom right of the last page.
 
 #### fill_placeholders
 
-Sets field values in a contract, by `placeholderKey` or by name (case-insensitive), and can change who fills a field.
+Sets field values in a contract or a template, by `placeholderKey` or by name (case-insensitive), and can change who
+fills a field (`specific_recipient` is for contracts only).
 
-**Arguments:** `contractKey`, `fields[]` of `{ placeholderKey?, name?, value?, filledBy?, recipientKey? }`.
+**Arguments:** `contractKey` or `templateKey`, `fields[]` of `{ placeholderKey?, name?, value?, filledBy?, recipientKey? }`.
 `recipientKey` is required when `filledBy` is `specific_recipient`. Changing `filledBy` to anything else clears the
 assigned recipient.
 
@@ -719,6 +738,17 @@ nothing. Allowed only in `send` mode; recipients are checked against the domain 
 recipients), `customMessage?` (overrides the invitation message), `userKey?`
 
 **Returns:** `contractKey`, `sentTo[]` with `email`, `action`, `signingUrl`.
+
+#### get_pdf_fields
+
+Lists every box on a PDF contract or PDF template, in the same units as `place_pdf_fields` (percent of the page from
+the top-left corner, pages 1-based). In apps with [interactive views](https://sendforsign.com/docs/ai-agents/interactive-views) it also opens the
+PDF, where the person can drag and resize the boxes; call it again afterwards to read where they put them.
+
+**Arguments:** `contractKey` or `templateKey`, `userKey?`
+
+**Returns:** `name`, `status`, `pages[]` (`page`, `widthPt`, `heightPt`), `fields[]` (`kind`, `name`, `value` and
+`filledBy` for text fields, `recipient`, `page`, `x`, `y`, `width`, `height`), `recipients[]`.
 
 #### get_contract_timeline
 
@@ -760,6 +790,96 @@ Creates a tenant and returns its `userKey`. `customKey` is your own ID for it, s
 **Arguments:** `fullname`, `email`, `customKey?`
 
 **Returns:** `userKey`, `fullname`, `email`, `customKey`.
+
+#### create_template
+
+Creates a reusable template from text. Fields are marked in the text: `{{Name}}` (your side fills it on each
+contract), `{{Name=Value}}` (with a default) and `{{Name@any}}` (the recipient fills it when signing).
+`{{Name@email}}` is refused, because a template has no recipients yet.
+
+**Arguments:** `name`, `content`, `contentFormat?` (`markdown` default, or `html`), `userKey?`
+
+**Returns:** `templateKey`, `name`, `fields[]` with `name`, `placeholderKey`, `filledBy`, `value`.
+
+#### update_template
+
+Renames a template and/or replaces its body, with the same markers. A field keeps its key when the same name is used
+again. Contracts already made from the template do not change.
+
+**Arguments:** `templateKey`, `name?`, `content?`, `contentFormat?`, `userKey?`
+
+#### create_pdf_template
+
+Creates a PDF template from a PDF by https URL (`pdfUrl`) or base64 (`pdfBase64`), up to 20 MB, and returns the page
+sizes. Add text fields with [`place_pdf_fields`](#place_pdf_fields) and `templateKey`. Contracts made from it with
+`create_contract` get the PDF and those fields.
+
+**Arguments:** `name`, `pdfUrl?` or `pdfBase64?`, `userKey?`
+
+**Returns:** `templateKey`, `name`, `pages[]`.
+
+#### create_template_from_contract
+
+Saves an existing contract (its text and fields) as a new template.
+
+**Arguments:** `contractKey`, `name`, `userKey?` · **Returns:** `templateKey`.
+
+#### duplicate_template
+
+**Arguments:** `templateKey`, `userKey?` · **Returns:** the copy's `templateKey`.
+
+#### delete_template
+
+Deletes a template; contracts made from it are not affected. Needs `confirm: true` and `send` mode.
+
+**Arguments:** `templateKey`, `confirm`, `userKey?`
+
+#### duplicate_contract
+
+Copies a contract as a new draft, without recipients.
+
+**Arguments:** `contractKey`, `userKey?` · **Returns:** the new `contractKey`.
+
+#### remove_field
+
+Deletes a field from a contract or a template, with its tags in the text.
+
+**Arguments:** `contractKey` or `templateKey`, `placeholderKey`
+
+#### update_recipient
+
+Changes a recipient's `fullname`, `email`, `action`, `position` or `customMessage`. Emails nobody. A new email must be
+in the connection's allowed domains.
+
+**Arguments:** `contractKey`, `recipientKey`, any of the fields above, `userKey?` · **Returns:** `recipients[]`.
+
+#### remove_recipient
+
+Removes a recipient; their signing link stops working. Emails nobody.
+
+**Arguments:** `contractKey`, `recipientKey`, `userKey?` · **Returns:** `recipients[]`.
+
+#### get_usage
+
+Contracts sent this billing period against the plan limit, and the count for this connection's client. Same numbers
+as [`GET /api/usage`](https://sendforsign.com/docs/api-reference/usage).
+
+#### list_webhooks
+
+Webhook URLs of the client and the events each receives. Secrets are not returned.
+
+#### create_webhook
+
+Registers an https URL that receives contract events, which include recipients' names and emails. Use only a URL the
+user owns and confirmed: needs `confirm: true` and `send` mode. Without event flags it subscribes to all events.
+
+**Arguments:** `url`, `created?`, `sent?`, `seen?`, `approved?`, `signed?`, `fullySigned?`, `confirm`
+
+**Returns:** `webhookKey`, `url`, `events`, `secret` (shown once; use it to verify the signature).
+
+#### delete_webhook
+
+**Arguments:** `webhookKey`, `confirm` (needs `send` mode).
 
 ## Agent modes and accountability
 Source: https://sendforsign.com/docs/ai-agents/accountability
@@ -2566,6 +2686,37 @@ curl -X GET 'https://api.sendforsign.com/api/contract_event?clientKey=658599d9-b
      -H 'Content-Type: application/json' \
 ```
 
+### Get agent actions
+
+Source: https://sendforsign.com/docs/api-reference/contract/agent_actions
+
+Endpoint: `GET https://api.sendforsign.com/api/agent_action`
+
+Returns the agent action log of one contract, oldest first. Each change an AI agent makes through the
+[MCP server](https://sendforsign.com/docs/ai-agents/overview) is recorded, including actions that were blocked by the connection's mode or domain
+allowlist. The same entries appear in the contract timeline of the editor. See [Accountability](https://sendforsign.com/docs/ai-agents/accountability).
+
+Parameters:
+- `clientKey` (query, string, required): Key of the client.
+- `contractKey` (query, string, required): Key of the contract.
+
+Example:
+```bash
+curl -X GET 'https://api.sendforsign.com/api/agent_action?clientKey=CLIENT_KEY&contractKey=CONTRACT_KEY' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY'
+```
+
+Response:
+```json
+[
+  { "createTime": "2026-11-18T10:02:11Z", "agent": "Claude", "onBehalfOf": "mia@studionord.example",
+    "mode": "send", "tool": "create_contract", "outcome": "ok", "message": null },
+  { "createTime": "2026-11-18T10:03:40Z", "agent": "Claude", "onBehalfOf": "mia@studionord.example",
+    "mode": "send", "tool": "send_for_signature", "outcome": "blocked",
+    "message": "<why the connection's rules refused it>" }
+]
+```
+
 ## PDF and Word
 
 ### Download PDF
@@ -4030,7 +4181,7 @@ Parameters:
 - `branding` (body, object, required): Structure.
   - `emailFrom` (body, string): The sender's name that will be shown in the emails you send to recipients.
   - `emailDomain` (body, string): Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
-  - `recipientLinkDomain` (body, string): Available for Business accounts only. You'll need input from the Sendforsign team—contact your account manager.
+  - `recipientLinkDomain` (body, string): Your own domain for signing links, such as `sign.yourcompany.com`. Ask us for a DNS target, add a CNAME record, then check it with `"action": "check_domain"` (below). The domain is saved only once it serves the signing page over HTTPS; otherwise the request returns 400 and signing links keep working on the current domain. In the app: Settings → White-label.
   - `emailExplainer` (body, string): A short text shown at the bottom of the emails you send to recipients.
   - `emailLogo` (body, string): The logo that will be shown in the emails you send to recipients. Provide a public URL to a PNG, JPG, JPEG, or SVG image (W154 x H30).
   - `emailButtonColor` (body, string): The button color that will be shown in the emails you send to recipients. Provide a hex code; the default is #1677ff.
@@ -4063,5 +4214,40 @@ Response:
 {
     "code": "201",
     "message": "Settings updated"
+}
+```
+
+### Usage
+
+Source: https://sendforsign.com/docs/api-reference/usage
+
+Endpoint: `GET https://api.sendforsign.com/api/usage`
+
+Returns how many contracts reached a recipient in the current billing period, the plan limit, and the same count for each
+client (tenant) of your account. A contract counts once: when it is first sent, opened, approved or signed. Drafts never count.
+
+Use your API key; client tokens are not accepted, because usage covers the whole account.
+
+Parameters:
+- `clientKey` (query, string): Only this client. Returns 404 if the client is not yours.
+
+Example:
+```bash
+curl -X GET 'https://api.sendforsign.com/api/usage' \
+     -H 'X-Sendforsign-Key: YOUR_API_KEY'
+```
+
+Response:
+```json
+{
+  "periodStart": "2026-11-03 09:12:00",
+  "periodEnd": "2026-12-02 09:12:00",
+  "limit": 300,
+  "used": 41,
+  "remaining": 259,
+  "clients": [
+    { "clientKey": "CLIENT_KEY_1", "customKey": "customer_4812", "name": "Studio Nord", "contracts": 29 },
+    { "clientKey": "CLIENT_KEY_2", "customKey": "customer_4813", "name": "Berg & Co", "contracts": 12 }
+  ]
 }
 ```

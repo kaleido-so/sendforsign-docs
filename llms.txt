@@ -19,6 +19,7 @@ Key facts:
 - [MCP tools reference](https://sendforsign.com/docs/ai-agents/tools.md): Every MCP tool with arguments and results, which tools write and which email people.
 - [MCP headers reference](https://sendforsign.com/docs/ai-agents/headers.md): Auth, default client and tenant, agent identity, on-behalf-of, agent mode, recipient domain allowlist.
 - [Agent modes and accountability](https://sendforsign.com/docs/ai-agents/accountability.md): read_only/draft/send modes, confirm flag, allowed domains, hash-chained audit log, ESIGN/UETA context.
+- [Interactive views (MCP Apps)](https://sendforsign.com/docs/ai-agents/interactive-views.md): Contract card, PDF field placement and signing status views in Claude and other MCP Apps hosts; ui:// resources, app-only tools, no credentials in the browser.
 - [Recipes](https://sendforsign.com/docs/ai-agents/recipes.md): Template → fill → send; embedded signing without email; one tenant per customer; webhooks when fully signed.
 - [Prompt library](https://sendforsign.com/docs/ai-agents/prompts.md): Ready-to-paste prompts for Claude, ChatGPT and Cursor connected to Sendforsign MCP: create, fill and send, track, multi-tenant, safe modes.
 - [Agent skill and llms.txt](https://sendforsign.com/docs/ai-agents/skills.md): Install the Sendforsign SKILL.md in Claude Code, Claude apps, Codex.
