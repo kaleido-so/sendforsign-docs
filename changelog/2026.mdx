@@ -2,8 +2,24 @@
 title: "Changelog 2026"
 icon: 'calendar'
 sidebarTitle: "2026"
-description: "What's new in Sendforsign in 2026: the remote MCP server for AI agents, the agent skill, the AI agents docs section and the deprecation of AI+API."
+description: "What's new in Sendforsign in 2026: the remote MCP server for AI agents, interactive views (MCP Apps), the agent skill, the AI agents docs section and the deprecation of AI+API."
 ---
+
+## 19 November
+
+### Interactive views in Claude and other MCP Apps hosts
+- Sendforsign tools now open [interactive views](/ai-agents/interactive-views) in apps that support MCP Apps,
+  including Claude, VS Code Copilot, Goose, Postman and MCPJam. There are three: a **contract card** (the document
+  with fields highlighted, your fields editable, recipients, Send), **PDF fields** (drag and resize signature, date,
+  name, email and text boxes on the pages), and **signing status** (who has seen and signed, with history and
+  reminders).
+- Sending from a view lists who will be emailed and needs a click on **Send now**. The connection's mode and
+  allowed domains still apply.
+- Views hold no credentials and make no network requests. Other apps get the same JSON as before.
+- New tool [`get_pdf_fields`](/ai-agents/tools#get_pdf_fields): the boxes on a PDF in percent of the page.
+
+### Fixes
+- `place_pdf_fields` no longer marks a contract as "Seen" before it is sent.
 
 ## 18 November (later)
 

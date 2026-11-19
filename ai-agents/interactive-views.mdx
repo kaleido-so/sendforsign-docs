@@ -1,0 +1,90 @@
+---
+title: "Interactive views (MCP Apps)"
+sidebarTitle: "Interactive views"
+description: "In Claude and other MCP Apps hosts, Sendforsign tools show the contract, the PDF with its signature boxes and the signing status as interactive views, where people can fill fields, drag boxes and send."
+---
+
+In AI apps that support [MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview), the Sendforsign tools
+show an interactive view next to the answer instead of only JSON. These apps include Claude (web and desktop), VS Code
+Copilot, Goose, Postman and MCPJam. The person can check the contract, fix it and send it without leaving the chat. The
+agent learns what they changed.
+
+Nothing needs to be configured. The views come with the [MCP server](/ai-agents/mcp-quickstart), and apps without MCP
+Apps get the same JSON results as before.
+
+## The three views
+
+### Contract card
+
+Opened by `get_contract`, `create_contract`, `update_contract`, `fill_placeholders`, `add_recipients`,
+`update_recipient`, `remove_recipient`, `remove_field`, `duplicate_contract`, and by `get_template`, `create_template`
+and `update_template` for templates.
+
+- The document with every field highlighted. Your fields are amber while empty and green once filled. Fields the
+  recipients fill are shown in each recipient's colour.
+- **Your fields**: type a value and press Enter. The value is saved to the contract at once. This works for fields
+  your side fills (`owner` / `none`), while the contract is a draft.
+- Fields left for recipients, the recipients and their status, and **Send for signature…**.
+- **Ask to fill N empty fields** hands the rest to the agent.
+
+### PDF fields
+
+Opened by `create_pdf_contract`, `create_pdf_template`, `place_pdf_fields` and `get_pdf_fields`.
+
+- The PDF pages with each signature, date, name, email and text box on them, coloured by recipient.
+- Drag a box to move it, or drag its corner to resize it. Arrow keys nudge a selected box. Signature, date, name and
+  email boxes can also go to another page, or be removed.
+- **+ Add field** puts a new box on the current page.
+
+Placing fields this way is the quickest fix when the agent's percent coordinates are slightly off. Afterwards the
+agent can call [`get_pdf_fields`](/ai-agents/tools#get_pdf_fields) to read the boxes back in percent of the page.
+
+### Signing status
+
+Opened by `get_contract_timeline`, `list_recipients` and `send_for_signature`.
+
+- For each recipient, how far they got: sent, seen, then signed or approved. A bar shows how many have signed.
+- The history of the contract, with the agent's actions when the [audit log](/ai-agents/accountability) is on.
+- **Send reminder…** for recipients who have been sent the contract but have not signed yet.
+
+## Sending from a view
+
+**Send for signature…** and **Send reminder…** first list exactly who will be emailed, with an optional message.
+Nothing is sent until the person clicks **Send now**. That click is their approval: underneath it is the ordinary
+`send_for_signature` call with `confirm: true`. The connection's [mode](/ai-agents/accountability#agent-modes),
+allowed recipient domains and tenant limit still apply. In `draft` and `read_only` modes the send buttons do not
+appear.
+
+## What the agent learns
+
+When the person changes something in a view, the agent is told on its next turn. It learns the field values they
+set, where the PDF boxes are now (in percent of the page), and that the contract was sent so it should not send it
+again. If the person clicks **Ask to fill…** or **Open the PDF with its fields**, a message is added to the chat.
+
+## Security
+
+- **No credentials in the browser.** A view has no API key, token or cookie. Every action is a tool call that the
+  AI app runs on its existing connection, an API key or an OAuth connector alike. So the same permissions, modes and
+  [audit log](/ai-agents/accountability) apply as for the agent.
+- **No network access.** Each view is one self-contained HTML file. It declares an empty Content Security Policy
+  (`connectDomains: []`), so it cannot call any server, Sendforsign included. Its data reaches it only through the
+  app.
+- **Narrow helper tools.** The views use four extra tools that only views can call (`_meta.ui.visibility: ["app"]`):
+  `view_load`, `view_pdf`, `view_set_field` and `view_set_boxes`. They can only change values of your own fields and
+  box positions on a draft. In `read_only` mode they are blocked like any other write.
+
+## For MCP Apps hosts and integrators
+
+| View | Resource URI |
+|---|---|
+| Contract card | `ui://sendforsign/contract.html` |
+| PDF fields | `ui://sendforsign/pdf-fields.html` |
+| Signing status | `ui://sendforsign/timeline.html` |
+
+- Resources use the MIME type `text/html;profile=mcp-app` and follow MCP Apps spec version `2026-01-26`.
+- Tools link their view with `_meta.ui.resourceUri`, and with the older flat key `_meta["ui/resourceUri"]`.
+- A view finds its contract through the `contractKey` or `templateKey` in the tool result's `structuredContent`, or
+  in the tool input. Your host must deliver `ui/notifications/tool-input` and `tool-result`, and pass `tools/call`
+  from the view through to the server, app-only tools included.
+- Views report `ui/notifications/size-changed` and offer full screen when the host lists it. They follow
+  `host-context-changed` for light and dark theme, the standard CSS variables, locale and time zone.

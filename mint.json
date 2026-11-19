@@ -79,7 +79,8 @@
       "pages": [
         "ai-agents/tools",
         "ai-agents/headers",
-        "ai-agents/accountability"
+        "ai-agents/accountability",
+        "ai-agents/interactive-views"
       ]
     },
     {
